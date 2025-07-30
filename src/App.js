@@ -39,10 +39,13 @@ import TutorBookingList from "./components/TutorBookingList";
 import BookingForm from "./components/BookingForm";
 import AdminDashboard from "./components/admin/AdminDashboard";
 import UserList from "./components/admin/UserList";
-import TutorList from "./components/admin/TutorList"; 
-import AdminBookingList from "./components/admin/AdminBookingList"; 
+import TutorList from "./components/admin/TutorList";
+import AdminBookingList from "./components/admin/AdminBookingList";
 import StudentMyPage from "./components/StudentMyPage";
-
+import AdminTutorApprovalPage from "./components/AdminTutorApprovalPage";
+import AdminLoginPage from "./components/AdminLoginPage";
+import AdminTutorManagement from "./components/admin/AdminTutorManagement";
+import AdminReviewManagement from "./components/admin/AdminReviewManagement";
 
 function App() {
   const { user } = useContext(AuthContext);
@@ -64,150 +67,35 @@ function App() {
         <Route path="/admin/users" element={<RequireAuth role="admin"><UserList /></RequireAuth>} />
         <Route path="/admin/tutors" element={<RequireAuth role="admin"><TutorList /></RequireAuth>} />
         <Route path="/admin/bookings" element={<RequireAuth role="admin"><AdminBookingList /></RequireAuth>} />
+        <Route path="/admin/tutor-approval" element={<RequireAuth role="admin"><AdminTutorApprovalPage /></RequireAuth>} />
+
         <Route path="/book" element={<BookingForm />} />
         <Route path="/student/mypage" element={<RequireAuth><StudentMyPage /></RequireAuth>} />
-        
-        
+        <Route path="/mypage" element={<RequireAuth><MyPage /></RequireAuth>} />
+        <Route path="/mybookings" element={<RequireAuth><BookingList /></RequireAuth>} />
+        <Route path="/my-bookings" element={<RequireAuth><BookingListWithTutorName /></RequireAuth>} />
+        <Route path="/payment" element={<RequireAuth><PaymentPage /></RequireAuth>} />
+        <Route path="/payments/success" element={<RequireAuth><PaymentSuccess /></RequireAuth>} />
+        <Route path="/payment-list" element={<RequireAuth><PaymentList /></RequireAuth>} />
+        <Route path="/payments/history" element={<RequireAuth><PaymentHistory /></RequireAuth>} />
+        <Route path="/change-password" element={<RequireAuth><ChangePasswordPage /></RequireAuth>} />
+        <Route path="/edit-profile" element={<RequireAuth><ProfileEditPage /></RequireAuth>} />
+        <Route path="/admin/tutors" element={<AdminTutorManagement />} />
+        <Route path="/admin/reviews" element={<AdminReviewManagement />} />
 
-        <Route
-          path="/mypage"
-          element={
-            <RequireAuth>
-              <MyPage />
-            </RequireAuth>
-          }
-        />
-        <Route
-          path="/mybookings"
-          element={
-            <RequireAuth>
-              <BookingList />
-            </RequireAuth>
-          }
-        />
-        <Route
-          path="/my-bookings"
-          element={
-            <RequireAuth>
-              <BookingListWithTutorName />
-            </RequireAuth>
-          }
-        />
-        <Route
-          path="/payment"
-          element={
-            <RequireAuth>
-              <PaymentPage />
-            </RequireAuth>
-          }
-        />
-        <Route
-          path="/payments/success"
-          element={
-            <RequireAuth>
-              <PaymentSuccess />
-            </RequireAuth>
-          }
-        />
-        <Route
-          path="/payment-list"
-          element={
-            <RequireAuth>
-              <PaymentList />
-            </RequireAuth>
-          }
-        />
-        <Route
-          path="/payments/history"
-          element={
-            <RequireAuth>
-              <PaymentHistory />
-            </RequireAuth>
-          }
-        />
-        <Route
-          path="/change-password"
-          element={
-            <RequireAuth>
-              <ChangePasswordPage />
-            </RequireAuth>
-          }
-        />
-        <Route
-          path="/edit-profile"
-          element={
-            <RequireAuth>
-              <ProfileEditPage />
-            </RequireAuth>
-          }
-        />
+        <Route path="/tutor/dashboard" element={<RequireAuth role="tutor"><TutorDashboardPage /></RequireAuth>} />
+        <Route path="/tutor/bookings" element={<RequireAuth role="tutor"><TutorBookingList /></RequireAuth>} />
+        <Route path="/tutor-availability" element={<RequireAuth role="tutor"><TutorAvailabilityPage /></RequireAuth>} />
+        <Route path="/tutor/calendar" element={<RequireAuth role="tutor"><TutorCalendarDashboard /></RequireAuth>} />
+        <Route path="/admin/login" element={<AdminLoginPage />} />
 
-        <Route
-          path="/tutor/dashboard"
-          element={
-            <RequireAuth role="tutor">
-              <TutorDashboardPage />
-            </RequireAuth>
-          }
-        />
-        <Route
-          path="/tutor/bookings"
-          element={
-            <RequireAuth role="tutor">
-              <TutorBookingList />
-            </RequireAuth>
-          }
-        />
-        <Route
-          path="/tutor-availability"
-          element={
-            <RequireAuth role="tutor">
-              <TutorAvailabilityPage />
-            </RequireAuth>
-          }
-        />
-        <Route
-          path="/tutor/calendar"
-          element={
-            <RequireAuth role="tutor">
-              <TutorCalendarDashboard />
-            </RequireAuth>
-          }
-        />
+        <Route path="/booking" element={<RequireAuth><BookingPage /></RequireAuth>} />
+        <Route path="/booking/:tutorId" element={<RequireAuth><BookingPageWithDisabledTimesWrapper /></RequireAuth>} />
+        <Route path="/book/:id" element={<RequireAuth><BookTutorPage /></RequireAuth>} />
 
-        <Route
-          path="/booking"
-          element={
-            <RequireAuth>
-              <BookingPage />
-            </RequireAuth>
-          }
-        />
-        <Route
-          path="/booking/:tutorId"
-          element={
-            <RequireAuth>
-              <BookingPageWithDisabledTimesWrapper />
-            </RequireAuth>
-          }
-        />
-        <Route
-          path="/book/:id"
-          element={
-            <RequireAuth>
-              <BookTutorPage />
-            </RequireAuth>
-          }
-        />
+        <Route path="/dashboard" element={<RequireAuth><Dashboard /></RequireAuth>} />
 
-        <Route
-          path="/dashboard"
-          element={
-            <RequireAuth>
-              <Dashboard />
-            </RequireAuth>
-          }
-        />
+        {/* 로그인 상태에 따라 리다이렉트 */}
         <Route path="*" element={<Navigate to={user ? "/dashboard" : "/login"} />} />
       </Routes>
     </BrowserRouter>

@@ -13,6 +13,7 @@ export default function Navbar() {
   );
 }
 
+
 const styles = {
   navLinks: {
     display: "flex",
@@ -26,4 +27,4 @@ const styles = {
     textDecoration: "none",
     fontWeight: "bold",
   },
-};
+}; 

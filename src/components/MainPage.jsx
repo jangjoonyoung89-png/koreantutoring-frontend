@@ -4,7 +4,6 @@ import { Link } from "react-router-dom";
 export default function MainPage() {
   return (
     <div>
-      
       <nav style={styles.navbar}>
         <div style={styles.logo}>KOREAN TUTORING</div>
         <div style={styles.navLinks}>
@@ -30,7 +29,6 @@ export default function MainPage() {
         </div>
       </section>
 
-      
       <section style={styles.section}>
         <h2 style={styles.sectionTitle}>추천 튜터</h2>
         <div style={styles.tutorList}>
@@ -51,7 +49,6 @@ export default function MainPage() {
         </div>
       </section>
 
-      
       <footer style={styles.footer}>
         <p>© 20250901 KOREAN TUTORING. 장준영 All rights reserved.</p>
         <p>문의: jjy@mail.kcu.ac</p>
@@ -88,7 +85,7 @@ const styles = {
   },
   banner: {
     height: "80vh",
-    backgroundImage: `url("https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1350&q=80")`,
+    backgroundImage: 'url("https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1350&q=80")',
     backgroundSize: "cover",
     backgroundPosition: "center",
     position: "relative",
