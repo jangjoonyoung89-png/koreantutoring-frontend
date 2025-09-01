@@ -3,17 +3,20 @@ import React, { useEffect, useState } from "react";
 function BookingList() {
   const [bookings, setBookings] = useState([]);
   const [message, setMessage] = useState("");
-  
 
   useEffect(() => {
     const fetchBookings = async () => {
       const token = localStorage.getItem("token");
       try {
-        const response = await fetch("http://localhost:8000/bookings", {
+        const response = await fetch("http://localhost:8000/api/bookings", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
+
+        if (!response.ok) {
+          throw new Error("네트워크 응답 오류");
+        }
 
         const data = await response.json();
         setBookings(data);
@@ -29,11 +32,12 @@ function BookingList() {
   return (
     <div style={{ maxWidth: 600, margin: "auto", padding: 20 }}>
       <h2>내 예약 목록</h2>
-      {message && <p>{message}</p>}
+      {message && <p style={{ color: "red" }}>{message}</p>}
       <ul>
+        {bookings.length === 0 && <li>예약 내역이 없습니다.</li>}
         {bookings.map((booking) => (
           <li key={booking.id}>
-            튜터 ID: {booking.tutorId}, 시간: {booking.time}
+            튜터: {booking.tutorName} (ID: {booking.tutorId}), 시간: {new Date(booking.time).toLocaleString()}
           </li>
         ))}
       </ul>

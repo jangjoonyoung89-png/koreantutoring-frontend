@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 import PayButton from "./PayButton";
+import { Link } from "react-router-dom";
 
 function BookingListWithTutorName() {
   const { user } = useContext(AuthContext);
@@ -11,7 +12,6 @@ function BookingListWithTutorName() {
 
   const token = localStorage.getItem("token");
 
-  
   useEffect(() => {
     const fetchBookings = async () => {
       try {
@@ -31,7 +31,6 @@ function BookingListWithTutorName() {
     if (user?.id) fetchBookings();
   }, [user, token]);
 
-  
   const handleCancel = async (bookingId) => {
     if (!window.confirm("정말 이 예약을 취소하시겠습니까?")) return;
 
@@ -54,7 +53,6 @@ function BookingListWithTutorName() {
     }
   };
 
-  
   const handleUpdate = async (bookingId) => {
     if (!newTime) {
       setMessage("새로운 시간을 입력하세요.");
@@ -133,13 +131,32 @@ function BookingListWithTutorName() {
                   </button>
 
                   <PayButton
-  tutorId={booking.tutor._id}
-  studentId={user.id}
-  time={booking.time}
-  tutorName={booking.tutor.name}
-  price={booking.price}
-/>
+                    tutorId={booking.tutor._id}
+                    studentId={user.id}
+                    time={booking.time}
+                    tutorName={booking.tutor.name}
+                    price={booking.price}
+                  />
 
+                  {/* ✅ 실시간 수업 참여 버튼 */}
+                  <Link
+                    to={`/video-class/${booking._id}`}
+                    style={{
+                      display: "inline-block",
+                      marginLeft: "10px",
+                      padding: "6px 12px",
+                      backgroundColor: "#4CAF50",
+                      color: "white",
+                      textDecoration: "none",
+                      borderRadius: "5px",
+                      fontWeight: "bold",
+                      transition: "transform 0.2s",
+                    }}
+                    onMouseOver={(e) => e.currentTarget.style.transform = "scale(1.05)"}
+                    onMouseOut={(e) => e.currentTarget.style.transform = "scale(1)"}
+                  >
+                    실시간 수업 참여
+                  </Link>
                 </>
               )}
 

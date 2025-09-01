@@ -19,7 +19,8 @@ function Dashboard() {
       <div className="bg-white shadow-lg rounded-2xl p-8 max-w-md w-full text-center">
         <h2 className="text-3xl font-bold text-gray-800 mb-4">📊 대시보드</h2>
         <p className="text-lg text-gray-600 mb-6">
-          환영합니다, <span className="text-blue-600 font-semibold">{displayName}</span>!
+          환영합니다,{" "}
+          <span className="text-blue-600 font-semibold">{displayName}</span>!
         </p>
         <button
           aria-label="로그아웃"
@@ -37,12 +38,18 @@ function Dashboard() {
 }
 
 function Board() {
+  const navigate = useNavigate();
+
   // 임시 게시글 데이터 (나중에 API 연동 가능)
   const posts = [
     { id: 1, title: "첫번째 게시글", author: "홍길동" },
     { id: 2, title: "두번째 게시글", author: "김철수" },
     { id: 3, title: "React 대시보드 만들기", author: "장준영" },
   ];
+
+  const handleClick = (id) => {
+    navigate(`/posts/${id}`);
+  };
 
   return (
     <div className="mt-8 text-left">
@@ -51,9 +58,10 @@ function Board() {
         {posts.map((post) => (
           <li
             key={post.id}
+            onClick={() => handleClick(post.id)}
             className="mb-3 p-3 border rounded hover:bg-gray-50 cursor-pointer transition"
           >
-            <strong>{post.title}</strong>
+            <strong className="text-blue-600 hover:underline">{post.title}</strong>
             <div className="text-sm text-gray-500 mt-1">작성자: {post.author}</div>
           </li>
         ))}
