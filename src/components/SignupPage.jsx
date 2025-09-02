@@ -10,6 +10,9 @@ function SignupPage() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
+  // 환경변수에서 API URL 불러오기 (없으면 localhost 기본값 사용)
+  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8000";
+
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
     setError("");
@@ -22,11 +25,12 @@ function SignupPage() {
     e.preventDefault();
 
     if (!validateEmail(form.email)) return setError("유효한 이메일을 입력하세요.");
-    if (form.password.length < 8) return setError("비밀번호는 최소 8자 이상이어야 합니다.");
+    if (form.password.length < 8)
+      return setError("비밀번호는 최소 8자 이상이어야 합니다.");
     if (!form.fullName) return setError("이름을 입력하세요.");
 
     try {
-      const res = await fetch("http://localhost:8000/auth/signup", {
+      const res = await fetch(`${API_URL}/auth/signup`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -141,7 +145,9 @@ function SignupPage() {
           <option value="tutor">튜터</option>
         </select>
 
-        <button type="submit" style={buttonStyle}>가입하기</button>
+        <button type="submit" style={buttonStyle}>
+          가입하기
+        </button>
       </form>
     </div>
   );

@@ -10,6 +10,9 @@ function LoginPage() {
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
 
+  // API URL은 환경변수에서 불러오기
+  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8000";
+
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
     setError("");
@@ -20,7 +23,7 @@ function LoginPage() {
     e.preventDefault();
 
     try {
-      const res = await fetch("http://localhost:8000/auth/login", {
+      const res = await fetch(`${API_URL}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
