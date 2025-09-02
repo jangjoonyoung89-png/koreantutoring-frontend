@@ -10,11 +10,12 @@ function LoginPage() {
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
 
-  // API URL은 환경변수에서 불러오기
-  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8000";
+  // 환경변수에서 API URL 가져오기 (배포용과 로컬 모두 대응)
+  const API_URL = (process.env.REACT_APP_API_URL || "http://localhost:8000").trim();
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setForm({ ...form, [name]: value });
     setError("");
     setSuccess("");
   };
@@ -22,11 +23,20 @@ function LoginPage() {
   const handleLogin = async (e) => {
     e.preventDefault();
 
+    // 이메일과 비밀번호 공백 제거
+    const email = form.email.trim();
+    const password = form.password.trim();
+
+    if (!email || !password) {
+      setError("이메일과 비밀번호를 입력해주세요.");
+      return;
+    }
+
     try {
       const res = await fetch(`${API_URL}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify({ email, password }),
       });
 
       const data = await res.json();
@@ -36,9 +46,12 @@ function LoginPage() {
         return;
       }
 
+      // 로그인 성공 처리
       setSuccess("로그인 성공");
       localStorage.setItem("token", data.token);
       login({ token: data.token, user: data.user });
+
+      // 로그인 후 대시보드로 이동
       navigate("/dashboard");
 
     } catch (err) {
