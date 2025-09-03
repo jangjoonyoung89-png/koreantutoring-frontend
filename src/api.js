@@ -4,12 +4,12 @@ import axios from "axios";
 // API 기본 설정
 // ======================
 const API_BASE_URL =
-  process.env.REACT_APP_API_BASE_URL ||
-  "https://koreantutoring-backend.onrender.com";
+  process.env.REACT_APP_API_BASE_URL?.trim() ||
+  "https://api.koreantutoring.co.kr";
 
 const api = axios.create({
   baseURL: API_BASE_URL,
-  withCredentials: true, // 인증 쿠키 사용
+  withCredentials: true, // 인증 쿠키 포함
 });
 
 // ======================
@@ -33,6 +33,16 @@ export const signup = async (userData) => {
 
 export const login = async (credentials) => {
   const { data } = await api.post("/auth/login", credentials);
+  return data;
+};
+
+export const logout = async () => {
+  const { data } = await api.post("/auth/logout");
+  return data;
+};
+
+export const getCurrentUser = async () => {
+  const { data } = await api.get("/auth/me");
   return data;
 };
 
@@ -60,7 +70,9 @@ export const getTutorAvailability = async (id) => {
 };
 
 export const updateTutorAvailability = async (id, availableTimes) => {
-  const { data } = await api.patch(`/api/tutors/${id}/availability`, { availableTimes });
+  const { data } = await api.patch(`/api/tutors/${id}/availability`, {
+    availableTimes,
+  });
   return data;
 };
 
@@ -78,7 +90,7 @@ export const uploadTutorVideo = async (id, file) => {
 // 예약 관련
 // ======================
 export const getBookings = async () => {
-  const { data } = await api.get("/my-bookings");
+  const { data } = await api.get("/bookings/my");
   return data;
 };
 

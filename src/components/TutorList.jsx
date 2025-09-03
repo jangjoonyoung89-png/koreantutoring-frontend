@@ -26,9 +26,7 @@ function TutorList() {
     console.log("튜터 목록 API 호출 시작...");
 
     api.get("/api/tutors/with-rating", {
-      headers: {
-        "Cache-Control": "no-store",
-      },
+      headers: { "Cache-Control": "no-store" },
       params: { t: Date.now() }, // 캐시 방지용 쿼리
     })
       .then((res) => {
@@ -65,7 +63,7 @@ function TutorList() {
               }}
             >
               <img
-                src={tutor.photoUrl || tutor.profileImage || "https://via.placeholder.com/50"}
+                src={tutor.img || tutor.photoUrl || tutor.profileImage || "https://via.placeholder.com/50"}
                 alt={`${tutor.name} 프로필`}
                 style={{
                   width: 50,
@@ -79,7 +77,7 @@ function TutorList() {
                 <strong>{tutor.name}</strong> (
                 {typeof tutor.experience === "number" ? tutor.experience : "경력 정보 없음"}년 경력)
                 <p style={{ margin: "4px 0" }}>{tutor.bio || "소개 없음"}</p>
-                <p>₩{tutor.hourlyRate || tutor.price || "가격 정보 없음"}</p>
+                <p>₩{tutor.price ?? "가격 정보 없음"}</p>
                 <p>
                   평점:{" "}
                   {tutor.averageRating !== null && tutor.averageRating !== undefined ? (

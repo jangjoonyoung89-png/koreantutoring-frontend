@@ -51,7 +51,7 @@ function TutorProfilePage() {
   const [reviewCount, setReviewCount] = useState(0);
 
   const API_BASE_URL =
-    process.env.REACT_APP_API_URL || "https://koreantutoring-backend.onrender.com";
+    process.env.REACT_APP_API_URL || "https://api.koreantutoring.co.kr";
 
   async function fetchData(url) {
     const res = await fetch(url, {

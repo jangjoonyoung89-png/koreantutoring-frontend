@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 
-// 로컬 fallback 데이터 (문자열 ID 기준)
+// 로컬 fallback 데이터
 const tutorsFallback = [
   {
     id: "66bca24e6f6e3b1f44a9a111",
@@ -45,11 +45,11 @@ const tutorsFallback = [
   },
 ];
 
-// 환경변수 또는 기본 API 주소
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL?.trim() || "https://koreantutoring-backend.onrender.com";
+// 환경 변수 또는 기본 API 주소
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL?.trim() || "https://api.koreantutoring.co.kr";
 
 function TutorDetail() {
-  const { id } = useParams(); // URL에서 튜터 ID
+  const { id } = useParams();
   const [tutor, setTutor] = useState(null);
   const [error, setError] = useState("");
 
@@ -61,23 +61,18 @@ function TutorDetail() {
 
     const fetchTutor = async () => {
       try {
-        // API 요청
-        const res = await axios.get(`${API_BASE_URL}/api/tutors/${id}`, {
-          withCredentials: true,
-        });
-
+        const res = await axios.get(`${API_BASE_URL}/api/tutors/${id}`, { withCredentials: true });
         if (res.data) {
-          // _id → id 변환 (MongoDB ObjectId인 경우)
+          // MongoDB ObjectId 처리
           setTutor({ ...res.data, id: res.data._id || res.data.id });
         } else {
-          // API에 데이터 없으면 로컬 fallback
+          // API에 데이터 없으면 fallback
           const localTutor = tutorsFallback.find((t) => t.id === id);
           if (localTutor) setTutor(localTutor);
           else setError("해당 튜터를 찾을 수 없습니다.");
         }
       } catch (err) {
-        console.error("API 요청 실패:", err.message);
-        // API 실패 시 로컬 fallback
+        console.warn("API 요청 실패 → fallback 데이터 사용", err.message);
         const localTutor = tutorsFallback.find((t) => t.id === id);
         if (localTutor) setTutor(localTutor);
         else setError("튜터 정보를 불러오는 데 실패했습니다.");
@@ -115,7 +110,11 @@ function TutorDetail() {
       {tutor.videoUrl && (
         <div style={{ marginTop: 20 }}>
           <h4>소개 영상</h4>
-          <video src={`${API_BASE_URL}${tutor.videoUrl}`} controls width="400">
+          <video
+            src={tutor.videoUrl.startsWith("http") ? tutor.videoUrl : `${API_BASE_URL}${tutor.videoUrl}`}
+            controls
+            width="100%"
+          >
             지원하지 않는 브라우저입니다.
           </video>
         </div>

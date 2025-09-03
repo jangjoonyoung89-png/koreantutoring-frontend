@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route, Navigate, Link } from "react-router-dom";
 import { AuthContext } from "./context/AuthContext";
+import api from "./api"; // 공통 axios 인스턴스
 
 // 일반 사용자 페이지
 import SignupPage from "./components/SignupPage";
@@ -52,7 +53,9 @@ import AdminLoginPage from "./components/AdminLoginPage";
 // 인증 보호
 import RequireAuth from "./components/RequireAuth";
 
+// ----------------------
 // 상단 네비게이션 바
+// ----------------------
 function Navbar() {
   return (
     <nav style={styles.navbar}>
@@ -67,20 +70,20 @@ function Navbar() {
   );
 }
 
+// ----------------------
 // 메인 페이지
+// ----------------------
 function MainPage() {
   const [tutors, setTutors] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("http://localhost:3002/tutors")
+    console.log("추천 튜터 API 호출 시작...");
+
+    api.get("/api/tutors/with-rating", { params: { t: Date.now() } })
       .then((res) => {
-        if (!res.ok) throw new Error(`튜터 정보를 불러올 수 없습니다. 상태코드: ${res.status}`);
-        return res.json();
-      })
-      .then((data) => {
-        console.log("튜터 데이터 불러오기 성공:", data);
-        setTutors(data);
+        console.log("튜터 데이터 불러오기 성공:", res.data);
+        setTutors(res.data);
       })
       .catch((err) => {
         console.error("튜터 API 호출 에러:", err);
@@ -112,15 +115,15 @@ function MainPage() {
             <p>추천 튜터 정보를 불러오는 중...</p>
           ) : tutors.length > 0 ? (
             tutors.slice(0, 3).map((tutor) => (
-              <div key={tutor.id} style={styles.tutorCard}>
+              <div key={tutor._id} style={styles.tutorCard}>
                 <img
-                  src={tutor.profileImage || `https://randomuser.me/api/portraits/lego/${tutor.id}.jpg`}
+                  src={tutor.photoUrl || tutor.profileImage || "https://via.placeholder.com/100"}
                   alt={tutor.name}
                   style={styles.tutorImage}
                 />
                 <h3 style={styles.tutorName}>{tutor.name}</h3>
                 <p style={styles.tutorExperience}>경력: {tutor.experience}년</p>
-                <Link to={`/tutors/${tutor.id}`} style={styles.detailLink}>
+                <Link to={`/tutors/${tutor._id}`} style={styles.detailLink}>
                   자세히 보기 →
                 </Link>
               </div>
@@ -132,13 +135,16 @@ function MainPage() {
       </section>
 
       <footer style={styles.footer}>
-        <p>© 2025 KOREAN TUTORING. All rights reserved.</p>
+        <p>© 20250901 KOREAN TUTORING. 장준영 All rights reserved.</p>
         <p>문의: jjy@mail.kcu.ac</p>
       </footer>
     </div>
   );
 }
 
+// ----------------------
+// 전체 라우팅
+// ----------------------
 export default function App() {
   const { user } = useContext(AuthContext);
 
@@ -190,7 +196,9 @@ export default function App() {
   );
 }
 
+// ----------------------
 // 스타일 객체
+// ----------------------
 const styles = {
   navbar: {
     display: "flex",
