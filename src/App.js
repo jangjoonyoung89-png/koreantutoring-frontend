@@ -80,20 +80,40 @@ function MainPage() {
   useEffect(() => {
     console.log("추천 튜터 API 호출 시작...");
 
+    // sampleTutors를 useEffect 내부로 이동
+    const sampleTutors = [
+      { _id: "sample1", name: "장준영", experience: 5, photoUrl: "https://via.placeholder.com/100" },
+      { _id: "sample2", name: "장서은", experience: 3, photoUrl: "https://via.placeholder.com/100" },
+      { _id: "sample3", name: "김수영", experience: 7, photoUrl: "https://via.placeholder.com/100" },
+    ];
+
     api.get("/api/tutors/with-rating", { params: { t: Date.now() } })
       .then((res) => {
         console.log("튜터 데이터 불러오기 성공:", res.data);
-        setTutors(res.data);
+        if (Array.isArray(res.data) && res.data.length > 0) {
+          setTutors(res.data);
+        } else {
+          console.warn("API에서 튜터가 없어서 샘플 데이터 사용");
+          setTutors(sampleTutors);
+        }
       })
       .catch((err) => {
         console.error("튜터 API 호출 에러:", err);
-        setTutors([]);
+        setTutors(sampleTutors); // API 실패 시 샘플 데이터 사용
       })
       .finally(() => setLoading(false));
   }, []);
 
+  // 화면에 표시할 튜터 (최대 3명)
+  const displayTutors = tutors.length > 0 ? tutors.slice(0, 3) : [
+    { _id: "sample1", name: "김한국", experience: 5, photoUrl: "https://via.placeholder.com/100" },
+    { _id: "sample2", name: "이서울", experience: 3, photoUrl: "https://via.placeholder.com/100" },
+    { _id: "sample3", name: "박부산", experience: 7, photoUrl: "https://via.placeholder.com/100" },
+  ];
+
   return (
     <div>
+      {/* Banner */}
       <section style={styles.banner}>
         <div style={styles.bannerOverlay}>
           <div style={styles.bannerContent}>
@@ -108,13 +128,14 @@ function MainPage() {
         </div>
       </section>
 
+      {/* 추천 튜터 */}
       <section style={styles.section}>
         <h2 style={styles.sectionTitle}>추천 튜터</h2>
         <div style={styles.tutorList}>
           {loading ? (
             <p>추천 튜터 정보를 불러오는 중...</p>
-          ) : tutors.length > 0 ? (
-            tutors.slice(0, 3).map((tutor) => (
+          ) : (
+            displayTutors.map((tutor) => (
               <div key={tutor._id} style={styles.tutorCard}>
                 <img
                   src={tutor.photoUrl || tutor.profileImage || "https://via.placeholder.com/100"}
@@ -128,12 +149,11 @@ function MainPage() {
                 </Link>
               </div>
             ))
-          ) : (
-            <p>현재 추천 가능한 튜터가 없습니다.</p>
           )}
         </div>
       </section>
 
+      {/* Footer */}
       <footer style={styles.footer}>
         <p>© 20250901 KOREAN TUTORING. 장준영 All rights reserved.</p>
         <p>문의: jjy@mail.kcu.ac</p>
