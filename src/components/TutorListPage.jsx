@@ -15,8 +15,9 @@ function TutorListPage() {
         const data = await api.getTutorsWithRating();
         const mapped = data.map((t) => ({
           ...t,
-          id: t._id || t.id, // _id → id 통일
-          averageRating: t.averageRating || 0, // 평점 없으면 0
+          id: t._id || t.id,
+          averageRating: t.averageRating || 0,
+          img: t.img || "https://via.placeholder.com/200", // 기본 이미지
         }));
         setTutors(mapped);
       } catch (err) {
@@ -26,7 +27,6 @@ function TutorListPage() {
         setLoading(false);
       }
     };
-
     fetchTutors();
   }, []);
 
@@ -45,21 +45,19 @@ function TutorListPage() {
             onClick={() => navigate(`/tutors/${t.id}`)}
           >
             <img
-              src={t.img || "/default-profile.png"}
+              src={t.img}
               alt={t.name}
               className="w-full h-48 object-cover"
             />
             <div className="p-4">
               <h3 className="text-lg font-semibold mb-1">{t.name}</h3>
-              <p className="text-gray-600 mb-2 line-clamp-2">{t.bio}</p>
+              <p className="text-gray-600 mb-2 line-clamp-2">{t.bio || "소개 정보 없음"}</p>
               <p className="mb-1">
                 💰 가격: <span className="font-medium">{t.price?.toLocaleString() || 0}원</span>
               </p>
               <p>
                 ⭐ 평점: {renderStars(t.averageRating)}{" "}
-                <span className="text-sm text-gray-500">
-                  ({t.averageRating.toFixed(1)})
-                </span>
+                <span className="text-sm text-gray-500">({t.averageRating.toFixed(1)})</span>
               </p>
             </div>
           </li>

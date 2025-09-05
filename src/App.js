@@ -2,19 +2,28 @@ import React, { useContext, useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route, Navigate, Link, useParams } from "react-router-dom";
 import { AuthContext } from "./context/AuthContext";
 import api from "./api"; // 공통 axios 인스턴스
+import Calendar from "react-calendar";
+import "react-calendar/dist/Calendar.css";
+import ReviewList from "./components/ReviewList";
 
+// ----------------------
 // 일반 사용자 페이지
+// ----------------------
 import SignupPage from "./components/SignupPage";
 import LoginPage from "./components/LoginPage";
 import SignupTest from "./components/SignupTest";
 import ForgotPasswordPage from "./components/ForgotPasswordPage";
 import ResetPasswordPage from "./components/ResetPasswordPage";
 
+// ----------------------
 // 튜터 관련
+// ----------------------
 import TutorListPage from "./components/TutorListPage";
 import VideoClassPage from "./components/VideoClassPage";
 
+// ----------------------
 // 예약 및 결제
+// ----------------------
 import BookingPage from "./components/BookingPage";
 import BookingPageWithDisabledTimesWrapper from "./components/BookingPageWithDisabledTimesWrapper";
 import BookTutorPage from "./components/BookTutorPage";
@@ -30,16 +39,24 @@ import PaymentHistory from "./components/PaymentHistory";
 import ChangePasswordPage from "./components/ChangePasswordPage";
 import ProfileEditPage from "./components/ProfileEditPage";
 import Dashboard from "./components/Dashboard";
+
+// ----------------------
+// 게시글
+// ----------------------
 import PostDetail from "./components/PostDetail";
 import CreatePostForm from "./components/CreatePostForm";
 
+// ----------------------
 // 튜터 페이지
+// ----------------------
 import TutorDashboardPage from "./components/TutorDashboardPage";
 import TutorBookingList from "./components/TutorBookingList";
 import TutorAvailabilityPage from "./components/TutorAvailabilityPage";
 import TutorCalendarDashboard from "./components/TutorCalendarDashboard";
 
+// ----------------------
 // 관리자 페이지
+// ----------------------
 import AdminDashboard from "./components/admin/AdminDashboard";
 import UserList from "./components/admin/UserList";
 import AdminTutorManagement from "./components/admin/AdminTutorManagement";
@@ -49,18 +66,13 @@ import AdminTutorApprovalPage from "./components/AdminTutorApprovalPage";
 import AdminReviewManagement from "./components/admin/AdminReviewManagement";
 import AdminLoginPage from "./components/AdminLoginPage";
 
+// ----------------------
 // 인증 보호
+// ----------------------
 import RequireAuth from "./components/RequireAuth";
 
-// 캘린더
-import Calendar from "react-calendar";
-import "react-calendar/dist/Calendar.css";
-
-// 리뷰 리스트
-import ReviewList from "./components/ReviewList";
-
 // ----------------------
-// 상단 네비게이션 바
+// Navbar
 // ----------------------
 function Navbar() {
   return (
@@ -77,7 +89,7 @@ function Navbar() {
 }
 
 // ----------------------
-// 메인 페이지
+// MainPage
 // ----------------------
 function MainPage() {
   const [tutors, setTutors] = useState([]);
@@ -109,7 +121,7 @@ function MainPage() {
           <div style={styles.bannerContent}>
             <h1 style={styles.bannerTitle}>외국인을 위한 한국어 튜터링 플랫폼</h1>
             <p style={styles.bannerSubtitle}>언제 어디서나 원어민 한국어 선생님과 함께 하는 맞춤형 한국어 학습</p>
-            <Link to="/signup"><button style={styles.ctaButtonEnhanced}>지금 시작하기</button></Link>
+            <Link to="/signup"><button style={styles.ctaButton}>지금 시작하기</button></Link>
           </div>
         </div>
       </section>
@@ -141,7 +153,7 @@ function MainPage() {
 }
 
 // ----------------------
-// 튜터 상세 페이지
+// TutorDetailPage
 // ----------------------
 function TutorDetailPage() {
   const { id } = useParams();
@@ -280,6 +292,8 @@ export default function App() {
         <Route path="/tutor/bookings" element={<RequireAuth role="tutor"><TutorBookingList /></RequireAuth>} />
         <Route path="/tutor-availability" element={<RequireAuth role="tutor"><TutorAvailabilityPage /></RequireAuth>} />
         <Route path="/tutor/calendar" element={<RequireAuth role="tutor"><TutorCalendarDashboard /></RequireAuth>} />
+        <Route path="/video" element={<VideoClassPage />} />
+        <Route path="/dashboard" element={<RequireAuth><Dashboard /></RequireAuth>} />
 
         {/* 관리자 */}
         <Route path="/admin" element={<RequireAuth role="admin"><AdminDashboard /></RequireAuth>} />
