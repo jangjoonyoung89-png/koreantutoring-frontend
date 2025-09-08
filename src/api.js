@@ -7,6 +7,8 @@ const API_BASE_URL =
   process.env.REACT_APP_API_BASE_URL?.trim() ||
   "https://api.koreantutoring.co.kr";
 
+console.log("📡 API Base URL:", API_BASE_URL);
+
 const api = axios.create({
   baseURL: API_BASE_URL,
   withCredentials: true, // 인증 쿠키 포함
@@ -61,7 +63,16 @@ export const getTutorById = async (id) => {
 
 export const getTutorsWithRating = async () => {
   const { data } = await api.get("/api/tutors/with-rating");
-  return data;
+
+  // 응답 구조 안전 처리
+  if (Array.isArray(data)) {
+    return data;
+  } else if (data?.tutors) {
+    return data.tutors;
+  } else {
+    console.warn("⚠️ 예상치 못한 튜터 응답 구조:", data);
+    return [];
+  }
 };
 
 export const getTutorAvailability = async (id) => {

@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route, Navigate, Link, useParams } from "react-router-dom";
 import { AuthContext } from "./context/AuthContext";
-import api from "./api"; // 공통 axios 인스턴스
+import api from "./api"; // axios 인스턴스
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import ReviewList from "./components/ReviewList";
@@ -21,9 +21,6 @@ import ResetPasswordPage from "./components/ResetPasswordPage";
 import TutorListPage from "./components/TutorListPage";
 import VideoClassPage from "./components/VideoClassPage";
 
-// ----------------------
-// 예약 및 결제
-// ----------------------
 import BookingPage from "./components/BookingPage";
 import BookingPageWithDisabledTimesWrapper from "./components/BookingPageWithDisabledTimesWrapper";
 import BookTutorPage from "./components/BookTutorPage";
@@ -143,7 +140,6 @@ function MainPage() {
         </div>
       </section>
 
-      {/* Footer */}
       <footer style={styles.footer}>
         <p>© 20250901 KOREAN TUTORING. 장준영 All rights reserved.</p>
         <p>문의: jjy@mail.kcu.ac</p>
@@ -315,6 +311,7 @@ export default function App() {
     </BrowserRouter>
   );
 }
+
 
 const styles = {
   navbar: {
