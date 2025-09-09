@@ -20,7 +20,6 @@ import ResetPasswordPage from "./components/ResetPasswordPage";
 // ----------------------
 import TutorListPage from "./components/TutorListPage";
 import VideoClassPage from "./components/VideoClassPage";
-
 import BookingPage from "./components/BookingPage";
 import BookingPageWithDisabledTimesWrapper from "./components/BookingPageWithDisabledTimesWrapper";
 import BookTutorPage from "./components/BookTutorPage";
@@ -194,10 +193,14 @@ function TutorDetailPage() {
     setSelectedSlot("");
   }, [selectedDate, tutor]);
 
-  const formatDate = date => `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,"0")}-${String(date.getDate()).padStart(2,"0")}`;
+  const formatDate = date =>
+    `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,"0")}-${String(date.getDate()).padStart(2,"0")}`;
 
   const handleBooking = async () => {
-    if (!selectedSlot) { setMessage("⏳ 시간을 선택해주세요."); return; }
+    if (!selectedSlot) {
+      setMessage("⏳ 시간을 선택해주세요.");
+      return;
+    }
     try {
       await api.post("/api/bookings", { tutor: tutor._id, date: formatDate(selectedDate), time: selectedSlot });
       setMessage(`✅ ${formatDate(selectedDate)} ${selectedSlot} 예약 완료`);
@@ -226,8 +229,11 @@ function TutorDetailPage() {
         {availableSlots.length === 0 ? <p>선택한 날짜에는 수업 가능 시간이 없습니다.</p> :
           <div className="flex gap-2 flex-wrap">
             {availableSlots.map(slot => (
-              <button key={slot} onClick={() => setSelectedSlot(slot)}
-                className={`px-3 py-1 rounded border ${selectedSlot===slot?"bg-blue-500 text-white":"bg-gray-100"}`}>
+              <button
+                key={slot}
+                onClick={() => setSelectedSlot(slot)}
+                className={`px-3 py-1 rounded border ${selectedSlot===slot?"bg-blue-500 text-white":"bg-gray-100"}`}
+              >
                 {slot}
               </button>
             ))}
@@ -311,7 +317,6 @@ export default function App() {
     </BrowserRouter>
   );
 }
-
 
 const styles = {
   navbar: {
