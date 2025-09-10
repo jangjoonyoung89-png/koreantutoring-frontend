@@ -1,34 +1,31 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { fetchTutors } from "../api/tutorApi";
+import styles from "./MainPage.module.css"; // CSS 모듈 import
 
 export default function MainPage() {
   const [tutors, setTutors] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [expandedTutorId, setExpandedTutorId] = useState(null);
 
-  // 🎨 샘플 한국인 얼굴 이미지
+  // 샘플 한국인 얼굴 이미지
   const sampleTutors = [
     {
       _id: "sample1",
       name: "장준영",
       experience: 5,
-      photoUrl:
-        "https://images.unsplash.com/photo-1588776814546-0f7f2b8fa3a7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=400",
+      photoUrl: "https://randomuser.me/api/portraits/men/32.jpg",
     },
     {
       _id: "sample2",
       name: "장서은",
       experience: 3,
-      photoUrl:
-        "https://images.unsplash.com/photo-1599566150163-29194dcaad36?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=400",
+      photoUrl: "https://randomuser.me/api/portraits/women/44.jpg",
     },
     {
       _id: "sample3",
       name: "김수영",
       experience: 7,
-      photoUrl:
-        "https://images.unsplash.com/photo-1588776814500-b94d93eaf38c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=400",
+      photoUrl: "https://randomuser.me/api/portraits/men/55.jpg",
     },
   ];
 
@@ -59,8 +56,8 @@ export default function MainPage() {
 
   const displayTutors = tutors.slice(0, 3);
 
-  // inline styles
-  const styles = {
+  // inline 스타일
+  const inlineStyles = {
     navbar: {
       display: "flex",
       justifyContent: "space-between",
@@ -96,6 +93,19 @@ export default function MainPage() {
     bannerContent: {
       maxWidth: "600px",
     },
+    bannerTitle: {
+      fontSize: "36px",
+      fontWeight: "bold",
+      textShadow: "2px 2px 6px rgba(0,0,0,0.5)",
+      marginBottom: "15px",
+    },
+    bannerSubtitle: {
+      fontSize: "20px",
+      fontWeight: "500",
+      lineHeight: "1.6",
+      color: "#ffdd99",
+      textShadow: "1px 1px 4px rgba(0,0,0,0.4)",
+    },
     ctaButtonEnhanced: {
       marginTop: "20px",
       padding: "10px 20px",
@@ -119,19 +129,8 @@ export default function MainPage() {
       justifyContent: "center",
       gap: "30px",
       flexWrap: "wrap",
+      overflow: "visible", // 카드 확대 시 잘리지 않게
     },
-    tutorCard: (isExpanded) => ({
-      width: "150px",
-      border: "1px solid #ddd",
-      borderRadius: "10px",
-      padding: "10px",
-      boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
-      transition: "transform 0.3s, box-shadow 0.3s",
-      transform: isExpanded ? "scale(1.2)" : "scale(1)",
-      zIndex: isExpanded ? 10 : 1,
-      position: "relative",
-      cursor: "pointer",
-    }),
     tutorImg: {
       width: "100px",
       height: "100px",
@@ -164,78 +163,67 @@ export default function MainPage() {
 
   return (
     <div>
-      {/* 상단 네비게이션 */}
-      <nav style={styles.navbar}>
-        <div style={styles.logo}>KOREAN TUTORING</div>
-        <div style={styles.navLinks}>
-          <Link to="/" style={styles.navLink}>
+      {/* 네비게이션 */}
+      <nav style={inlineStyles.navbar}>
+        <div style={inlineStyles.logo}>KOREAN TUTORING</div>
+        <div style={inlineStyles.navLinks}>
+          <Link to="/" style={inlineStyles.navLink}>
             HOME
           </Link>
-          <Link to="/tutors" style={styles.navLink}>
+          <Link to="/tutors" style={inlineStyles.navLink}>
             TUTOR
           </Link>
-          <Link to="/signup" style={styles.navLink}>
+          <Link to="/signup" style={inlineStyles.navLink}>
             SIGNUP
           </Link>
-          <Link to="/login" style={styles.navLink}>
+          <Link to="/login" style={inlineStyles.navLink}>
             LOGIN
           </Link>
         </div>
       </nav>
 
       {/* 배너 */}
-      <section style={styles.banner}>
-        <div style={styles.bannerContent}>
-          <h1>외국인을 위한 한국어 튜터링 플랫폼</h1>
-          <p>언제 어디서나 원어민 한국어 선생님과 함께 하는 맞춤형 한국어 학습</p>
+      <section style={inlineStyles.banner}>
+        <div style={inlineStyles.bannerContent}>
+          <h1 style={inlineStyles.bannerTitle}>
+            외국인을 위한 한국어 튜터링 플랫폼
+          </h1>
+          <p style={inlineStyles.bannerSubtitle}>
+            언제 어디서나 원어민 한국어 선생님과 함께 하는 맞춤형 한국어 학습
+          </p>
           <Link to="/signup">
-            <button style={styles.ctaButtonEnhanced}>지금 시작하기</button>
+           <button className={styles.ctaButton}>지금 시작하기</button>
           </Link>
         </div>
       </section>
 
       {/* 추천 튜터 */}
-      <section style={styles.section}>
-        <h2 style={styles.sectionTitle}>추천 튜터</h2>
+      <section style={inlineStyles.section}>
+        <h2 style={inlineStyles.sectionTitle}>추천 튜터</h2>
         {loading ? (
           <p>추천 튜터 정보를 불러오는 중...</p>
         ) : (
-          <div style={styles.tutorList}>
-            {displayTutors.map((tutor) => {
-              const isExpanded = expandedTutorId === tutor._id;
-              return (
-                <div
-                  key={tutor._id}
-                  style={styles.tutorCard(isExpanded)}
-                  onMouseEnter={() => setExpandedTutorId(tutor._id)}
-                  onMouseLeave={() => setExpandedTutorId(null)}
-                >
-                  <img
-                    src={tutor.photoUrl}
-                    alt={tutor.name}
-                    style={styles.tutorImg}
-                  />
-                  <h3 style={styles.tutorName}>{tutor.name}</h3>
-                  <p style={styles.tutorExperience}>
-                    경력: {tutor.experience}년
-                  </p>
-                  <span
-                    style={styles.detailLink}
-                    onClick={() =>
-                      setExpandedTutorId(isExpanded ? null : tutor._id)
-                    }
-                  >
-                    자세히 보기 →
-                  </span>
-                </div>
-              );
-            })}
+          <div style={inlineStyles.tutorList}>
+            {displayTutors.map((tutor) => (
+              <div key={tutor._id} className={styles.tutorCard}>
+                <img
+                  src={tutor.photoUrl}
+                  alt={tutor.name}
+                  style={inlineStyles.tutorImg}
+                />
+                <h3 style={inlineStyles.tutorName}>{tutor.name}</h3>
+                <p style={inlineStyles.tutorExperience}>
+                  경력: {tutor.experience}년
+                </p>
+                <span style={inlineStyles.detailLink}>자세히 보기 →</span>
+              </div>
+            ))}
           </div>
         )}
       </section>
 
       {/* 푸터 */}
-      <footer style={styles.footer}>
+      <footer style={inlineStyles.footer}>
         <p>© 20250901 KOREAN TUTORING 장준영. All rights reserved.</p>
         <p>문의: jjy@mail.kcu.ac</p>
       </footer>
