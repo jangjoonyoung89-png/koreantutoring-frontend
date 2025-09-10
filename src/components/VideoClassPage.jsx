@@ -1,25 +1,34 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { AuthContext } from "../context/AuthContext";
 
 export default function VideoClassPage() {
   const { bookingId } = useParams();
+  const { user } = useContext(AuthContext);
+  const navigate = useNavigate();
+
   const [classInfo, setClassInfo] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [canEnter, setCanEnter] = useState(false);
 
   useEffect(() => {
-    axios
-      .get(`/my-bookings/${bookingId}`)
-      .then((res) => {
+    const fetchClass = async () => {
+      try {
+        const res = await axios.get(`/my-bookings/${bookingId}`);
         const data = res.data;
-        setClassInfo(data);
-        setLoading(false);
 
-        const userId = data.currentUserId;
-        const isStudent = data.currentUserRole === "student";
-        const isTutor = data.currentUserRole === "tutor";
+        // 로그인 사용자 정보와 예약 사용자 비교
+        if (!user) {
+          setError("로그인이 필요합니다.");
+          setLoading(false);
+          return;
+        }
+
+        const userId = user._id;
+        const isStudent = user.role === "student";
+        const isTutor = user.role === "tutor";
 
         const authorized =
           (isStudent && userId === data.studentId) ||
@@ -27,25 +36,32 @@ export default function VideoClassPage() {
 
         if (!authorized) {
           setError("접근 권한이 없습니다. 예약된 사용자만 입장 가능합니다.");
+          setLoading(false);
           return;
         }
 
-        // 수업 시작 시간 비교
+        setClassInfo(data);
+
+        // 수업 시작 시간 체크
         const now = new Date();
         const startTime = new Date(data.time);
         if (now >= startTime) {
           setCanEnter(true);
         }
 
-      })
-      .catch(() => {
+        setLoading(false);
+      } catch (err) {
+        console.error(err);
         setError("수업 정보를 불러오는 중 오류가 발생했습니다.");
         setLoading(false);
-      });
-  }, [bookingId]);
+      }
+    };
 
-  if (loading) return <p>로딩 중...</p>;
-  if (error) return <p style={{ color: "red" }}>{error}</p>;
+    fetchClass();
+  }, [bookingId, user]);
+
+  if (loading) return <p style={{ textAlign: "center", marginTop: 50 }}>로딩 중...</p>;
+  if (error) return <p style={{ color: "red", textAlign: "center", marginTop: 50 }}>{error}</p>;
   if (!classInfo) return null;
 
   const { tutorName, studentName, time, roomId } = classInfo;

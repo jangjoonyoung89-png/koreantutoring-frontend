@@ -3,19 +3,24 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 function AdminLoginPage() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("admin@example.com"); // 테스트용 기본값
+  const [password, setPassword] = useState("admin123");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setError("");
+    setLoading(true);
     try {
       const res = await axios.post("/api/auth/admin/login", { email, password });
       localStorage.setItem("token", res.data.token);
       navigate("/admin/dashboard");
     } catch (err) {
       setError(err.response?.data?.detail || "로그인 실패");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -30,6 +35,7 @@ function AdminLoginPage() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           className="w-full border p-2 rounded"
+          required
         />
         <input
           type="password"
@@ -37,9 +43,14 @@ function AdminLoginPage() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           className="w-full border p-2 rounded"
+          required
         />
-        <button type="submit" className="w-full bg-blue-600 text-white p-2 rounded">
-          로그인
+        <button
+          type="submit"
+          className={`w-full p-2 rounded text-white ${loading ? "bg-gray-500" : "bg-blue-600"}`}
+          disabled={loading}
+        >
+          {loading ? "로그인 중..." : "로그인"}
         </button>
       </form>
     </div>

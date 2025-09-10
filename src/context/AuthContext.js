@@ -1,4 +1,5 @@
-import React, { createContext, useState, useEffect } from "react";
+// src/context/AuthContext.js
+import React, { createContext, useState, useEffect, useContext } from "react";
 
 // 1️⃣ Context 생성
 export const AuthContext = createContext();
@@ -44,3 +45,6 @@ export function AuthProvider({ children }) {
     </AuthContext.Provider>
   );
 }
+
+// 🔹 7️⃣ useAuth 훅 추가
+export const useAuth = () => useContext(AuthContext);

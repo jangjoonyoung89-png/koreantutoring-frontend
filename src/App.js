@@ -1,23 +1,25 @@
 import React, { useContext, useEffect, useState } from "react";
-import { BrowserRouter, Routes, Route, Navigate, Link, useParams } from "react-router-dom";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Navigate,
+  Link,
+  useParams,
+} from "react-router-dom";
 import { AuthContext } from "./context/AuthContext";
-import api from "./api"; // axios 인스턴스
+import api from "./api";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
-import ReviewList from "./components/ReviewList";
 
 // ----------------------
-// 일반 사용자 페이지
+// 페이지 임포트
 // ----------------------
 import SignupPage from "./components/SignupPage";
 import LoginPage from "./components/LoginPage";
 import SignupTest from "./components/SignupTest";
 import ForgotPasswordPage from "./components/ForgotPasswordPage";
 import ResetPasswordPage from "./components/ResetPasswordPage";
-
-// ----------------------
-// 튜터 관련
-// ----------------------
 import TutorListPage from "./components/TutorListPage";
 import VideoClassPage from "./components/VideoClassPage";
 import BookingPage from "./components/BookingPage";
@@ -34,25 +36,15 @@ import PaymentList from "./components/PaymentList";
 import PaymentHistory from "./components/PaymentHistory";
 import ChangePasswordPage from "./components/ChangePasswordPage";
 import ProfileEditPage from "./components/ProfileEditPage";
+import StudentDashboardPage from "./components/StudentDashboardPage";
+import TutorDashboardPage from "./components/TutorDashboardPage";
 import Dashboard from "./components/Dashboard";
-
-// ----------------------
-// 게시글
-// ----------------------
+import ReviewList from "./components/ReviewList";
 import PostDetail from "./components/PostDetail";
 import CreatePostForm from "./components/CreatePostForm";
-
-// ----------------------
-// 튜터 페이지
-// ----------------------
-import TutorDashboardPage from "./components/TutorDashboardPage";
 import TutorBookingList from "./components/TutorBookingList";
 import TutorAvailabilityPage from "./components/TutorAvailabilityPage";
 import TutorCalendarDashboard from "./components/TutorCalendarDashboard";
-
-// ----------------------
-// 관리자 페이지
-// ----------------------
 import AdminDashboard from "./components/admin/AdminDashboard";
 import UserList from "./components/admin/UserList";
 import AdminTutorManagement from "./components/admin/AdminTutorManagement";
@@ -61,10 +53,6 @@ import AdminBookingList from "./components/admin/AdminBookingList";
 import AdminTutorApprovalPage from "./components/AdminTutorApprovalPage";
 import AdminReviewManagement from "./components/admin/AdminReviewManagement";
 import AdminLoginPage from "./components/AdminLoginPage";
-
-// ----------------------
-// 인증 보호
-// ----------------------
 import RequireAuth from "./components/RequireAuth";
 
 // ----------------------
@@ -75,10 +63,21 @@ function Navbar() {
     <nav style={styles.navbar}>
       <div style={styles.logo}>KOREAN TUTORING</div>
       <div style={styles.navLinks}>
-        <Link to="/" style={styles.navLink}>HOME</Link>
-        <Link to="/tutors" style={styles.navLink}>TUTOR</Link>
-        <Link to="/signup" style={styles.navLink}>SIGNUP</Link>
-        <Link to="/login" style={styles.navLink}>LOGIN</Link>
+        <Link to="/" style={styles.navLink}>
+          HOME
+        </Link>
+        <Link to="/tutors" style={styles.navLink}>
+          TUTOR
+        </Link>
+        <Link to="/signup" style={styles.navLink}>
+          SIGNUP
+        </Link>
+        <Link to="/login" style={styles.navLink}>
+          LOGIN
+        </Link>
+        <Link to="/admin/login" style={{ ...styles.navLink, color: "#ffdd57" }}>
+          ADMIN
+        </Link>
       </div>
     </nav>
   );
@@ -97,9 +96,8 @@ function MainPage() {
       { _id: "sample2", name: "장서은", experience: 3, photoUrl: "https://via.placeholder.com/100" },
       { _id: "sample3", name: "김수영", experience: 7, photoUrl: "https://via.placeholder.com/100" },
     ];
-
     api.get("/api/tutors/with-rating", { params: { t: Date.now() } })
-      .then(res => {
+      .then((res) => {
         if (Array.isArray(res.data) && res.data.length > 0) setTutors(res.data);
         else setTutors(sampleTutors);
       })
@@ -111,31 +109,41 @@ function MainPage() {
 
   return (
     <div>
-      {/* Banner */}
       <section style={styles.banner}>
         <div style={styles.bannerOverlay}>
           <div style={styles.bannerContent}>
             <h1 style={styles.bannerTitle}>외국인을 위한 한국어 튜터링 플랫폼</h1>
-            <p style={styles.bannerSubtitle}>언제 어디서나 원어민 한국어 선생님과 함께 하는 맞춤형 한국어 학습</p>
-            <Link to="/signup"><button style={styles.ctaButton}>지금 시작하기</button></Link>
+            <p style={styles.bannerSubtitle}>
+              언제 어디서나 원어민 한국어 선생님과 함께 하는 맞춤형 한국어 학습
+            </p>
+            <Link to="/signup">
+              <button style={styles.ctaButton}>지금 시작하기</button>
+            </Link>
           </div>
         </div>
       </section>
 
-      {/* 추천 튜터 */}
       <section style={styles.section}>
         <h2 style={styles.sectionTitle}>추천 튜터</h2>
         <div style={styles.tutorList}>
-          {loading ? <p>추천 튜터 정보를 불러오는 중...</p> :
-            displayTutors.map(tutor => (
+          {loading ? (
+            <p>추천 튜터 정보를 불러오는 중...</p>
+          ) : (
+            displayTutors.map((tutor) => (
               <div key={tutor._id} style={styles.tutorCard}>
-                <img src={tutor.photoUrl || "https://via.placeholder.com/100"} alt={tutor.name} style={styles.tutorImage} />
+                <img
+                  src={tutor.photoUrl || "https://via.placeholder.com/100"}
+                  alt={tutor.name}
+                  style={styles.tutorImage}
+                />
                 <h3 style={styles.tutorName}>{tutor.name}</h3>
                 <p style={styles.tutorExperience}>경력: {tutor.experience}년</p>
-                <Link to={`/tutors/${tutor._id}`} style={styles.detailLink}>자세히 보기 →</Link>
+                <Link to={`/tutors/${tutor._id}`} style={styles.detailLink}>
+                  자세히 보기 →
+                </Link>
               </div>
             ))
-          }
+          )}
         </div>
       </section>
 
@@ -175,7 +183,7 @@ function TutorDetailPage() {
           availableTimes: [
             { day: "Monday", slots: ["10:00", "12:00"] },
             { day: "Wednesday", slots: ["14:00", "16:00"] },
-          ]
+          ],
         });
       } finally {
         setLoading(false);
@@ -188,12 +196,12 @@ function TutorDetailPage() {
     if (!tutor) return;
     const dayNamesEN = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
     const selectedDay = dayNamesEN[selectedDate.getDay()];
-    const dayAvailability = tutor.availableTimes?.find(d => d.day === selectedDay);
+    const dayAvailability = tutor.availableTimes?.find((d) => d.day === selectedDay);
     setAvailableSlots(dayAvailability ? dayAvailability.slots : []);
     setSelectedSlot("");
   }, [selectedDate, tutor]);
 
-  const formatDate = date =>
+  const formatDate = (date) =>
     `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,"0")}-${String(date.getDate()).padStart(2,"0")}`;
 
   const handleBooking = async () => {
@@ -202,7 +210,11 @@ function TutorDetailPage() {
       return;
     }
     try {
-      await api.post("/api/bookings", { tutor: tutor._id, date: formatDate(selectedDate), time: selectedSlot });
+      await api.post("/api/bookings", {
+        tutor: tutor._id,
+        date: formatDate(selectedDate),
+        time: selectedSlot,
+      });
       setMessage(`✅ ${formatDate(selectedDate)} ${selectedSlot} 예약 완료`);
     } catch {
       setMessage("❌ 예약 실패");
@@ -226,22 +238,28 @@ function TutorDetailPage() {
 
       <div className="mt-6">
         <h3 className="font-semibold mb-2">⏰ 가능 시간</h3>
-        {availableSlots.length === 0 ? <p>선택한 날짜에는 수업 가능 시간이 없습니다.</p> :
+        {availableSlots.length === 0 ? (
+          <p>선택한 날짜에는 수업 가능 시간이 없습니다.</p>
+        ) : (
           <div className="flex gap-2 flex-wrap">
-            {availableSlots.map(slot => (
+            {availableSlots.map((slot) => (
               <button
                 key={slot}
                 onClick={() => setSelectedSlot(slot)}
-                className={`px-3 py-1 rounded border ${selectedSlot===slot?"bg-blue-500 text-white":"bg-gray-100"}`}
+                className={`px-3 py-1 rounded border ${
+                  selectedSlot === slot ? "bg-blue-500 text-white" : "bg-gray-100"
+                }`}
               >
                 {slot}
               </button>
             ))}
           </div>
-        }
+        )}
       </div>
 
-      <button onClick={handleBooking} className="mt-4 px-4 py-2 bg-green-600 text-white rounded">예약하기</button>
+      <button onClick={handleBooking} className="mt-4 px-4 py-2 bg-green-600 text-white rounded">
+        예약하기
+      </button>
       {message && <p className="mt-2">{message}</p>}
 
       <div className="mt-8">
@@ -262,6 +280,7 @@ export default function App() {
     <BrowserRouter basename={process.env.PUBLIC_URL}>
       <Navbar />
       <Routes>
+        {/* 메인 */}
         <Route path="/" element={<MainPage />} />
         <Route path="/tutors" element={<TutorListPage />} />
         <Route path="/tutors/:id" element={<TutorDetailPage />} />
@@ -273,7 +292,7 @@ export default function App() {
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
 
-        {/* 예약/결제 */}
+        {/* 학생/예약/결제 */}
         <Route path="/book" element={<RequireAuth><BookingForm /></RequireAuth>} />
         <Route path="/booking" element={<RequireAuth><BookingPage /></RequireAuth>} />
         <Route path="/booking/:tutorId" element={<RequireAuth><BookingPageWithDisabledTimesWrapper /></RequireAuth>} />
@@ -288,14 +307,14 @@ export default function App() {
         <Route path="/payments/history" element={<RequireAuth><PaymentHistory /></RequireAuth>} />
         <Route path="/change-password" element={<RequireAuth><ChangePasswordPage /></RequireAuth>} />
         <Route path="/edit-profile" element={<RequireAuth><ProfileEditPage /></RequireAuth>} />
+        <Route path="/dashboard" element={<RequireAuth><Dashboard /></RequireAuth>} />
 
-        {/* 튜터 페이지 */}
+        {/* 튜터 */}
         <Route path="/tutor/dashboard" element={<RequireAuth role="tutor"><TutorDashboardPage /></RequireAuth>} />
         <Route path="/tutor/bookings" element={<RequireAuth role="tutor"><TutorBookingList /></RequireAuth>} />
         <Route path="/tutor-availability" element={<RequireAuth role="tutor"><TutorAvailabilityPage /></RequireAuth>} />
         <Route path="/tutor/calendar" element={<RequireAuth role="tutor"><TutorCalendarDashboard /></RequireAuth>} />
-        <Route path="/video" element={<VideoClassPage />} />
-        <Route path="/dashboard" element={<RequireAuth><Dashboard /></RequireAuth>} />
+        <Route path="/video/:bookingId" element={<RequireAuth role="tutor"><VideoClassPage /></RequireAuth>} />
 
         {/* 관리자 */}
         <Route path="/admin" element={<RequireAuth role="admin"><AdminDashboard /></RequireAuth>} />
@@ -310,8 +329,9 @@ export default function App() {
         {/* 게시글 */}
         <Route path="/create-post" element={<CreatePostForm />} />
         <Route path="/posts/:id" element={<RequireAuth><PostDetail /></RequireAuth>} />
+        <Route path="/student/dashboard" element={<RequireAuth role="student"><StudentDashboardPage /></RequireAuth>} />
 
-        {/* 기본 fallback */}
+        {/* fallback */}
         <Route path="*" element={<Navigate to={user ? "/dashboard" : "/login"} replace />} />
       </Routes>
     </BrowserRouter>
@@ -346,8 +366,7 @@ const styles = {
   },
   banner: {
     height: "80vh",
-    backgroundImage:
-      'url("https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1350&q=80")',
+    backgroundImage: 'url("https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1350&q=80")',
     backgroundSize: "cover",
     backgroundPosition: "center",
     position: "relative",

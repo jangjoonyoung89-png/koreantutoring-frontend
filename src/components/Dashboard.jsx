@@ -11,8 +11,7 @@ function Dashboard() {
     navigate("/login");
   };
 
-  const displayName =
-    user?.full_name?.trim() !== "" ? user.full_name : user?.email || "사용자";
+  const displayName = user?.full_name?.trim() !== "" ? user.full_name : user?.email || "사용자";
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100 px-4">
@@ -29,7 +28,6 @@ function Dashboard() {
         >
           로그아웃
         </button>
-
         {/* 게시판 컴포넌트 삽입 */}
         <Board />
       </div>

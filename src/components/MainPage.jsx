@@ -89,6 +89,7 @@ export default function MainPage() {
       justifyContent: "center",
       alignItems: "center",
       textAlign: "center",
+      flexDirection: "column",
     },
     bannerContent: {
       maxWidth: "600px",
@@ -106,7 +107,7 @@ export default function MainPage() {
       color: "#ffdd99",
       textShadow: "1px 1px 4px rgba(0,0,0,0.4)",
     },
-    ctaButtonEnhanced: {
+    ctaButton: {
       marginTop: "20px",
       padding: "10px 20px",
       fontSize: "16px",
@@ -129,7 +130,7 @@ export default function MainPage() {
       justifyContent: "center",
       gap: "30px",
       flexWrap: "wrap",
-      overflow: "visible", // 카드 확대 시 잘리지 않게
+      overflow: "visible",
     },
     tutorImg: {
       width: "100px",
@@ -167,18 +168,12 @@ export default function MainPage() {
       <nav style={inlineStyles.navbar}>
         <div style={inlineStyles.logo}>KOREAN TUTORING</div>
         <div style={inlineStyles.navLinks}>
-          <Link to="/" style={inlineStyles.navLink}>
-            HOME
-          </Link>
-          <Link to="/tutors" style={inlineStyles.navLink}>
-            TUTOR
-          </Link>
-          <Link to="/signup" style={inlineStyles.navLink}>
-            SIGNUP
-          </Link>
-          <Link to="/login" style={inlineStyles.navLink}>
-            LOGIN
-          </Link>
+          <Link to="/" style={inlineStyles.navLink}>HOME</Link>
+          <Link to="/tutors" style={inlineStyles.navLink}>TUTOR</Link>
+          <Link to="/signup" style={inlineStyles.navLink}>SIGNUP</Link>
+          <Link to="/login" style={inlineStyles.navLink}>LOGIN</Link>
+          {/* ✅ 관리자 모드 링크는 Navbar에만 */}
+          <Link to="/admin/login" style={inlineStyles.navLink}>관리자 모드</Link>
         </div>
       </nav>
 
@@ -191,9 +186,11 @@ export default function MainPage() {
           <p style={inlineStyles.bannerSubtitle}>
             언제 어디서나 원어민 한국어 선생님과 함께 하는 맞춤형 한국어 학습
           </p>
-          <Link to="/signup">
-           <button className={styles.ctaButton}>지금 시작하기</button>
-          </Link>
+          <div>
+            <Link to="/signup">
+              <button style={inlineStyles.ctaButton}>지금 시작하기</button>
+            </Link>
+          </div>
         </div>
       </section>
 
