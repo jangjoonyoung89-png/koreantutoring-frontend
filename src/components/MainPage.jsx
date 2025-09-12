@@ -160,6 +160,17 @@ export default function MainPage() {
       color: "#fff",
       marginTop: "40px",
     },
+ adminButton: {
+  backgroundColor: "#333", // LOGIN 버튼 배경색과 동일
+  color: "#fff",            // 글씨 흰색
+  padding: "6px 12px",
+  borderRadius: "5px",
+  textDecoration: "none",
+  fontSize: "16px",
+  fontWeight: "600",
+  boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+  cursor: "pointer",
+  },
   };
 
   return (
@@ -172,8 +183,7 @@ export default function MainPage() {
           <Link to="/tutors" style={inlineStyles.navLink}>TUTOR</Link>
           <Link to="/signup" style={inlineStyles.navLink}>SIGNUP</Link>
           <Link to="/login" style={inlineStyles.navLink}>LOGIN</Link>
-          {/* ✅ 관리자 모드 링크는 Navbar에만 */}
-          <Link to="/admin/login" style={inlineStyles.navLink}>관리자 모드</Link>
+          <Link to="/admin/login" className={styles.adminButton}>ADMIN</Link>
         </div>
       </nav>
 

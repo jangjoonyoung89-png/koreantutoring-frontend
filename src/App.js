@@ -63,21 +63,11 @@ function Navbar() {
     <nav style={styles.navbar}>
       <div style={styles.logo}>KOREAN TUTORING</div>
       <div style={styles.navLinks}>
-        <Link to="/" style={styles.navLink}>
-          HOME
-        </Link>
-        <Link to="/tutors" style={styles.navLink}>
-          TUTOR
-        </Link>
-        <Link to="/signup" style={styles.navLink}>
-          SIGNUP
-        </Link>
-        <Link to="/login" style={styles.navLink}>
-          LOGIN
-        </Link>
-        <Link to="/admin/login" style={{ ...styles.navLink, color: "#ffdd57" }}>
-          ADMIN
-        </Link>
+        <Link to="/" style={styles.navLink}>HOME</Link>
+        <Link to="/tutors" style={styles.navLink}>TUTOR</Link>
+        <Link to="/signup" style={styles.navLink}>SIGNUP</Link>
+        <Link to="/login" style={styles.navLink}>LOGIN</Link>
+        <Link to="/admin/login" style={{ ...styles.navLink, color: "#ffdd57" }}>ADMIN</Link>
       </div>
     </nav>
   );
@@ -246,9 +236,7 @@ function TutorDetailPage() {
               <button
                 key={slot}
                 onClick={() => setSelectedSlot(slot)}
-                className={`px-3 py-1 rounded border ${
-                  selectedSlot === slot ? "bg-blue-500 text-white" : "bg-gray-100"
-                }`}
+                className={`px-3 py-1 rounded border ${selectedSlot === slot ? "bg-blue-500 text-white" : "bg-gray-100"}`}
               >
                 {slot}
               </button>
@@ -271,10 +259,18 @@ function TutorDetailPage() {
 }
 
 // ----------------------
-// 전체 App
+// App
 // ----------------------
 export default function App() {
   const { user } = useContext(AuthContext);
+
+  const renderDashboard = () => {
+    if (!user) return <Navigate to="/login" replace />;
+    if (user.role === "tutor") return <TutorDashboardPage />;
+    if (user.role === "student") return <StudentDashboardPage />;
+    if (user.role === "admin") return <AdminDashboard />;
+    return <Dashboard />;
+  };
 
   return (
     <BrowserRouter basename={process.env.PUBLIC_URL}>
@@ -307,7 +303,7 @@ export default function App() {
         <Route path="/payments/history" element={<RequireAuth><PaymentHistory /></RequireAuth>} />
         <Route path="/change-password" element={<RequireAuth><ChangePasswordPage /></RequireAuth>} />
         <Route path="/edit-profile" element={<RequireAuth><ProfileEditPage /></RequireAuth>} />
-        <Route path="/dashboard" element={<RequireAuth><Dashboard /></RequireAuth>} />
+        <Route path="/dashboard" element={<RequireAuth>{renderDashboard()}</RequireAuth>} />
 
         {/* 튜터 */}
         <Route path="/tutor/dashboard" element={<RequireAuth role="tutor"><TutorDashboardPage /></RequireAuth>} />
@@ -329,7 +325,6 @@ export default function App() {
         {/* 게시글 */}
         <Route path="/create-post" element={<CreatePostForm />} />
         <Route path="/posts/:id" element={<RequireAuth><PostDetail /></RequireAuth>} />
-        <Route path="/student/dashboard" element={<RequireAuth role="student"><StudentDashboardPage /></RequireAuth>} />
 
         {/* fallback */}
         <Route path="*" element={<Navigate to={user ? "/dashboard" : "/login"} replace />} />

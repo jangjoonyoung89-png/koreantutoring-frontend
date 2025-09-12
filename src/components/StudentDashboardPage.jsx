@@ -11,26 +11,39 @@ export default function StudentDashboardPage() {
 
   useEffect(() => {
     if (user?._id) {
-      axios
-        .get(`/api/bookings?studentId=${user._id}`)
-        .then((res) => setBookings(res.data))
-        .catch((err) => console.error(err));
-
-      axios
-        .get(`/api/materials?studentId=${user._id}`)
-        .then((res) => setMaterials(res.data))
-        .catch((err) => console.error(err));
-
-      axios
-        .get(`/api/reviews?studentId=${user._id}`)
-        .then((res) => setReviews(res.data))
-        .catch((err) => console.error(err));
+      Promise.all([
+        axios.get(`/api/bookings?studentId=${user._id}`),
+        axios.get(`/api/materials?studentId=${user._id}`),
+        axios.get(`/api/reviews?studentId=${user._id}`),
+      ])
+        .then(([bookingsRes, materialsRes, reviewsRes]) => {
+          setBookings(bookingsRes.data);
+          setMaterials(materialsRes.data);
+          setReviews(reviewsRes.data);
+        })
+        .catch((err) => console.error("학생 대시보드 데이터 로딩 오류:", err));
     }
   }, [user]);
 
   return (
     <div className="p-6 max-w-5xl mx-auto">
       <h1 className="text-3xl font-bold mb-6">📘 학생 대시보드</h1>
+
+      {/* 통계 카드 */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
+        <div className="bg-blue-100 p-4 rounded-lg shadow text-center">
+          <p className="text-xl font-bold">{bookings.length}</p>
+          <p className="text-gray-700">예약 수업</p>
+        </div>
+        <div className="bg-green-100 p-4 rounded-lg shadow text-center">
+          <p className="text-xl font-bold">{materials.length}</p>
+          <p className="text-gray-700">수업 자료</p>
+        </div>
+        <div className="bg-yellow-100 p-4 rounded-lg shadow text-center">
+          <p className="text-xl font-bold">{reviews.length}</p>
+          <p className="text-gray-700">작성 리뷰</p>
+        </div>
+      </div>
 
       {/* 예약 목록 */}
       <section className="mb-10">
@@ -39,7 +52,7 @@ export default function StudentDashboardPage() {
           {bookings.map((b) => (
             <li key={b._id} className="bg-white shadow rounded p-4">
               <p>
-                <strong>튜터:</strong> {b.tutor.full_name}
+                <strong>튜터:</strong> {b.tutor?.full_name || "정보 없음"}
               </p>
               <p>
                 <strong>일시:</strong> {b.date} {b.time}
@@ -62,7 +75,7 @@ export default function StudentDashboardPage() {
           {materials.map((file) => (
             <li key={file._id} className="bg-white shadow rounded p-4">
               <p>
-                <strong>튜터:</strong> {file.tutor.full_name}
+                <strong>튜터:</strong> {file.tutor?.full_name || "정보 없음"}
               </p>
               <p>
                 <strong>파일:</strong>{" "}
@@ -87,7 +100,7 @@ export default function StudentDashboardPage() {
           {reviews.map((r) => (
             <li key={r._id} className="bg-white shadow rounded p-4">
               <p>
-                <strong>튜터:</strong> {r.tutor.full_name}
+                <strong>튜터:</strong> {r.tutor?.full_name || "정보 없음"}
               </p>
               <p>
                 <strong>별점:</strong> {r.rating} ⭐
