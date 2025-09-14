@@ -7,14 +7,18 @@ export default function AdminDashboard() {
   const [isAuthorized, setIsAuthorized] = useState(true);
   const navigate = useNavigate();
 
+  // ----------------------
   // 로그아웃 처리
+  // ----------------------
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     navigate("/admin/login");
   };
 
+  // ----------------------
   // 권한 확인
+  // ----------------------
   useEffect(() => {
     const token = localStorage.getItem("token");
     const userData = localStorage.getItem("user");
@@ -34,11 +38,17 @@ export default function AdminDashboard() {
     }
   }, []);
 
+  // ----------------------
   // 통계 가져오기
+  // ----------------------
   useEffect(() => {
     if (isAuthorized) {
+      const token = localStorage.getItem("token");
+
       axios
-        .get("http://localhost:8000/api/stats/admin")
+        .get("http://localhost:8000/api/stats/admin", {
+          headers: { Authorization: `Bearer ${token}` },
+        })
         .then((res) => setStats(res.data))
         .catch((err) => {
           console.error("통계 로드 실패", err);
@@ -47,8 +57,14 @@ export default function AdminDashboard() {
     }
   }, [isAuthorized]);
 
+  // ----------------------
+  // 권한 없는 경우 → 로그인으로 이동
+  // ----------------------
   if (!isAuthorized) return <Navigate to="/admin/login" />;
 
+  // ----------------------
+  // JSX 리턴
+  // ----------------------
   return (
     <div className="min-h-screen bg-gray-100 p-6">
       {/* 상단 */}
@@ -111,7 +127,9 @@ export default function AdminDashboard() {
             </div>
             <div className="bg-white rounded shadow p-4 text-center">
               <p className="text-gray-500 mb-2">총 결제 금액</p>
-              <p className="text-2xl font-bold">₩{stats.totalPayments}</p>
+              <p className="text-2xl font-bold">
+                ₩{stats.totalPayments.toLocaleString()}
+              </p>
             </div>
             <div className="bg-white rounded shadow p-4 text-center">
               <p className="text-gray-500 mb-2">총 리뷰 수</p>
