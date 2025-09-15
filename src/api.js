@@ -4,7 +4,7 @@ import axios from "axios";
 // API 기본 설정
 // ======================
 const API_BASE_URL =
-  process.env.REACT_APP_API_BASE_URL?.trim() ||
+  process.env.REACT_APP_API_URL?.trim() ||
   "https://api.koreantutoring.co.kr";
 
 console.log("📡 API Base URL:", API_BASE_URL);
