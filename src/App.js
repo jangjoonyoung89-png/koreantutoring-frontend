@@ -259,6 +259,71 @@ function TutorDetailPage() {
 }
 
 // ----------------------
+// VideoClassPage (학생/튜터 접근) 
+// ----------------------
+export function VideoClassPageWrapper() {
+  const { bookingId } = useParams();
+  const { user } = useContext(AuthContext);
+  const [link, setLink] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const fetchLink = async () => {
+      try {
+        const res = await api.get(`/api/bookings/${bookingId}`);
+        const data = res.data;
+
+        if (!user) {
+          setError("로그인이 필요합니다.");
+          setLoading(false);
+          return;
+        }
+
+        const isStudent = user.role === "student" && user._id === data.studentId;
+        const isTutor = user.role === "tutor" && user._id === data.tutorId;
+
+        if (!isStudent && !isTutor) {
+          setError("접근 권한이 없습니다.");
+          setLoading(false);
+          return;
+        }
+
+        if (!data.videoLink) {
+          setError("영상 링크가 없습니다.");
+          setLoading(false);
+          return;
+        }
+
+        setLink(data.videoLink);
+      } catch (err) {
+        console.error(err);
+        setError("영상 정보를 불러오는 중 오류가 발생했습니다.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchLink();
+  }, [bookingId, user]);
+
+  if (loading) return <p style={{ textAlign: "center", marginTop: 50 }}>로딩 중...</p>;
+  if (error) return <p style={{ color: "red", textAlign: "center", marginTop: 50 }}>{error}</p>;
+
+  return (
+    <div style={{ maxWidth: 900, margin: "0 auto", padding: 20 }}>
+      <h2 style={{ fontSize: "1.5rem", fontWeight: "bold", marginBottom: 20 }}>🧑‍🏫 실시간 수업</h2>
+      <iframe
+        src={link}
+        allow="camera; microphone; fullscreen"
+        style={{ width: "100%", height: "600px", border: "none" }}
+        title="Video Class"
+      />
+    </div>
+  );
+}
+
+// ----------------------
 // App
 // ----------------------
 export default function App() {
@@ -310,7 +375,8 @@ export default function App() {
         <Route path="/tutor/bookings" element={<RequireAuth role="tutor"><TutorBookingList /></RequireAuth>} />
         <Route path="/tutor-availability" element={<RequireAuth role="tutor"><TutorAvailabilityPage /></RequireAuth>} />
         <Route path="/tutor/calendar" element={<RequireAuth role="tutor"><TutorCalendarDashboard /></RequireAuth>} />
-        <Route path="/video/:bookingId" element={<RequireAuth role="tutor"><VideoClassPage /></RequireAuth>} />
+        <Route path="/video/:bookingId" element={<RequireAuth><VideoClassPageWrapper /></RequireAuth>} />
+        <Route path="/video/:bookingId" element={<RequireAuth><VideoClassPage /></RequireAuth>} />
 
         {/* 관리자 */}
         <Route path="/admin" element={<RequireAuth role="admin"><AdminDashboard /></RequireAuth>} />
@@ -333,6 +399,9 @@ export default function App() {
   );
 }
 
+// ----------------------
+// Styles
+// ----------------------
 const styles = {
   navbar: {
     display: "flex",
@@ -355,9 +424,6 @@ const styles = {
     textDecoration: "none",
     fontWeight: 600,
     transition: "color 0.2s",
-  },
-  navLinkHover: {
-    color: "#ffdd57",
   },
   banner: {
     height: "80vh",
@@ -427,9 +493,6 @@ const styles = {
     textAlign: "center",
     boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
     transition: "transform 0.2s",
-  },
-  tutorCardHover: {
-    transform: "translateY(-5px)",
   },
   tutorImage: {
     width: 110,
