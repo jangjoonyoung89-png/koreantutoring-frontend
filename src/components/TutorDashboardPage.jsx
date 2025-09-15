@@ -68,7 +68,7 @@ function TutorDashboardPage() {
     }
   };
 
-  // 수업 자료 업로드
+  // 자료 업로드
   const handleFileUpload = async () => {
     if (!file) return alert("파일을 선택해주세요.");
     const formData = new FormData();
@@ -88,143 +88,117 @@ function TutorDashboardPage() {
   };
 
   return (
-    <div style={{ maxWidth: 1100, margin: "40px auto", padding: 20, fontFamily: "Arial" }}>
-      <h1 style={{ textAlign: "center", marginBottom: 40 }}>🎓 튜터 대시보드</h1>
+    <div className="max-w-6xl mx-auto p-6 font-sans">
+      <h1 className="text-3xl font-bold text-center mb-10">🎓 튜터 대시보드</h1>
 
-      {error && <p style={{ color: "red" }}>{error}</p>}
+      {error && <p className="text-red-500 mb-4">{error}</p>}
 
-      {/* 📊 예약 현황 */}
-      <section style={cardStyle}>
-        <h2>📊 나의 수업 예약 현황</h2>
+      {/* 예약 현황 */}
+      <section className="bg-white p-6 rounded-xl shadow mb-8">
+        <h2 className="text-2xl font-semibold mb-4">📊 나의 수업 예약 현황</h2>
         {bookings.length === 0 ? (
           <p>예약 내역이 없습니다.</p>
         ) : (
-          <table style={tableStyle}>
-            <thead>
-              <tr>
-                <th>학생 이름</th>
-                <th>날짜</th>
-                <th>시간</th>
-                <th>요청사항</th>
-                <th>상태</th>
-                <th>기능</th>
-              </tr>
-            </thead>
-            <tbody>
-              {bookings.map((b, i) => (
-                <tr
-                  key={b._id}
-                  style={{ backgroundColor: i % 2 === 0 ? "#f9f9f9" : "white" }}
-                >
-                  <td>{b.student?.full_name}</td>
-                  <td>{new Date(b.date).toLocaleDateString()}</td>
-                  <td>{b.time}</td>
-                  <td>{b.notes || "없음"}</td>
-                  <td style={{ fontWeight: "bold", color: getStatusColor(b.status) }}>
-                    {b.status || "pending"}
-                  </td>
-                  <td>
-                    <Link to={`/classroom/${b._id}`} style={linkStyle}>입장</Link>
-                    <Link to={`/chat/${b._id}`} style={linkStyle}>채팅</Link>
-                    <Link to={`/whiteboard/${b._id}`} style={linkStyle}>화이트보드</Link>
-                    {b.status === "pending" && (
-                      <>
-                        <button style={approveBtn} onClick={() => handleApprove(b._id)}>✔️ 승인</button>
-                        <button style={rejectBtn} onClick={() => handleReject(b._id)}>❌ 거절</button>
-                      </>
-                    )}
-                  </td>
+          <div className="overflow-x-auto">
+            <table className="min-w-full border border-gray-200">
+              <thead className="bg-gray-100">
+                <tr>
+                  <th className="px-4 py-2 text-left">학생 이름</th>
+                  <th className="px-4 py-2 text-left">날짜</th>
+                  <th className="px-4 py-2 text-left">시간</th>
+                  <th className="px-4 py-2 text-left">요청사항</th>
+                  <th className="px-4 py-2 text-left">상태</th>
+                  <th className="px-4 py-2 text-left">기능</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {bookings.map((b, i) => (
+                  <tr key={b._id} className={i % 2 === 0 ? "bg-gray-50" : "bg-white"}>
+                    <td className="px-4 py-2">{b.student?.full_name}</td>
+                    <td className="px-4 py-2">{new Date(b.date).toLocaleDateString()}</td>
+                    <td className="px-4 py-2">{b.time}</td>
+                    <td className="px-4 py-2">{b.notes || "없음"}</td>
+                    <td className={`px-4 py-2 font-bold ${getStatusColor(b.status)}`}>
+                      {b.status || "pending"}
+                    </td>
+                    <td className="px-4 py-2 space-x-2">
+                      <Link className="text-blue-500 hover:underline" to={`/classroom/${b._id}`}>입장</Link>
+                      <Link className="text-blue-500 hover:underline" to={`/chat/${b._id}`}>채팅</Link>
+                      <Link className="text-blue-500 hover:underline" to={`/whiteboard/${b._id}`}>화이트보드</Link>
+                      {b.status === "pending" && (
+                        <>
+                          <button
+                            className="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600"
+                            onClick={() => handleApprove(b._id)}
+                          >
+                            ✔️ 승인
+                          </button>
+                          <button
+                            className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600"
+                            onClick={() => handleReject(b._id)}
+                          >
+                            ❌ 거절
+                          </button>
+                        </>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </section>
 
-      {/* 📁 자료 업로드 */}
-      <section style={cardStyle}>
-        <h2>📁 수업 자료 업로드</h2>
-        <input type="file" onChange={(e) => setFile(e.target.files[0])} />
-        <button style={uploadBtn} onClick={handleFileUpload}>업로드</button>
+      {/* 자료 업로드 */}
+      <section className="bg-white p-6 rounded-xl shadow mb-8">
+        <h2 className="text-2xl font-semibold mb-4">📁 수업 자료 업로드</h2>
+        <div className="flex items-center space-x-3">
+          <input
+            type="file"
+            onChange={(e) => setFile(e.target.files[0])}
+            className="border p-2 rounded"
+          />
+          <button
+            onClick={handleFileUpload}
+            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+          >
+            업로드
+          </button>
+          {file && <span className="text-gray-700">{file.name}</span>}
+        </div>
       </section>
 
-      {/* ⭐ 리뷰 */}
-      <section style={cardStyle}>
-        <h2>⭐ 학생 리뷰</h2>
+      {/* 리뷰 */}
+      <section className="bg-white p-6 rounded-xl shadow mb-8">
+        <h2 className="text-2xl font-semibold mb-4">⭐ 학생 리뷰</h2>
         {reviews.length === 0 ? (
           <p>리뷰가 없습니다.</p>
         ) : (
-          <ul>
+          <div className="grid gap-4">
             {reviews.map((r) => (
-              <li key={r._id} style={{ marginBottom: 10 }}>
-                <strong>{r.studentName}</strong>: {r.comment} ({r.rating}⭐)
-              </li>
+              <div key={r._id} className="p-4 border rounded-lg shadow-sm hover:shadow-md transition">
+                <p className="font-semibold">{r.studentName}</p>
+                <p>{r.comment}</p>
+                <p className="text-yellow-500 font-bold">{'⭐'.repeat(r.rating)}</p>
+              </div>
             ))}
-          </ul>
+          </div>
         )}
       </section>
     </div>
   );
 }
 
-// 🎨 스타일
-const cardStyle = {
-  background: "#fff",
-  padding: "20px",
-  borderRadius: "12px",
-  boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-  marginBottom: "30px",
-};
-
-const tableStyle = {
-  width: "100%",
-  borderCollapse: "collapse",
-};
-
-const linkStyle = {
-  marginRight: "10px",
-  textDecoration: "none",
-  color: "#007bff",
-};
-
-const approveBtn = {
-  background: "#28a745",
-  color: "white",
-  border: "none",
-  padding: "5px 10px",
-  borderRadius: "6px",
-  cursor: "pointer",
-  marginLeft: "8px",
-};
-
-const rejectBtn = {
-  background: "#dc3545",
-  color: "white",
-  border: "none",
-  padding: "5px 10px",
-  borderRadius: "6px",
-  cursor: "pointer",
-  marginLeft: "5px",
-};
-
-const uploadBtn = {
-  marginLeft: "10px",
-  background: "#007bff",
-  color: "white",
-  border: "none",
-  padding: "6px 12px",
-  borderRadius: "6px",
-  cursor: "pointer",
-};
-
+// 상태 색상
 function getStatusColor(status) {
   switch (status) {
     case "approved":
-      return "green";
+      return "text-green-600";
     case "rejected":
-      return "red";
+      return "text-red-600";
     default:
-      return "gray";
+      return "text-gray-500";
   }
 }
 
