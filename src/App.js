@@ -17,18 +17,12 @@ import "react-calendar/dist/Calendar.css";
 // ----------------------
 import SignupPage from "./components/SignupPage";
 import LoginPage from "./components/LoginPage";
-import SignupTest from "./components/SignupTest";
 import ForgotPasswordPage from "./components/ForgotPasswordPage";
 import ResetPasswordPage from "./components/ResetPasswordPage";
 import TutorListPage from "./components/TutorListPage";
-import VideoClassPage from "./components/VideoClassPage";
-import BookingPage from "./components/BookingPage";
-import BookingPageWithDisabledTimesWrapper from "./components/BookingPageWithDisabledTimesWrapper";
-import BookTutorPage from "./components/BookTutorPage";
 import BookingForm from "./components/BookingForm";
 import StudentMyPage from "./components/StudentMyPage";
 import MyPage from "./components/MyPage";
-import BookingList from "./components/BookingList";
 import BookingListWithTutorName from "./components/BookingListWithTutorName";
 import PaymentPage from "./components/PaymentPage";
 import PaymentSuccess from "./components/PaymentSuccess";
@@ -38,19 +32,13 @@ import ChangePasswordPage from "./components/ChangePasswordPage";
 import ProfileEditPage from "./components/ProfileEditPage";
 import StudentDashboardPage from "./components/StudentDashboardPage";
 import TutorDashboardPage from "./components/TutorDashboardPage";
-import Dashboard from "./components/Dashboard";
 import ReviewList from "./components/ReviewList";
-import PostDetail from "./components/PostDetail";
-import CreatePostForm from "./components/CreatePostForm";
-import TutorBookingList from "./components/TutorBookingList";
-import TutorAvailabilityPage from "./components/TutorAvailabilityPage";
-import TutorCalendarDashboard from "./components/TutorCalendarDashboard";
+import VideoClassPageWrapper from "./components/VideoClassPageWrapper";
 import AdminDashboard from "./components/admin/AdminDashboard";
 import UserList from "./components/admin/UserList";
 import AdminTutorManagement from "./components/admin/AdminTutorManagement";
-import TutorList from "./components/admin/TutorList";
-import AdminBookingList from "./components/admin/AdminBookingList";
 import AdminTutorApprovalPage from "./components/AdminTutorApprovalPage";
+import AdminBookingList from "./components/admin/AdminBookingList";
 import AdminReviewManagement from "./components/admin/AdminReviewManagement";
 import AdminLoginPage from "./components/AdminLoginPage";
 import RequireAuth from "./components/RequireAuth";
@@ -86,7 +74,7 @@ function MainPage() {
       { _id: "sample2", name: "장서은", experience: 3, photoUrl: "https://via.placeholder.com/100" },
       { _id: "sample3", name: "김수영", experience: 7, photoUrl: "https://via.placeholder.com/100" },
     ];
-    api.get("/api/tutors/with-rating", { params: { t: Date.now() } })
+    api.get("/api/tutors/with-rating")
       .then((res) => {
         if (Array.isArray(res.data) && res.data.length > 0) setTutors(res.data);
         else setTutors(sampleTutors);
@@ -157,12 +145,18 @@ function TutorDetailPage() {
   const [selectedSlot, setSelectedSlot] = useState("");
   const [message, setMessage] = useState("");
 
+  const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || "http://localhost:8000";
+
   useEffect(() => {
     const fetchTutor = async () => {
       setLoading(true);
       try {
         const res = await api.get(`/api/tutors/${id}`);
-        setTutor(res.data);
+        let data = res.data;
+        if (data.sampleVideoUrl && !data.sampleVideoUrl.startsWith("http")) {
+          data.sampleVideoUrl = `${BACKEND_URL}${data.sampleVideoUrl}`;
+        }
+        setTutor(data);
       } catch {
         setTutor({
           _id: id,
@@ -170,6 +164,8 @@ function TutorDetailPage() {
           email: "sample@example.com",
           bio: "샘플 튜터 소개",
           averageRating: 4.5,
+          sampleVideoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+          videoLink: "https://meet.jit.si/sampleRoom",
           availableTimes: [
             { day: "Monday", slots: ["10:00", "12:00"] },
             { day: "Wednesday", slots: ["14:00", "16:00"] },
@@ -180,7 +176,7 @@ function TutorDetailPage() {
       }
     };
     fetchTutor();
-  }, [id]);
+  }, [id, BACKEND_URL]);
 
   useEffect(() => {
     if (!tutor) return;
@@ -211,6 +207,29 @@ function TutorDetailPage() {
     }
   };
 
+  // -----------------------------
+  // 영상 처리
+  // -----------------------------
+  let videoElement = <p style={{color:"#888"}}>등록된 영상이 없습니다.</p>;
+  if (tutor?.sampleVideoUrl) {
+    let embedUrl = tutor.sampleVideoUrl;
+    if (tutor.sampleVideoUrl.includes("youtube.com"))
+      embedUrl = tutor.sampleVideoUrl.replace("watch?v=", "embed/");
+    else if (tutor.sampleVideoUrl.includes("youtu.be"))
+      embedUrl = tutor.sampleVideoUrl.replace("youtu.be/", "www.youtube.com/embed/");
+    
+    videoElement = (
+      <iframe
+        className="w-full h-80 rounded"
+        src={embedUrl}
+        title="튜터 소개 영상"
+        frameBorder="0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowFullScreen
+      ></iframe>
+    );
+  }
+
   if (loading) return <p className="text-center mt-6">로딩 중...</p>;
   if (!tutor) return <p className="text-center mt-6 text-red-500">{message || "튜터 정보를 불러올 수 없습니다."}</p>;
 
@@ -221,13 +240,30 @@ function TutorDetailPage() {
       <p className="text-gray-700">소개: {tutor.bio}</p>
       <p className="text-gray-700">평점: {tutor.averageRating}</p>
 
-      <div className="mt-6">
-        <h3 className="font-semibold mb-2">📅 예약 날짜 선택</h3>
-        <Calendar value={selectedDate} onChange={setSelectedDate} />
+      {/* 샘플 영상 */}
+      <div style={{marginTop:20}}>
+        <h3>🎥 튜터 소개 영상</h3>
+        {videoElement}
       </div>
 
-      <div className="mt-6">
-        <h3 className="font-semibold mb-2">⏰ 가능 시간</h3>
+      {/* 실시간 수업 링크 */}
+      <div style={{marginTop:20}}>
+        <h3>📡 실시간 수업</h3>
+        {tutor.videoLink ? (
+          <a href={tutor.videoLink} target="_blank" rel="noopener noreferrer"
+             style={{padding:"10px 20px", background:"#2563eb", color:"#fff", borderRadius:8, display:"inline-block", marginTop:10}}>
+            실시간 수업 입장하기
+          </a>
+        ) : <p style={{color:"#888"}}>실시간 수업 링크가 아직 없습니다.</p>}
+      </div>
+
+      {/* 예약 */}
+      <div style={{marginTop:20}}>
+        <h3>📅 예약 날짜 선택</h3>
+        <Calendar value={selectedDate} onChange={setSelectedDate} />
+      </div>
+      <div style={{marginTop:10}}>
+        <h3>⏰ 가능 시간</h3>
         {availableSlots.length === 0 ? (
           <p>선택한 날짜에는 수업 가능 시간이 없습니다.</p>
         ) : (
@@ -244,7 +280,6 @@ function TutorDetailPage() {
           </div>
         )}
       </div>
-
       <button onClick={handleBooking} className="mt-4 px-4 py-2 bg-green-600 text-white rounded">
         예약하기
       </button>
@@ -254,71 +289,6 @@ function TutorDetailPage() {
         <h3 className="text-xl font-bold mb-4">학생 리뷰</h3>
         <ReviewList tutorId={tutor._id} />
       </div>
-    </div>
-  );
-}
-
-// ----------------------
-// VideoClassPage (학생/튜터 접근) 
-// ----------------------
-export function VideoClassPageWrapper() {
-  const { bookingId } = useParams();
-  const { user } = useContext(AuthContext);
-  const [link, setLink] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-
-  useEffect(() => {
-    const fetchLink = async () => {
-      try {
-        const res = await api.get(`/api/bookings/${bookingId}`);
-        const data = res.data;
-
-        if (!user) {
-          setError("로그인이 필요합니다.");
-          setLoading(false);
-          return;
-        }
-
-        const isStudent = user.role === "student" && user._id === data.studentId;
-        const isTutor = user.role === "tutor" && user._id === data.tutorId;
-
-        if (!isStudent && !isTutor) {
-          setError("접근 권한이 없습니다.");
-          setLoading(false);
-          return;
-        }
-
-        if (!data.videoLink) {
-          setError("영상 링크가 없습니다.");
-          setLoading(false);
-          return;
-        }
-
-        setLink(data.videoLink);
-      } catch (err) {
-        console.error(err);
-        setError("영상 정보를 불러오는 중 오류가 발생했습니다.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchLink();
-  }, [bookingId, user]);
-
-  if (loading) return <p style={{ textAlign: "center", marginTop: 50 }}>로딩 중...</p>;
-  if (error) return <p style={{ color: "red", textAlign: "center", marginTop: 50 }}>{error}</p>;
-
-  return (
-    <div style={{ maxWidth: 900, margin: "0 auto", padding: 20 }}>
-      <h2 style={{ fontSize: "1.5rem", fontWeight: "bold", marginBottom: 20 }}>🧑‍🏫 실시간 수업</h2>
-      <iframe
-        src={link}
-        allow="camera; microphone; fullscreen"
-        style={{ width: "100%", height: "600px", border: "none" }}
-        title="Video Class"
-      />
     </div>
   );
 }
@@ -334,7 +304,7 @@ export default function App() {
     if (user.role === "tutor") return <TutorDashboardPage />;
     if (user.role === "student") return <StudentDashboardPage />;
     if (user.role === "admin") return <AdminDashboard />;
-    return <Dashboard />;
+    return <Navigate to="/" />;
   };
 
   return (
@@ -349,18 +319,13 @@ export default function App() {
         {/* 회원가입/로그인 */}
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/login" element={<LoginPage />} />
-        <Route path="/signup-test" element={<SignupTest />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
 
         {/* 학생/예약/결제 */}
         <Route path="/book" element={<RequireAuth><BookingForm /></RequireAuth>} />
-        <Route path="/booking" element={<RequireAuth><BookingPage /></RequireAuth>} />
-        <Route path="/booking/:tutorId" element={<RequireAuth><BookingPageWithDisabledTimesWrapper /></RequireAuth>} />
-        <Route path="/book/:id" element={<RequireAuth><BookTutorPage /></RequireAuth>} />
         <Route path="/student/mypage" element={<RequireAuth><StudentMyPage /></RequireAuth>} />
         <Route path="/mypage" element={<RequireAuth><MyPage /></RequireAuth>} />
-        <Route path="/mybookings" element={<RequireAuth><BookingList /></RequireAuth>} />
         <Route path="/my-bookings" element={<RequireAuth><BookingListWithTutorName /></RequireAuth>} />
         <Route path="/payment" element={<RequireAuth><PaymentPage /></RequireAuth>} />
         <Route path="/payments/success" element={<RequireAuth><PaymentSuccess /></RequireAuth>} />
@@ -368,32 +333,22 @@ export default function App() {
         <Route path="/payments/history" element={<RequireAuth><PaymentHistory /></RequireAuth>} />
         <Route path="/change-password" element={<RequireAuth><ChangePasswordPage /></RequireAuth>} />
         <Route path="/edit-profile" element={<RequireAuth><ProfileEditPage /></RequireAuth>} />
+
+        {/* 대시보드 */}
         <Route path="/dashboard" element={<RequireAuth>{renderDashboard()}</RequireAuth>} />
 
         {/* 튜터 */}
         <Route path="/tutor/dashboard" element={<RequireAuth role="tutor"><TutorDashboardPage /></RequireAuth>} />
-        <Route path="/tutor/bookings" element={<RequireAuth role="tutor"><TutorBookingList /></RequireAuth>} />
-        <Route path="/tutor-availability" element={<RequireAuth role="tutor"><TutorAvailabilityPage /></RequireAuth>} />
-        <Route path="/tutor/calendar" element={<RequireAuth role="tutor"><TutorCalendarDashboard /></RequireAuth>} />
         <Route path="/video/:bookingId" element={<RequireAuth><VideoClassPageWrapper /></RequireAuth>} />
-        <Route path="/video/:bookingId" element={<RequireAuth><VideoClassPage /></RequireAuth>} />
 
         {/* 관리자 */}
-        <Route path="/admin" element={<RequireAuth role="admin"><AdminDashboard /></RequireAuth>} />
+        <Route path="/admin/dashboard" element={<RequireAuth role="admin"><AdminDashboard /></RequireAuth>} />
         <Route path="/admin/users" element={<RequireAuth role="admin"><UserList /></RequireAuth>} />
         <Route path="/admin/tutors" element={<RequireAuth role="admin"><AdminTutorManagement /></RequireAuth>} />
-        <Route path="/admin/tutor-list" element={<RequireAuth role="admin"><TutorList /></RequireAuth>} />
-        <Route path="/admin/bookings" element={<RequireAuth role="admin"><AdminBookingList /></RequireAuth>} />
         <Route path="/admin/tutor-approval" element={<RequireAuth role="admin"><AdminTutorApprovalPage /></RequireAuth>} />
+        <Route path="/admin/bookings" element={<RequireAuth role="admin"><AdminBookingList /></RequireAuth>} />
         <Route path="/admin/reviews" element={<RequireAuth role="admin"><AdminReviewManagement /></RequireAuth>} />
         <Route path="/admin/login" element={<AdminLoginPage />} />
-
-        {/* 게시글 */}
-        <Route path="/create-post" element={<CreatePostForm />} />
-        <Route path="/posts/:id" element={<RequireAuth><PostDetail /></RequireAuth>} />
-
-        {/* fallback */}
-        <Route path="*" element={<Navigate to={user ? "/dashboard" : "/login"} replace />} />
       </Routes>
     </BrowserRouter>
   );

@@ -32,6 +32,7 @@ export default function TutorDashboardPage() {
     if (user?.role === "tutor") fetchData();
   }, [user]);
 
+  // ✅ 예약 승인
   const handleApprove = async (bookingId) => {
     try {
       const res = await fetch(
@@ -47,6 +48,7 @@ export default function TutorDashboardPage() {
     }
   };
 
+  // ✅ 예약 거절
   const handleReject = async (bookingId) => {
     try {
       const res = await fetch(
@@ -62,6 +64,7 @@ export default function TutorDashboardPage() {
     }
   };
 
+  // ✅ 자료 업로드
   const handleFileUpload = async () => {
     if (!file) return alert("파일 선택해주세요");
     const formData = new FormData();
@@ -69,7 +72,7 @@ export default function TutorDashboardPage() {
     try {
       const res = await fetch("http://localhost:8000/api/materials", {
         method: "POST",
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }, // ❌ Content-Type 넣지 말 것
         body: formData,
       });
       if (!res.ok) throw new Error("업로드 실패");
@@ -80,10 +83,14 @@ export default function TutorDashboardPage() {
     }
   };
 
+  // ✅ 수업 입장 가능 여부 (예약시간 + 승인 상태)
   const isClassEnterable = (booking) => {
     const now = new Date();
-    const bookingTime = new Date(`${booking.date}T${booking.time}`);
-    return now >= bookingTime && booking.status === "approved";
+    // DB에 따라 date가 ISO 문자열일 수도 있음 → 그대로 Date 객체로 변환
+    const bookingDate = new Date(booking.date);
+    const [hours, minutes] = booking.time.split(":");
+    bookingDate.setHours(hours, minutes, 0, 0);
+    return now >= bookingDate && booking.status === "approved";
   };
 
   return (
@@ -105,13 +112,14 @@ export default function TutorDashboardPage() {
               >
                 <div className="flex flex-col gap-1">
                   <p>
-                    <strong>학생:</strong> {b.student?.full_name}
+                    <strong>학생:</strong> {b.student?.full_name || b.student?.name || "이름 없음"}
                   </p>
                   <p>
-                    <strong>날짜:</strong> {new Date(b.date).toLocaleDateString()}
+                    <strong>날짜:</strong>{" "}
+                    {b.date ? new Date(b.date).toLocaleDateString() : "날짜 없음"}
                   </p>
                   <p>
-                    <strong>시간:</strong> {b.time}
+                    <strong>시간:</strong> {b.time || "시간 없음"}
                   </p>
                   <p>
                     <strong>요청:</strong> {b.notes || "없음"}
@@ -123,8 +131,11 @@ export default function TutorDashboardPage() {
                 <div className="flex flex-wrap gap-2">
                   <Link
                     to={`/video/${b._id}`}
+                    title={isClassEnterable(b) ? "" : "수업 시간이 되어야 입장할 수 있습니다"}
                     className={`px-3 py-1 rounded text-white ${
-                      isClassEnterable(b) ? "bg-blue-500 hover:bg-blue-600" : "bg-gray-400 cursor-not-allowed"
+                      isClassEnterable(b)
+                        ? "bg-blue-500 hover:bg-blue-600"
+                        : "bg-gray-400 cursor-not-allowed"
                     }`}
                   >
                     영상
@@ -141,7 +152,7 @@ export default function TutorDashboardPage() {
                   >
                     화이트보드
                   </Link>
-                  {b.status === "pending" && (
+                  {(b.status === "pending" || !b.status) && (
                     <>
                       <button
                         onClick={() => handleApprove(b._id)}
@@ -195,9 +206,13 @@ export default function TutorDashboardPage() {
                 key={r._id}
                 className="p-4 border rounded-lg shadow-sm hover:shadow-md transition"
               >
-                <p className="font-semibold">{r.studentName}</p>
+                <p className="font-semibold">
+                  {r.studentName || r.student?.full_name || "익명"}
+                </p>
                 <p>{r.comment}</p>
-                <p className="text-yellow-500 font-bold">{'⭐'.repeat(r.rating)}</p>
+                <p className="text-yellow-500 font-bold">
+                  {"⭐".repeat(r.rating || 0)}
+                </p>
               </div>
             ))}
           </div>

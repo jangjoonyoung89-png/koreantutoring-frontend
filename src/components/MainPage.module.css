@@ -1,3 +1,12 @@
+.tutorList {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
+  perspective: 1000px;
+  overflow: visible; /* hover 시 이미지 안 잘리도록 */
+}
+
 .tutorCard {
   width: 150px;
   border: 1px solid #ddd;
@@ -8,12 +17,46 @@
   position: relative;
   cursor: pointer;
   background-color: #fff;
+  overflow: visible; /* hover 시 이미지 안 잘리도록 */
+  z-index: 1;
 }
 
 .tutorCard:hover {
   transform: scale(1.2);
   z-index: 10;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.tutorCard img {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 10px;
+  border: 3px solid #ddd;
+}
+
+.tutorCard h3 {
+  font-size: 18px;
+  margin: 10px 0 5px 0;
+  font-weight: 600;
+}
+
+.tutorCard p {
+  font-size: 14px;
+  margin-bottom: 8px;
+  color: #555;
+}
+
+.tutorCard span {
+  font-size: 14px;
+  color: #0077cc;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.tutorCard span:hover {
+  color: #005fa3;
 }
 
 .ctaButton {
@@ -25,16 +68,16 @@
   border: none;
   cursor: pointer;
   border-radius: 5px;
-  transition: transform 0.2s ease; /* 부드러운 애니메이션 */
+  transition: transform 0.2s ease;
 }
 
 .ctaButton:hover {
-  transform: scale(1.05); /* 살짝 커짐 */
+  transform: scale(1.05);
 }
 
 .adminButton {
-  background-color: #333; /* LOGIN 버튼과 동일 */
-  color: #fff; /* 글씨 흰색 */
+  background-color: #333;
+  color: #fff;
   padding: 6px 12px;
   border-radius: 5px;
   text-decoration: none;
@@ -42,4 +85,12 @@
   font-weight: 600;
   box-shadow: 0 2px 6px rgba(0,0,0,0.2);
   cursor: pointer;
+}
+
+.footer {
+  padding: 20px;
+  text-align: center;
+  background-color: #333;
+  color: #fff;
+  margin-top: 40px;
 }

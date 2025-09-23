@@ -7,7 +7,7 @@ export default function MainPage() {
   const [tutors, setTutors] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // 샘플 한국인 얼굴 이미지
+  // 무조건 나오는 샘플 얼굴 (randomuser.me)
   const sampleTutors = [
     {
       _id: "sample1",
@@ -25,11 +25,11 @@ export default function MainPage() {
       _id: "sample3",
       name: "김수영",
       experience: 7,
-      photoUrl: "https://randomuser.me/api/portraits/men/55.jpg",
+      photoUrl: "https://randomuser.me/api/portraits/women/68.jpg",
     },
   ];
 
-  // API fetch + fallback
+  // API 호출 + fallback
   useEffect(() => {
     const loadTutors = async () => {
       try {
@@ -38,8 +38,7 @@ export default function MainPage() {
           const tutorsWithPhotos = data.map((tutor, index) => ({
             ...tutor,
             photoUrl:
-              tutor.photoUrl ||
-              sampleTutors[index % sampleTutors.length].photoUrl,
+              sampleTutors[index % sampleTutors.length].photoUrl, // 무조건 샘플 이미지 사용
           }));
           setTutors(tutorsWithPhotos);
         } else {
@@ -54,6 +53,7 @@ export default function MainPage() {
     loadTutors();
   }, []);
 
+  // 최대 3명 표시
   const displayTutors = tutors.slice(0, 3);
 
   // inline 스타일
@@ -125,52 +125,6 @@ export default function MainPage() {
       fontSize: "24px",
       marginBottom: "20px",
     },
-    tutorList: {
-      display: "flex",
-      justifyContent: "center",
-      gap: "30px",
-      flexWrap: "wrap",
-      overflow: "visible",
-    },
-    tutorImg: {
-      width: "100px",
-      height: "100px",
-      borderRadius: "50%",
-      objectFit: "cover",
-      display: "block",
-      margin: "0 auto 10px auto",
-    },
-    tutorName: {
-      fontSize: "18px",
-      margin: "10px 0 5px 0",
-    },
-    tutorExperience: {
-      fontSize: "14px",
-      marginBottom: "10px",
-    },
-    detailLink: {
-      textDecoration: "none",
-      color: "#0077cc",
-      cursor: "pointer",
-    },
-    footer: {
-      padding: "20px",
-      textAlign: "center",
-      backgroundColor: "#333",
-      color: "#fff",
-      marginTop: "40px",
-    },
- adminButton: {
-  backgroundColor: "#333", // LOGIN 버튼 배경색과 동일
-  color: "#fff",            // 글씨 흰색
-  padding: "6px 12px",
-  borderRadius: "5px",
-  textDecoration: "none",
-  fontSize: "16px",
-  fontWeight: "600",
-  boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
-  cursor: "pointer",
-  },
   };
 
   return (
@@ -179,11 +133,21 @@ export default function MainPage() {
       <nav style={inlineStyles.navbar}>
         <div style={inlineStyles.logo}>KOREAN TUTORING</div>
         <div style={inlineStyles.navLinks}>
-          <Link to="/" style={inlineStyles.navLink}>HOME</Link>
-          <Link to="/tutors" style={inlineStyles.navLink}>TUTOR</Link>
-          <Link to="/signup" style={inlineStyles.navLink}>SIGNUP</Link>
-          <Link to="/login" style={inlineStyles.navLink}>LOGIN</Link>
-          <Link to="/admin/login" className={styles.adminButton}>ADMIN</Link>
+          <Link to="/" style={inlineStyles.navLink}>
+            HOME
+          </Link>
+          <Link to="/tutors" style={inlineStyles.navLink}>
+            TUTOR
+          </Link>
+          <Link to="/signup" style={inlineStyles.navLink}>
+            SIGNUP
+          </Link>
+          <Link to="/login" style={inlineStyles.navLink}>
+            LOGIN
+          </Link>
+          <Link to="/admin/login" className={styles.adminButton}>
+            ADMIN
+          </Link>
         </div>
       </nav>
 
@@ -198,7 +162,7 @@ export default function MainPage() {
           </p>
           <div>
             <Link to="/signup">
-              <button style={inlineStyles.ctaButton}>지금 시작하기</button>
+              <button className={styles.ctaButton}>지금 시작하기</button>
             </Link>
           </div>
         </div>
@@ -210,19 +174,13 @@ export default function MainPage() {
         {loading ? (
           <p>추천 튜터 정보를 불러오는 중...</p>
         ) : (
-          <div style={inlineStyles.tutorList}>
+          <div className={styles.tutorList}>
             {displayTutors.map((tutor) => (
               <div key={tutor._id} className={styles.tutorCard}>
-                <img
-                  src={tutor.photoUrl}
-                  alt={tutor.name}
-                  style={inlineStyles.tutorImg}
-                />
-                <h3 style={inlineStyles.tutorName}>{tutor.name}</h3>
-                <p style={inlineStyles.tutorExperience}>
-                  경력: {tutor.experience}년
-                </p>
-                <span style={inlineStyles.detailLink}>자세히 보기 →</span>
+                <img src={tutor.photoUrl} alt={tutor.name} />
+                <h3>{tutor.name}</h3>
+                <p>경력: {tutor.experience}년</p>
+                <span>자세히 보기 →</span>
               </div>
             ))}
           </div>
@@ -230,8 +188,8 @@ export default function MainPage() {
       </section>
 
       {/* 푸터 */}
-      <footer style={inlineStyles.footer}>
-        <p>© 20250901 KOREAN TUTORING 장준영. All rights reserved.</p>
+      <footer className={styles.footer}>
+        <p>© 2025 KOREAN TUTORING 장준영. All rights reserved.</p>
         <p>문의: jjy@mail.kcu.ac</p>
       </footer>
     </div>
