@@ -74,6 +74,7 @@ function MainPage() {
       { _id: "sample2", name: "장서은", experience: 3, photoUrl: "https://via.placeholder.com/100" },
       { _id: "sample3", name: "김수영", experience: 7, photoUrl: "https://via.placeholder.com/100" },
     ];
+
     api.get("/api/tutors/with-rating")
       .then((res) => {
         if (Array.isArray(res.data) && res.data.length > 0) setTutors(res.data);
@@ -109,16 +110,10 @@ function MainPage() {
           ) : (
             displayTutors.map((tutor) => (
               <div key={tutor._id} style={styles.tutorCard}>
-                <img
-                  src={tutor.photoUrl || "https://via.placeholder.com/100"}
-                  alt={tutor.name}
-                  style={styles.tutorImage}
-                />
+                <img src={tutor.photoUrl || "https://via.placeholder.com/100"} alt={tutor.name} style={styles.tutorImage} />
                 <h3 style={styles.tutorName}>{tutor.name}</h3>
                 <p style={styles.tutorExperience}>경력: {tutor.experience}년</p>
-                <Link to={`/tutors/${tutor._id}`} style={styles.detailLink}>
-                  자세히 보기 →
-                </Link>
+                <Link to={`/tutors/${tutor._id}`} style={styles.detailLink}>자세히 보기 →</Link>
               </div>
             ))
           )}
@@ -144,7 +139,6 @@ function TutorDetailPage() {
   const [availableSlots, setAvailableSlots] = useState([]);
   const [selectedSlot, setSelectedSlot] = useState("");
   const [message, setMessage] = useState("");
-
   const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || "http://localhost:8000";
 
   useEffect(() => {
@@ -187,8 +181,7 @@ function TutorDetailPage() {
     setSelectedSlot("");
   }, [selectedDate, tutor]);
 
-  const formatDate = (date) =>
-    `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,"0")}-${String(date.getDate()).padStart(2,"0")}`;
+  const formatDate = (date) => `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,"0")}-${String(date.getDate()).padStart(2,"0")}`;
 
   const handleBooking = async () => {
     if (!selectedSlot) {
@@ -207,26 +200,13 @@ function TutorDetailPage() {
     }
   };
 
-  // -----------------------------
-  // 영상 처리
-  // -----------------------------
   let videoElement = <p style={{color:"#888"}}>등록된 영상이 없습니다.</p>;
   if (tutor?.sampleVideoUrl) {
     let embedUrl = tutor.sampleVideoUrl;
-    if (tutor.sampleVideoUrl.includes("youtube.com"))
-      embedUrl = tutor.sampleVideoUrl.replace("watch?v=", "embed/");
-    else if (tutor.sampleVideoUrl.includes("youtu.be"))
-      embedUrl = tutor.sampleVideoUrl.replace("youtu.be/", "www.youtube.com/embed/");
-    
+    if (tutor.sampleVideoUrl.includes("youtube.com")) embedUrl = tutor.sampleVideoUrl.replace("watch?v=", "embed/");
+    else if (tutor.sampleVideoUrl.includes("youtu.be")) embedUrl = tutor.sampleVideoUrl.replace("youtu.be/", "www.youtube.com/embed/");
     videoElement = (
-      <iframe
-        className="w-full h-80 rounded"
-        src={embedUrl}
-        title="튜터 소개 영상"
-        frameBorder="0"
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-        allowFullScreen
-      ></iframe>
+      <iframe className="w-full h-80 rounded" src={embedUrl} title="튜터 소개 영상" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
     );
   }
 
@@ -240,28 +220,25 @@ function TutorDetailPage() {
       <p className="text-gray-700">소개: {tutor.bio}</p>
       <p className="text-gray-700">평점: {tutor.averageRating}</p>
 
-      {/* 샘플 영상 */}
       <div style={{marginTop:20}}>
         <h3>🎥 튜터 소개 영상</h3>
         {videoElement}
       </div>
 
-      {/* 실시간 수업 링크 */}
       <div style={{marginTop:20}}>
         <h3>📡 실시간 수업</h3>
         {tutor.videoLink ? (
-          <a href={tutor.videoLink} target="_blank" rel="noopener noreferrer"
-             style={{padding:"10px 20px", background:"#2563eb", color:"#fff", borderRadius:8, display:"inline-block", marginTop:10}}>
+          <a href={tutor.videoLink} target="_blank" rel="noopener noreferrer" style={{padding:"10px 20px", background:"#2563eb", color:"#fff", borderRadius:8, display:"inline-block", marginTop:10}}>
             실시간 수업 입장하기
           </a>
         ) : <p style={{color:"#888"}}>실시간 수업 링크가 아직 없습니다.</p>}
       </div>
 
-      {/* 예약 */}
       <div style={{marginTop:20}}>
         <h3>📅 예약 날짜 선택</h3>
         <Calendar value={selectedDate} onChange={setSelectedDate} />
       </div>
+
       <div style={{marginTop:10}}>
         <h3>⏰ 가능 시간</h3>
         {availableSlots.length === 0 ? (
@@ -269,20 +246,15 @@ function TutorDetailPage() {
         ) : (
           <div className="flex gap-2 flex-wrap">
             {availableSlots.map((slot) => (
-              <button
-                key={slot}
-                onClick={() => setSelectedSlot(slot)}
-                className={`px-3 py-1 rounded border ${selectedSlot === slot ? "bg-blue-500 text-white" : "bg-gray-100"}`}
-              >
+              <button key={slot} onClick={() => setSelectedSlot(slot)} className={`px-3 py-1 rounded border ${selectedSlot === slot ? "bg-blue-500 text-white" : "bg-gray-100"}`}>
                 {slot}
               </button>
             ))}
           </div>
         )}
       </div>
-      <button onClick={handleBooking} className="mt-4 px-4 py-2 bg-green-600 text-white rounded">
-        예약하기
-      </button>
+
+      <button onClick={handleBooking} className="mt-4 px-4 py-2 bg-green-600 text-white rounded">예약하기</button>
       {message && <p className="mt-2">{message}</p>}
 
       <div className="mt-8">
@@ -301,10 +273,12 @@ export default function App() {
 
   const renderDashboard = () => {
     if (!user) return <Navigate to="/login" replace />;
-    if (user.role === "tutor") return <TutorDashboardPage />;
-    if (user.role === "student") return <StudentDashboardPage />;
-    if (user.role === "admin") return <AdminDashboard />;
-    return <Navigate to="/" />;
+    switch (user.role) {
+      case "tutor": return <TutorDashboardPage />;
+      case "student": return <StudentDashboardPage />;
+      case "admin": return <AdminDashboard />;
+      default: return <Navigate to="/" />;
+    }
   };
 
   return (
@@ -323,25 +297,25 @@ export default function App() {
         <Route path="/reset-password" element={<ResetPasswordPage />} />
 
         {/* 학생/예약/결제 */}
-        <Route path="/book" element={<RequireAuth><BookingForm /></RequireAuth>} />
-        <Route path="/student/mypage" element={<RequireAuth><StudentMyPage /></RequireAuth>} />
+        <Route path="/book" element={<RequireAuth role="student"><BookingForm /></RequireAuth>} />
+        <Route path="/student/mypage" element={<RequireAuth role="student"><StudentMyPage /></RequireAuth>} />
         <Route path="/mypage" element={<RequireAuth><MyPage /></RequireAuth>} />
         <Route path="/my-bookings" element={<RequireAuth><BookingListWithTutorName /></RequireAuth>} />
-        <Route path="/payment" element={<RequireAuth><PaymentPage /></RequireAuth>} />
-        <Route path="/payments/success" element={<RequireAuth><PaymentSuccess /></RequireAuth>} />
-        <Route path="/payment-list" element={<RequireAuth><PaymentList /></RequireAuth>} />
-        <Route path="/payments/history" element={<RequireAuth><PaymentHistory /></RequireAuth>} />
+        <Route path="/payment" element={<RequireAuth role="student"><PaymentPage /></RequireAuth>} />
+        <Route path="/payments/success" element={<RequireAuth role="student"><PaymentSuccess /></RequireAuth>} />
+        <Route path="/payment-list" element={<RequireAuth role="student"><PaymentList /></RequireAuth>} />
+        <Route path="/payments/history" element={<RequireAuth role="student"><PaymentHistory /></RequireAuth>} />
         <Route path="/change-password" element={<RequireAuth><ChangePasswordPage /></RequireAuth>} />
         <Route path="/edit-profile" element={<RequireAuth><ProfileEditPage /></RequireAuth>} />
 
-        {/* 대시보드 */}
+        {/* 공통 대시보드 */}
         <Route path="/dashboard" element={<RequireAuth>{renderDashboard()}</RequireAuth>} />
 
-        {/* 튜터 */}
+        {/* 튜터 전용 */}
         <Route path="/tutor/dashboard" element={<RequireAuth role="tutor"><TutorDashboardPage /></RequireAuth>} />
         <Route path="/video/:bookingId" element={<RequireAuth><VideoClassPageWrapper /></RequireAuth>} />
 
-        {/* 관리자 */}
+        {/* 관리자 전용 */}
         <Route path="/admin/dashboard" element={<RequireAuth role="admin"><AdminDashboard /></RequireAuth>} />
         <Route path="/admin/users" element={<RequireAuth role="admin"><UserList /></RequireAuth>} />
         <Route path="/admin/tutors" element={<RequireAuth role="admin"><AdminTutorManagement /></RequireAuth>} />
@@ -354,9 +328,6 @@ export default function App() {
   );
 }
 
-// ----------------------
-// Styles
-// ----------------------
 const styles = {
   navbar: {
     display: "flex",
@@ -423,7 +394,7 @@ const styles = {
     transition: "background-color 0.3s",
   },
   section: {
-    maxWidth: 1100,
+    maxWidth: "1100px",
     margin: "4rem auto",
     padding: "0 2rem",
   },
@@ -441,51 +412,41 @@ const styles = {
     justifyContent: "center",
   },
   tutorCard: {
-    width: 280,
-    backgroundColor: "#ffffff",
-    borderRadius: "16px",
-    padding: "24px 16px",
+    width: "220px",
+    border: "1px solid #ddd",
+    borderRadius: "10px",
+    padding: "16px",
+    boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
     textAlign: "center",
-    boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
-    transition: "transform 0.2s",
+    backgroundColor: "#fff",
   },
   tutorImage: {
-    width: 110,
-    height: 110,
+    width: "100px",
+    height: "100px",
     borderRadius: "50%",
     objectFit: "cover",
-    marginBottom: "16px",
-    border: "3px solid #0077cc",
+    marginBottom: "8px",
   },
   tutorName: {
-    fontSize: "1.25rem",
+    fontSize: "18px",
     fontWeight: 600,
-    color: "#333333",
-    marginBottom: "0.5rem",
+    marginBottom: "4px",
   },
   tutorExperience: {
-    fontSize: "1rem",
-    color: "#666666",
-    marginBottom: "1rem",
+    fontSize: "14px",
+    color: "#666",
+    marginBottom: "8px",
   },
   detailLink: {
-    display: "inline-block",
-    padding: "6px 12px",
-    fontSize: "0.95rem",
-    fontWeight: 600,
-    color: "#0077cc",
-    border: "1px solid #0077cc",
-    borderRadius: "8px",
+    fontSize: "14px",
+    color: "#2563eb",
     textDecoration: "none",
-    transition: "all 0.2s",
   },
   footer: {
-    marginTop: "60px",
-    padding: "2rem 1rem",
-    backgroundColor: "#0077cc",
-    color: "#ffffff",
     textAlign: "center",
-    fontSize: "0.9rem",
-    lineHeight: 1.5,
+    padding: "2rem 0",
+    backgroundColor: "#0077cc",
+    marginTop: "4rem",
+    color: "#ffffff",
   },
 };

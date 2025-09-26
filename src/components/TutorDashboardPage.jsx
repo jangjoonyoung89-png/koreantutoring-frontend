@@ -1,234 +1,107 @@
-import React, { useEffect, useState, useContext } from "react";
-import { AuthContext } from "../context/AuthContext";
-import { Link } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { FaChalkboardTeacher, FaFolderOpen, FaStar, FaSignOutAlt } from "react-icons/fa";
+import axios from "axios";
 
 export default function TutorDashboardPage() {
-  const { user } = useContext(AuthContext);
   const [bookings, setBookings] = useState([]);
   const [reviews, setReviews] = useState([]);
   const [error, setError] = useState("");
-  const [file, setFile] = useState(null);
 
+  // 예약 / 리뷰 불러오기
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const resBookings = await fetch(
-          `http://localhost:8000/api/bookings?tutorId=${user.id}`,
-          { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
-        );
-        if (!resBookings.ok) throw new Error("예약 정보를 불러오는 데 실패했습니다.");
-        setBookings(await resBookings.json());
-
-        const resReviews = await fetch(
-          `http://localhost:8000/api/reviews?tutorId=${user.id}`,
-          { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
-        );
-        if (!resReviews.ok) throw new Error("리뷰 정보를 불러오는 데 실패했습니다.");
-        setReviews(await resReviews.json());
-      } catch (err) {
-        setError(err.message || "서버 오류");
-      }
-    };
-    if (user?.role === "tutor") fetchData();
-  }, [user]);
-
-  // ✅ 예약 승인
-  const handleApprove = async (bookingId) => {
-    try {
-      const res = await fetch(
-        `http://localhost:8000/api/bookings/${bookingId}/approve`,
-        { method: "POST", headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
-      );
-      if (!res.ok) throw new Error("승인 실패");
-      setBookings((prev) =>
-        prev.map((b) => (b._id === bookingId ? { ...b, status: "approved" } : b))
-      );
-    } catch (err) {
-      alert(err.message);
-    }
-  };
-
-  // ✅ 예약 거절
-  const handleReject = async (bookingId) => {
-    try {
-      const res = await fetch(
-        `http://localhost:8000/api/bookings/${bookingId}/reject`,
-        { method: "POST", headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
-      );
-      if (!res.ok) throw new Error("거절 실패");
-      setBookings((prev) =>
-        prev.map((b) => (b._id === bookingId ? { ...b, status: "rejected" } : b))
-      );
-    } catch (err) {
-      alert(err.message);
-    }
-  };
-
-  // ✅ 자료 업로드
-  const handleFileUpload = async () => {
-    if (!file) return alert("파일 선택해주세요");
-    const formData = new FormData();
-    formData.append("file", file);
-    try {
-      const res = await fetch("http://localhost:8000/api/materials", {
-        method: "POST",
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }, // ❌ Content-Type 넣지 말 것
-        body: formData,
+    const token = localStorage.getItem("token");
+    axios
+      .get("http://localhost:8000/api/tutor/dashboard", {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((res) => {
+        setBookings(res.data.bookings || []);
+        setReviews(res.data.reviews || []);
+      })
+      .catch(() => {
+        setError("예약 정보를 불러오는 데 실패했습니다.");
       });
-      if (!res.ok) throw new Error("업로드 실패");
-      alert("업로드 완료!");
-      setFile(null);
-    } catch (err) {
-      alert(err.message);
-    }
-  };
-
-  // ✅ 수업 입장 가능 여부 (예약시간 + 승인 상태)
-  const isClassEnterable = (booking) => {
-    const now = new Date();
-    // DB에 따라 date가 ISO 문자열일 수도 있음 → 그대로 Date 객체로 변환
-    const bookingDate = new Date(booking.date);
-    const [hours, minutes] = booking.time.split(":");
-    bookingDate.setHours(hours, minutes, 0, 0);
-    return now >= bookingDate && booking.status === "approved";
-  };
+  }, []);
 
   return (
-    <div className="max-w-6xl mx-auto p-6 font-sans">
-      <h1 className="text-3xl font-bold text-center mb-10">🎓 튜터 대시보드</h1>
-      {error && <p className="text-red-500 mb-4">{error}</p>}
+    <div className="min-h-screen bg-gray-100">
+      {/* 상단 헤더 */}
+      <div className="bg-white shadow p-6 flex justify-between items-center">
+        <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
+          <FaChalkboardTeacher className="text-blue-600" />
+          튜터 대시보드
+        </h1>
+        <button className="flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg shadow">
+          <FaSignOutAlt /> 로그아웃
+        </button>
+      </div>
 
-      {/* 예약 현황 */}
-      <section className="mb-8">
-        <h2 className="text-2xl font-semibold mb-4">📊 예약 현황</h2>
-        {bookings.length === 0 ? (
-          <p>예약 없음</p>
-        ) : (
-          <div className="grid gap-6">
-            {bookings.map((b) => (
-              <div
-                key={b._id}
-                className="bg-white rounded-xl shadow p-4 flex flex-col md:flex-row justify-between items-start md:items-center space-y-4 md:space-y-0"
-              >
-                <div className="flex flex-col gap-1">
-                  <p>
-                    <strong>학생:</strong> {b.student?.full_name || b.student?.name || "이름 없음"}
-                  </p>
-                  <p>
-                    <strong>날짜:</strong>{" "}
-                    {b.date ? new Date(b.date).toLocaleDateString() : "날짜 없음"}
-                  </p>
-                  <p>
-                    <strong>시간:</strong> {b.time || "시간 없음"}
-                  </p>
-                  <p>
-                    <strong>요청:</strong> {b.notes || "없음"}
-                  </p>
-                  <p className={`font-bold ${getStatusColor(b.status)}`}>
-                    {b.status || "pending"}
-                  </p>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  <Link
-                    to={`/video/${b._id}`}
-                    title={isClassEnterable(b) ? "" : "수업 시간이 되어야 입장할 수 있습니다"}
-                    className={`px-3 py-1 rounded text-white ${
-                      isClassEnterable(b)
-                        ? "bg-blue-500 hover:bg-blue-600"
-                        : "bg-gray-400 cursor-not-allowed"
-                    }`}
-                  >
-                    영상
-                  </Link>
-                  <Link
-                    to={`/chat/${b._id}`}
-                    className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
-                  >
-                    채팅
-                  </Link>
-                  <Link
-                    to={`/whiteboard/${b._id}`}
-                    className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
-                  >
-                    화이트보드
-                  </Link>
-                  {(b.status === "pending" || !b.status) && (
-                    <>
-                      <button
-                        onClick={() => handleApprove(b._id)}
-                        className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600"
-                      >
-                        ✔️ 승인
-                      </button>
-                      <button
-                        onClick={() => handleReject(b._id)}
-                        className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
-                      >
-                        ❌ 거절
-                      </button>
-                    </>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
+      <div className="max-w-6xl mx-auto px-4 py-8 space-y-8">
+        {/* 에러 메시지 */}
+        {error && (
+          <div className="text-red-600 font-semibold mb-4">{error}</div>
         )}
-      </section>
 
-      {/* 자료 업로드 */}
-      <section className="bg-white p-6 rounded-xl shadow mb-8">
-        <h2 className="text-2xl font-semibold mb-4">📁 자료 업로드</h2>
-        <div className="flex items-center space-x-3">
-          <input
-            type="file"
-            onChange={(e) => setFile(e.target.files[0])}
-            className="border p-2 rounded"
-          />
-          <button
-            onClick={handleFileUpload}
-            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-          >
-            업로드
-          </button>
-          {file && <span>{file.name}</span>}
+        {/* 예약 현황 */}
+        <div className="bg-white rounded-xl shadow-lg p-6">
+          <h2 className="text-xl font-semibold flex items-center gap-2 mb-4 text-gray-700">
+            📊 예약 현황
+          </h2>
+          {bookings.length > 0 ? (
+            <ul className="divide-y divide-gray-200">
+              {bookings.map((b) => (
+                <li
+                  key={b._id}
+                  className="py-3 flex justify-between items-center hover:bg-gray-50 px-2 rounded-lg"
+                >
+                  <span>{b.studentName} - {b.date}</span>
+                  <span className="text-sm text-gray-500">{b.status}</span>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-gray-500">예약 없음</p>
+          )}
         </div>
-      </section>
 
-      {/* 리뷰 */}
-      <section className="bg-white p-6 rounded-xl shadow mb-8">
-        <h2 className="text-2xl font-semibold mb-4">⭐ 리뷰</h2>
-        {reviews.length === 0 ? (
-          <p>리뷰 없음</p>
-        ) : (
-          <div className="grid gap-4">
-            {reviews.map((r) => (
-              <div
-                key={r._id}
-                className="p-4 border rounded-lg shadow-sm hover:shadow-md transition"
-              >
-                <p className="font-semibold">
-                  {r.studentName || r.student?.full_name || "익명"}
-                </p>
-                <p>{r.comment}</p>
-                <p className="text-yellow-500 font-bold">
-                  {"⭐".repeat(r.rating || 0)}
-                </p>
-              </div>
-            ))}
+        {/* 자료 업로드 */}
+        <div className="bg-white rounded-xl shadow-lg p-6">
+          <h2 className="text-xl font-semibold flex items-center gap-2 mb-4 text-gray-700">
+            <FaFolderOpen className="text-yellow-500" /> 자료 업로드
+          </h2>
+          <div className="flex items-center gap-3">
+            <input
+              type="file"
+              className="flex-1 border rounded-lg px-3 py-2 text-gray-700"
+            />
+            <button className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg shadow">
+              업로드
+            </button>
           </div>
-        )}
-      </section>
+        </div>
+
+        {/* 리뷰 */}
+        <div className="bg-white rounded-xl shadow-lg p-6">
+          <h2 className="text-xl font-semibold flex items-center gap-2 mb-4 text-gray-700">
+            <FaStar className="text-yellow-400" /> 리뷰
+          </h2>
+          {reviews.length > 0 ? (
+            <ul className="space-y-3">
+              {reviews.map((r) => (
+                <li
+                  key={r._id}
+                  className="p-4 border rounded-lg hover:shadow transition"
+                >
+                  <p className="text-gray-800 font-medium">{r.comment}</p>
+                  <p className="text-sm text-gray-500">⭐ {r.rating}</p>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-gray-500">리뷰 없음</p>
+          )}
+        </div>
+      </div>
     </div>
   );
-}
-
-function getStatusColor(status) {
-  switch (status) {
-    case "approved":
-      return "text-green-600";
-    case "rejected":
-      return "text-red-600";
-    default:
-      return "text-gray-500";
-  }
 }

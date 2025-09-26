@@ -51,8 +51,16 @@ function LoginPage() {
       localStorage.setItem("token", data.token);
       login({ token: data.token, user: data.user });
 
-      // 로그인 후 대시보드로 이동
-      navigate("/dashboard");
+      // role 안정적으로 처리 (소문자 + 공백 제거)
+      const role = data.user.role?.trim().toLowerCase();
+
+      if (role === "admin") {
+        navigate("/admin/dashboard");
+      } else if (role === "tutor") {
+        navigate("/tutor/dashboard");
+      } else {
+        navigate("/student/mypage");
+      }
 
     } catch (err) {
       console.error("서버 오류:", err);
