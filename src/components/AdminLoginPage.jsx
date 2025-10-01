@@ -3,8 +3,8 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 function AdminLoginPage() {
-  const [username, setUsername] = useState("admin"); // 기본 테스트용 아이디
-  const [password, setPassword] = useState("1234"); // 기본 테스트용 비밀번호
+  const [username, setUsername] = useState("admin"); // 기본 테스트용
+  const [password, setPassword] = useState("1234");  // 기본 테스트용
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -15,26 +15,28 @@ function AdminLoginPage() {
     setLoading(true);
 
     try {
-      // 🔹 백엔드 로그인 API 호출
+      // 🔹 관리자 로그인 API 호출
       const res = await axios.post("http://localhost:8000/admin/login", {
         username,
         password,
       });
 
-      // 🔹 로그인 성공 → 토큰 저장
+      // 🔹 토큰 저장 (튜터/학생과 구분되도록 별도 key 사용)
       localStorage.setItem("adminToken", res.data.token);
 
-      // 🔹 관리자 대시보드로 이동
-      navigate("/admin/dashboard");
+      // 🔹 axios 기본 헤더 세팅
+      axios.defaults.headers.common[
+        "Authorization"
+      ] = `Bearer ${res.data.token}`;
+
+      // 🔹 관리자 대시보드로 이동 (튜터 대시보드 절대 아님!)
+      navigate("/admin/dashboard", { replace: true });
     } catch (err) {
       console.error("Admin login error:", err);
 
-      // 에러 메시지 표시
       if (err.response) {
-        // 백엔드에서 내려준 메시지 사용
         setError(err.response.data?.message || "로그인 실패");
       } else {
-        // 네트워크 오류 등
         setError("서버 연결 실패");
       }
     } finally {

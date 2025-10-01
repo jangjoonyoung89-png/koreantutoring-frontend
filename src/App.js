@@ -1,16 +1,9 @@
-import React, { useContext, useEffect, useState } from "react";
-import {
-  BrowserRouter,
-  Routes,
-  Route,
-  Navigate,
-  Link,
-  useParams,
-} from "react-router-dom";
-import { AuthContext } from "./context/AuthContext";
-import api from "./api";
+import React, { useState, useEffect, useContext } from "react";
+import { BrowserRouter, Routes, Route, Link, Navigate, useParams } from "react-router-dom";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
+import api from "./api";
+import { AuthContext } from "./context/AuthContext";
 
 // ----------------------
 // 페이지 임포트
@@ -34,6 +27,10 @@ import StudentDashboardPage from "./components/StudentDashboardPage";
 import TutorDashboardPage from "./components/TutorDashboardPage";
 import ReviewList from "./components/ReviewList";
 import VideoClassPageWrapper from "./components/VideoClassPageWrapper";
+
+// ----------------------
+// 관리자
+// ----------------------
 import AdminDashboard from "./components/admin/AdminDashboard";
 import UserList from "./components/admin/UserList";
 import AdminTutorManagement from "./components/admin/AdminTutorManagement";
@@ -41,6 +38,7 @@ import AdminTutorApprovalPage from "./components/AdminTutorApprovalPage";
 import AdminBookingList from "./components/admin/AdminBookingList";
 import AdminReviewManagement from "./components/admin/AdminReviewManagement";
 import AdminLoginPage from "./components/AdminLoginPage";
+import AdminQAManagement from "./components/admin/AdminQAManagement";
 import RequireAuth from "./components/RequireAuth";
 
 // ----------------------
@@ -203,10 +201,19 @@ function TutorDetailPage() {
   let videoElement = <p style={{color:"#888"}}>등록된 영상이 없습니다.</p>;
   if (tutor?.sampleVideoUrl) {
     let embedUrl = tutor.sampleVideoUrl;
-    if (tutor.sampleVideoUrl.includes("youtube.com")) embedUrl = tutor.sampleVideoUrl.replace("watch?v=", "embed/");
-    else if (tutor.sampleVideoUrl.includes("youtu.be")) embedUrl = tutor.sampleVideoUrl.replace("youtu.be/", "www.youtube.com/embed/");
+    if (tutor.sampleVideoUrl.includes("youtube.com"))
+      embedUrl = tutor.sampleVideoUrl.replace("watch?v=", "embed/");
+    else if (tutor.sampleVideoUrl.includes("youtu.be"))
+      embedUrl = tutor.sampleVideoUrl.replace("youtu.be/", "www.youtube.com/embed/");
     videoElement = (
-      <iframe className="w-full h-80 rounded" src={embedUrl} title="튜터 소개 영상" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
+      <iframe
+        className="w-full h-80 rounded"
+        src={embedUrl}
+        title="튜터 소개 영상"
+        frameBorder="0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowFullScreen
+      ></iframe>
     );
   }
 
@@ -228,7 +235,12 @@ function TutorDetailPage() {
       <div style={{marginTop:20}}>
         <h3>📡 실시간 수업</h3>
         {tutor.videoLink ? (
-          <a href={tutor.videoLink} target="_blank" rel="noopener noreferrer" style={{padding:"10px 20px", background:"#2563eb", color:"#fff", borderRadius:8, display:"inline-block", marginTop:10}}>
+          <a
+            href={tutor.videoLink}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{padding:"10px 20px", background:"#2563eb", color:"#fff", borderRadius:8, display:"inline-block", marginTop:10}}
+          >
             실시간 수업 입장하기
           </a>
         ) : <p style={{color:"#888"}}>실시간 수업 링크가 아직 없습니다.</p>}
@@ -246,7 +258,11 @@ function TutorDetailPage() {
         ) : (
           <div className="flex gap-2 flex-wrap">
             {availableSlots.map((slot) => (
-              <button key={slot} onClick={() => setSelectedSlot(slot)} className={`px-3 py-1 rounded border ${selectedSlot === slot ? "bg-blue-500 text-white" : "bg-gray-100"}`}>
+              <button
+                key={slot}
+                onClick={() => setSelectedSlot(slot)}
+                className={`px-3 py-1 rounded border ${selectedSlot === slot ? "bg-blue-500 text-white" : "bg-gray-100"}`}
+              >
                 {slot}
               </button>
             ))}
@@ -271,16 +287,6 @@ function TutorDetailPage() {
 export default function App() {
   const { user } = useContext(AuthContext);
 
-  const renderDashboard = () => {
-    if (!user) return <Navigate to="/login" replace />;
-    switch (user.role) {
-      case "tutor": return <TutorDashboardPage />;
-      case "student": return <StudentDashboardPage />;
-      case "admin": return <AdminDashboard />;
-      default: return <Navigate to="/" />;
-    }
-  };
-
   return (
     <BrowserRouter basename={process.env.PUBLIC_URL}>
       <Navbar />
@@ -296,7 +302,7 @@ export default function App() {
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
 
-        {/* 학생/예약/결제 */}
+        {/* 학생 전용 */}
         <Route path="/book" element={<RequireAuth role="student"><BookingForm /></RequireAuth>} />
         <Route path="/student/mypage" element={<RequireAuth role="student"><StudentMyPage /></RequireAuth>} />
         <Route path="/mypage" element={<RequireAuth><MyPage /></RequireAuth>} />
@@ -308,11 +314,11 @@ export default function App() {
         <Route path="/change-password" element={<RequireAuth><ChangePasswordPage /></RequireAuth>} />
         <Route path="/edit-profile" element={<RequireAuth><ProfileEditPage /></RequireAuth>} />
 
-        {/* 공통 대시보드 */}
-        <Route path="/dashboard" element={<RequireAuth>{renderDashboard()}</RequireAuth>} />
-
-        {/* 튜터 전용 */}
+        {/* 학생/튜터 대시보드 */}
+        <Route path="/dashboard/student" element={<RequireAuth role="student"><StudentDashboardPage /></RequireAuth>} />
         <Route path="/tutor/dashboard" element={<RequireAuth role="tutor"><TutorDashboardPage /></RequireAuth>} />
+
+        {/* 실시간 수업 */}
         <Route path="/video/:bookingId" element={<RequireAuth><VideoClassPageWrapper /></RequireAuth>} />
 
         {/* 관리자 전용 */}
@@ -322,12 +328,25 @@ export default function App() {
         <Route path="/admin/tutor-approval" element={<RequireAuth role="admin"><AdminTutorApprovalPage /></RequireAuth>} />
         <Route path="/admin/bookings" element={<RequireAuth role="admin"><AdminBookingList /></RequireAuth>} />
         <Route path="/admin/reviews" element={<RequireAuth role="admin"><AdminReviewManagement /></RequireAuth>} />
+        <Route path="/admin/qa" element={<RequireAuth role="admin"><AdminQAManagement /></RequireAuth>} />
         <Route path="/admin/login" element={<AdminLoginPage />} />
+
+        {/* 잘못된 /dashboard 접근 리다이렉트 */}
+        <Route path="/dashboard" element={
+          user ? (
+            user.role === "student" ? <Navigate to="/dashboard/student" replace /> :
+            user.role === "tutor" ? <Navigate to="/tutor/dashboard" replace /> :
+            <Navigate to="/" replace />
+          ) : <Navigate to="/login" replace />
+        } />
       </Routes>
     </BrowserRouter>
   );
 }
 
+// ----------------------
+// 스타일
+// ----------------------
 const styles = {
   navbar: {
     display: "flex",

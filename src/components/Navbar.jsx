@@ -22,7 +22,8 @@ export default function Navbar() {
 
       {/* 관리자 전용 */}
       {user?.role === "admin" && (
-        <Link to="/admin/login" style={styles.navLink}>관리자</Link>
+        <Link to="/admin/dashboard" style={styles.navLink}>ADMIN</Link>
+        <Link to="/admin/qa" style={{ ...styles.navLink, color: "#ffdd57" }}>ADMIN Q&A</Link>
       )}
 
       {/* 로그인/로그아웃 */}

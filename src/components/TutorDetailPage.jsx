@@ -42,7 +42,7 @@ function TutorDetailPage() {
             email: "jang@test.com",
             bio: "한국어 교육 전문가입니다.",
             averageRating: 4.8,
-            sampleVideoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+            sampleVideoUrl: "https://www.youtube.com/watch?v=gYbsYQl2TiQ",
             videoLink: "https://meet.jit.si/SampleRoom123", // 실시간 수업 링크 예시
             availableTimes: [
               { day: "Monday", slots: ["10:00", "12:00"] },
@@ -55,7 +55,7 @@ function TutorDetailPage() {
             email: "seo@test.com",
             bio: "비즈니스 한국어 전문 튜터입니다.",
             averageRating: 4.5,
-            sampleVideoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+            sampleVideoUrl: "https://www.youtube.com/watch?v=gYbsYQl2TiQ",
             videoLink: "https://meet.jit.si/SampleRoom456", // 실시간 수업 링크 예시
             availableTimes: [
               { day: "Tuesday", slots: ["13:00", "15:00"] },
@@ -251,5 +251,9 @@ function TutorDetailPage() {
     </div>
   );
 }
+
+<div className="mt-8">
+  <QASection tutorId={tutor._id} />
+</div>
 
 export default TutorDetailPage;
