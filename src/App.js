@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useContext } from "react";
-import { BrowserRouter, Routes, Route, Link, Navigate, useParams } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Link, Navigate, useParams, } from "react-router-dom";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import api from "./api";
-import { AuthContext } from "./context/AuthContext";
+import { AuthProvider, AuthContext } from "./context/AuthContext";
+import { AdminAuthProvider } from "./context/AdminAuthContext";
 
 // ----------------------
 // 페이지 임포트
@@ -53,7 +54,9 @@ function Navbar() {
         <Link to="/tutors" style={styles.navLink}>TUTOR</Link>
         <Link to="/signup" style={styles.navLink}>SIGNUP</Link>
         <Link to="/login" style={styles.navLink}>LOGIN</Link>
-        <Link to="/admin/login" style={{ ...styles.navLink, color: "#ffdd57" }}>ADMIN</Link>
+        <Link to="/admin/login" style={{ ...styles.navLink, color: "#ffdd57" }}>
+          ADMIN
+        </Link>
       </div>
     </nav>
   );
@@ -72,7 +75,6 @@ function MainPage() {
       { _id: "sample2", name: "장서은", experience: 3, photoUrl: "https://via.placeholder.com/100" },
       { _id: "sample3", name: "김수영", experience: 7, photoUrl: "https://via.placeholder.com/100" },
     ];
-
     api.get("/api/tutors/with-rating")
       .then((res) => {
         if (Array.isArray(res.data) && res.data.length > 0) setTutors(res.data);
@@ -179,7 +181,8 @@ function TutorDetailPage() {
     setSelectedSlot("");
   }, [selectedDate, tutor]);
 
-  const formatDate = (date) => `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,"0")}-${String(date.getDate()).padStart(2,"0")}`;
+  const formatDate = (date) =>
+    `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,"0")}-${String(date.getDate()).padStart(2,"0")}`;
 
   const handleBooking = async () => {
     if (!selectedSlot) {
@@ -187,11 +190,7 @@ function TutorDetailPage() {
       return;
     }
     try {
-      await api.post("/api/bookings", {
-        tutor: tutor._id,
-        date: formatDate(selectedDate),
-        time: selectedSlot,
-      });
+      await api.post("/api/bookings", { tutor: tutor._id, date: formatDate(selectedDate), time: selectedSlot });
       setMessage(`✅ ${formatDate(selectedDate)} ${selectedSlot} 예약 완료`);
     } catch {
       setMessage("❌ 예약 실패");
@@ -201,19 +200,10 @@ function TutorDetailPage() {
   let videoElement = <p style={{color:"#888"}}>등록된 영상이 없습니다.</p>;
   if (tutor?.sampleVideoUrl) {
     let embedUrl = tutor.sampleVideoUrl;
-    if (tutor.sampleVideoUrl.includes("youtube.com"))
-      embedUrl = tutor.sampleVideoUrl.replace("watch?v=", "embed/");
-    else if (tutor.sampleVideoUrl.includes("youtu.be"))
-      embedUrl = tutor.sampleVideoUrl.replace("youtu.be/", "www.youtube.com/embed/");
+    if (tutor.sampleVideoUrl.includes("youtube.com")) embedUrl = tutor.sampleVideoUrl.replace("watch?v=", "embed/");
+    else if (tutor.sampleVideoUrl.includes("youtu.be")) embedUrl = tutor.sampleVideoUrl.replace("youtu.be/", "www.youtube.com/embed/");
     videoElement = (
-      <iframe
-        className="w-full h-80 rounded"
-        src={embedUrl}
-        title="튜터 소개 영상"
-        frameBorder="0"
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-        allowFullScreen
-      ></iframe>
+      <iframe className="w-full h-80 rounded" src={embedUrl} title="튜터 소개 영상" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen ></iframe>
     );
   }
 
@@ -235,12 +225,7 @@ function TutorDetailPage() {
       <div style={{marginTop:20}}>
         <h3>📡 실시간 수업</h3>
         {tutor.videoLink ? (
-          <a
-            href={tutor.videoLink}
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{padding:"10px 20px", background:"#2563eb", color:"#fff", borderRadius:8, display:"inline-block", marginTop:10}}
-          >
+          <a href={tutor.videoLink} target="_blank" rel="noopener noreferrer" style={{padding:"10px 20px", background:"#2563eb", color:"#fff", borderRadius:8, display:"inline-block", marginTop:10}}>
             실시간 수업 입장하기
           </a>
         ) : <p style={{color:"#888"}}>실시간 수업 링크가 아직 없습니다.</p>}
@@ -258,11 +243,7 @@ function TutorDetailPage() {
         ) : (
           <div className="flex gap-2 flex-wrap">
             {availableSlots.map((slot) => (
-              <button
-                key={slot}
-                onClick={() => setSelectedSlot(slot)}
-                className={`px-3 py-1 rounded border ${selectedSlot === slot ? "bg-blue-500 text-white" : "bg-gray-100"}`}
-              >
+              <button key={slot} onClick={() => setSelectedSlot(slot)} className={`px-3 py-1 rounded border ${ selectedSlot === slot ? "bg-blue-500 text-white" : "bg-gray-100" }`}>
                 {slot}
               </button>
             ))}
@@ -270,7 +251,10 @@ function TutorDetailPage() {
         )}
       </div>
 
-      <button onClick={handleBooking} className="mt-4 px-4 py-2 bg-green-600 text-white rounded">예약하기</button>
+      <button onClick={handleBooking} className="mt-4 px-4 py-2 bg-green-600 text-white rounded">
+        예약하기
+      </button>
+
       {message && <p className="mt-2">{message}</p>}
 
       <div className="mt-8">
@@ -285,67 +269,82 @@ function TutorDetailPage() {
 // App
 // ----------------------
 export default function App() {
-  const { user } = useContext(AuthContext);
-
   return (
-    <BrowserRouter basename={process.env.PUBLIC_URL}>
-      <Navbar />
-      <Routes>
-        {/* 메인 */}
-        <Route path="/" element={<MainPage />} />
-        <Route path="/tutors" element={<TutorListPage />} />
-        <Route path="/tutors/:id" element={<TutorDetailPage />} />
-
-        {/* 회원가입/로그인 */}
-        <Route path="/signup" element={<SignupPage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-        <Route path="/reset-password" element={<ResetPasswordPage />} />
-
-        {/* 학생 전용 */}
-        <Route path="/book" element={<RequireAuth role="student"><BookingForm /></RequireAuth>} />
-        <Route path="/student/mypage" element={<RequireAuth role="student"><StudentMyPage /></RequireAuth>} />
-        <Route path="/mypage" element={<RequireAuth><MyPage /></RequireAuth>} />
-        <Route path="/my-bookings" element={<RequireAuth><BookingListWithTutorName /></RequireAuth>} />
-        <Route path="/payment" element={<RequireAuth role="student"><PaymentPage /></RequireAuth>} />
-        <Route path="/payments/success" element={<RequireAuth role="student"><PaymentSuccess /></RequireAuth>} />
-        <Route path="/payment-list" element={<RequireAuth role="student"><PaymentList /></RequireAuth>} />
-        <Route path="/payments/history" element={<RequireAuth role="student"><PaymentHistory /></RequireAuth>} />
-        <Route path="/change-password" element={<RequireAuth><ChangePasswordPage /></RequireAuth>} />
-        <Route path="/edit-profile" element={<RequireAuth><ProfileEditPage /></RequireAuth>} />
-
-        {/* 학생/튜터 대시보드 */}
-        <Route path="/dashboard/student" element={<RequireAuth role="student"><StudentDashboardPage /></RequireAuth>} />
-        <Route path="/tutor/dashboard" element={<RequireAuth role="tutor"><TutorDashboardPage /></RequireAuth>} />
-
-        {/* 실시간 수업 */}
-        <Route path="/video/:bookingId" element={<RequireAuth><VideoClassPageWrapper /></RequireAuth>} />
-
-        {/* 관리자 전용 */}
-        <Route path="/admin/dashboard" element={<RequireAuth role="admin"><AdminDashboard /></RequireAuth>} />
-        <Route path="/admin/users" element={<RequireAuth role="admin"><UserList /></RequireAuth>} />
-        <Route path="/admin/tutors" element={<RequireAuth role="admin"><AdminTutorManagement /></RequireAuth>} />
-        <Route path="/admin/tutor-approval" element={<RequireAuth role="admin"><AdminTutorApprovalPage /></RequireAuth>} />
-        <Route path="/admin/bookings" element={<RequireAuth role="admin"><AdminBookingList /></RequireAuth>} />
-        <Route path="/admin/reviews" element={<RequireAuth role="admin"><AdminReviewManagement /></RequireAuth>} />
-        <Route path="/admin/qa" element={<RequireAuth role="admin"><AdminQAManagement /></RequireAuth>} />
-        <Route path="/admin/login" element={<AdminLoginPage />} />
-
-        {/* 잘못된 /dashboard 접근 리다이렉트 */}
-        <Route path="/dashboard" element={
-          user ? (
-            user.role === "student" ? <Navigate to="/dashboard/student" replace /> :
-            user.role === "tutor" ? <Navigate to="/tutor/dashboard" replace /> :
-            <Navigate to="/" replace />
-          ) : <Navigate to="/login" replace />
-        } />
-      </Routes>
-    </BrowserRouter>
+    <AuthProvider>
+      <AdminAuthProvider>
+        <BrowserRouter basename={process.env.PUBLIC_URL}>
+          <Navbar />
+          <AppRoutes />
+        </BrowserRouter>
+      </AdminAuthProvider>
+    </AuthProvider>
   );
 }
 
 // ----------------------
-// 스타일
+// Routes 분리
+// ----------------------
+function AppRoutes() {
+  const { user } = useContext(AuthContext);
+
+  return (
+    <Routes>
+      {/* 메인 */}
+      <Route path="/" element={<MainPage />} />
+      <Route path="/tutors" element={<TutorListPage />} />
+      <Route path="/tutors/:id" element={<TutorDetailPage />} />
+
+      {/* 회원가입/로그인 */}
+      <Route path="/signup" element={<SignupPage />} />
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+      <Route path="/reset-password" element={<ResetPasswordPage />} />
+
+      {/* 학생 전용 */}
+      <Route path="/book" element={<RequireAuth role="student"><BookingForm /></RequireAuth>} />
+      <Route path="/student/mypage" element={<RequireAuth role="student"><StudentMyPage /></RequireAuth>} />
+      <Route path="/mypage" element={<RequireAuth><MyPage /></RequireAuth>} />
+      <Route path="/my-bookings" element={<RequireAuth><BookingListWithTutorName /></RequireAuth>} />
+      <Route path="/payment" element={<RequireAuth role="student"><PaymentPage /></RequireAuth>} />
+      <Route path="/payments/success" element={<RequireAuth role="student"><PaymentSuccess /></RequireAuth>} />
+      <Route path="/payment-list" element={<RequireAuth role="student"><PaymentList /></RequireAuth>} />
+      <Route path="/payments/history" element={<RequireAuth role="student"><PaymentHistory /></RequireAuth>} />
+      <Route path="/change-password" element={<RequireAuth><ChangePasswordPage /></RequireAuth>} />
+      <Route path="/edit-profile" element={<RequireAuth><ProfileEditPage /></RequireAuth>} />
+
+      {/* 학생/튜터 대시보드 */}
+      <Route path="/dashboard/student" element={<RequireAuth role="student"><StudentDashboardPage /></RequireAuth>} />
+      <Route path="/tutor/dashboard" element={<RequireAuth role="tutor"><TutorDashboardPage /></RequireAuth>} />
+
+      {/* 실시간 수업 */}
+      <Route path="/video/:bookingId" element={<RequireAuth><VideoClassPageWrapper /></RequireAuth>} />
+
+      {/* 관리자 전용 */}
+      <Route path="/admin/dashboard" element={<RequireAuth role="admin"><AdminDashboard /></RequireAuth>} />
+      <Route path="/admin/users" element={<RequireAuth role="admin"><UserList /></RequireAuth>} />
+      <Route path="/admin/tutors" element={<RequireAuth role="admin"><AdminTutorManagement /></RequireAuth>} />
+      <Route path="/admin/tutor-approval" element={<RequireAuth role="admin"><AdminTutorApprovalPage /></RequireAuth>} />
+      <Route path="/admin/bookings" element={<RequireAuth role="admin"><AdminBookingList /></RequireAuth>} />
+      <Route path="/admin/reviews" element={<RequireAuth role="admin"><AdminReviewManagement /></RequireAuth>} />
+      <Route path="/admin/qa" element={<RequireAuth role="admin"><AdminQAManagement /></RequireAuth>} />
+      <Route path="/admin/login" element={<AdminLoginPage />} />
+
+      {/* 잘못된 /dashboard 접근 리다이렉트 */}
+      <Route path="/dashboard" element={
+        user ? (
+          user.role === "student" ? <Navigate to="/dashboard/student" replace /> :
+          user.role === "tutor" ? <Navigate to="/tutor/dashboard" replace /> :
+          user.role === "admin" ? <Navigate to="/admin/dashboard" replace /> :
+          <Navigate to="/" replace />
+        ) : <Navigate to="/login" replace />
+      } />
+    </Routes>
+  );
+}
+
+
+// ----------------------
+// Styles
 // ----------------------
 const styles = {
   navbar: {

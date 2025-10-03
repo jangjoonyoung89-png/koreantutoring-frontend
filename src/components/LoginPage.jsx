@@ -46,17 +46,21 @@ function LoginPage() {
         return;
       }
 
+      // role 안정적으로 처리 (소문자 + 공백 제거)
+      const role = data.user.role?.trim().toLowerCase();
+
+      // ✅ 관리자 로그인은 이 페이지에서 차단
+      if (role === "admin") {
+        setError("관리자 계정은 관리자 로그인 페이지(/admin/login)를 이용해주세요.");
+        return;
+      }
+
       // 로그인 성공 처리
       setSuccess("로그인 성공");
       localStorage.setItem("token", data.token);
       login({ token: data.token, user: data.user });
 
-      // role 안정적으로 처리 (소문자 + 공백 제거)
-      const role = data.user.role?.trim().toLowerCase();
-
-      if (role === "admin") {
-        navigate("/admin/dashboard");
-      } else if (role === "tutor") {
+      if (role === "tutor") {
         navigate("/tutor/dashboard");
       } else {
         navigate("/student/mypage");
