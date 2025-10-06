@@ -7,14 +7,18 @@ export default function AdminDashboardPage() {
   const [isAuthorized, setIsAuthorized] = useState(true);
   const navigate = useNavigate();
 
+  // ---------------------
   // 로그아웃
+  // ---------------------
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     navigate("/admin/login");
   };
 
+  // ---------------------
   // 권한 확인
+  // ---------------------
   useEffect(() => {
     const token = localStorage.getItem("token");
     const userData = localStorage.getItem("user");
@@ -34,7 +38,9 @@ export default function AdminDashboardPage() {
     }
   }, []);
 
+  // ---------------------
   // 통계 가져오기
+  // ---------------------
   useEffect(() => {
     if (!isAuthorized) return;
     const token = localStorage.getItem("token");
@@ -85,14 +91,18 @@ export default function AdminDashboardPage() {
             <StatCard label="총 예약 수" count={stats.totalBookings} />
             <StatCard
               label="총 결제 금액"
-              count={`₩${stats.totalPayments.toLocaleString()}`}
+              count={
+                typeof stats.totalPayments === "number"
+                  ? `₩${stats.totalPayments.toLocaleString()}`
+                  : "₩0"
+              }
             />
             <StatCard label="총 리뷰 수" count={stats.totalReviews} />
           </div>
 
           {/* 평점 높은 튜터 Top 5 */}
           <Section title="⭐ 평점 높은 튜터 Top 5">
-            {stats.topTutors.length > 0 ? (
+            {stats.topTutors && stats.topTutors.length > 0 ? (
               <ul className="bg-white rounded-xl shadow divide-y divide-gray-200">
                 {stats.topTutors.map((tutor, idx) => (
                   <li
@@ -100,10 +110,10 @@ export default function AdminDashboardPage() {
                     className="flex justify-between items-center px-4 py-3 hover:bg-gray-50 transition"
                   >
                     <span>
-                      {idx + 1}. {tutor.full_name}
+                      {idx + 1}. {tutor.full_name || tutor.name}
                     </span>
                     <span className="text-yellow-500 font-semibold">
-                      ⭐ {tutor.averageRating.toFixed(1)}
+                      ⭐ {tutor.averageRating?.toFixed(1) || 0}
                     </span>
                   </li>
                 ))}

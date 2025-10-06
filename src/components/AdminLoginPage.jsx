@@ -1,18 +1,17 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { useAdminAuth } from "../context/AdminAuthContext";
 
 function AdminLoginPage() {
-  const [username, setUsername] = useState("");  // 입력 초기값
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [username, setUsername] = useState(""); 
+  const [password, setPassword] = useState(""); 
+  const [error, setError] = useState(""); 
+  const [loading, setLoading] = useState(false); 
 
   const navigate = useNavigate();
-  const { setUser } = useAuth();
+  const { login } = useAdminAuth();
 
-  // 환경변수에서 API URL 가져오기 (배포/로컬 모두 대응)
   const API_URL = (process.env.REACT_APP_API_URL || "http://localhost:8000").trim();
 
   const handleLogin = async (e) => {
@@ -21,47 +20,27 @@ function AdminLoginPage() {
     setLoading(true);
 
     try {
-      // -----------------------------
-      // 관리자 로그인 API 호출
-      // -----------------------------
-      const res = await axios.post(`${API_URL}/admin/login`, {
-        username,
-        password,
-      });
+      // 서버 관리자 로그인 API 호출
+      const res = await axios.post(`${API_URL}/admin/login`, { username, password });
 
-      // 샘플 계정용 처리
-      const token = res.data.token || "admin-token";
-      const user = { username, role: "admin" };
+      const { token, user } = res.data;
 
-      // -----------------------------
-      // role 체크 (관리자가 아니면 거부)
-      // -----------------------------
-      if (user.role.toLowerCase() !== "admin") {
+      // 관리자 role 확인
+      if (!user || user.role.toLowerCase() !== "admin") {
         setError("관리자 계정만 로그인할 수 있습니다.");
+        setLoading(false);
         return;
       }
 
-      // -----------------------------
-      // 토큰 저장 (학생/튜터와 구분)
-      // -----------------------------
-      localStorage.setItem("adminToken", token);
+      // 전역 AdminAuthContext에 저장
+      login({ user, token });
 
-      // axios 기본 헤더 설정
-      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-
-      // 전역 상태에도 관리자 등록
-      setUser(user);
-
-      // 관리자 대시보드로 이동
+      // 관리자 대시보드 이동
       navigate("/admin/dashboard", { replace: true });
     } catch (err) {
       console.error("Admin login error:", err);
-
-      if (err.response) {
-        setError(err.response.data?.message || "로그인 실패");
-      } else {
-        setError("서버 연결 실패");
-      }
+      if (err.response) setError(err.response.data?.message || "로그인 실패");
+      else setError("서버 연결 실패");
     } finally {
       setLoading(false);
     }
@@ -69,11 +48,9 @@ function AdminLoginPage() {
 
   return (
     <div className="max-w-md mx-auto mt-20 p-6 bg-white rounded-xl shadow">
-      <h2 className="text-xl font-bold mb-4 text-center">관리자 로그인</h2>
+      <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">관리자 로그인</h2>
 
-      {error && (
-        <p className="text-red-500 text-sm mb-2 text-center">{error}</p>
-      )}
+      {error && <p className="text-red-500 text-sm mb-4 text-center">{error}</p>}
 
       <form onSubmit={handleLogin} className="space-y-4">
         <input
@@ -81,7 +58,7 @@ function AdminLoginPage() {
           placeholder="아이디 (예: admin)"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
-          className="w-full border p-2 rounded"
+          className="w-full border p-3 rounded focus:outline-none focus:ring focus:border-blue-400"
           required
         />
 
@@ -90,13 +67,15 @@ function AdminLoginPage() {
           placeholder="비밀번호 (예: 1234)"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="w-full border p-2 rounded"
+          className="w-full border p-3 rounded focus:outline-none focus:ring focus:border-blue-400"
           required
         />
 
         <button
           type="submit"
-          className={`w-full p-2 rounded text-white ${loading ? "bg-gray-500" : "bg-blue-600"}`}
+          className={`w-full p-3 rounded text-white font-semibold ${
+            loading ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"
+          }`}
           disabled={loading}
         >
           {loading ? "로그인 중..." : "로그인"}

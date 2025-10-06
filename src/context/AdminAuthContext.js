@@ -6,6 +6,7 @@ export function AdminAuthProvider({ children }) {
   const [admin, setAdmin] = useState(null); 
   const [adminToken, setAdminToken] = useState(null);
 
+  // 페이지 새로고침 시 localStorage에서 정보 불러오기
   useEffect(() => {
     const storedToken = localStorage.getItem("adminToken");
     const storedAdmin = localStorage.getItem("adminUser");
@@ -16,14 +17,16 @@ export function AdminAuthProvider({ children }) {
     }
   }, []);
 
+  // 로그인 함수
   const login = ({ user, token }) => {
-    setAdmin(user);   // { id, username, role: "admin" }
+    setAdmin(user);
     setAdminToken(token);
 
     localStorage.setItem("adminToken", token);
     localStorage.setItem("adminUser", JSON.stringify(user));
   };
 
+  // 로그아웃 함수
   const logout = () => {
     setAdmin(null);
     setAdminToken(null);
@@ -39,4 +42,5 @@ export function AdminAuthProvider({ children }) {
   );
 }
 
+// hook으로 쉽게 사용
 export const useAdminAuth = () => useContext(AdminAuthContext);
