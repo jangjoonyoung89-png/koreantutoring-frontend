@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import { BrowserRouter, Routes, Route, Link, Navigate, useParams, } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Link, Navigate, useParams } from "react-router-dom";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import api from "./api";
@@ -30,7 +30,7 @@ import ReviewList from "./components/ReviewList";
 import VideoClassPageWrapper from "./components/VideoClassPageWrapper";
 
 // ----------------------
-// 관리자
+// 관리자 페이지
 // ----------------------
 import AdminDashboard from "./components/admin/AdminDashboard";
 import UserList from "./components/admin/UserList";
@@ -54,9 +54,7 @@ function Navbar() {
         <Link to="/tutors" style={styles.navLink}>TUTOR</Link>
         <Link to="/signup" style={styles.navLink}>SIGNUP</Link>
         <Link to="/login" style={styles.navLink}>LOGIN</Link>
-        <Link to="/admin/login" style={{ ...styles.navLink, color: "#ffdd57" }}>
-          ADMIN
-        </Link>
+        <Link to="/admin/login" style={{ ...styles.navLink, color: "#ffdd57" }}>ADMIN</Link>
       </div>
     </nav>
   );
@@ -92,16 +90,11 @@ function MainPage() {
         <div style={styles.bannerOverlay}>
           <div style={styles.bannerContent}>
             <h1 style={styles.bannerTitle}>외국인을 위한 한국어 튜터링 플랫폼</h1>
-            <p style={styles.bannerSubtitle}>
-              언제 어디서나 원어민 한국어 선생님과 함께 하는 맞춤형 한국어 학습
-            </p>
-            <Link to="/signup">
-              <button style={styles.ctaButton}>지금 시작하기</button>
-            </Link>
+            <p style={styles.bannerSubtitle}>언제 어디서나 원어민 한국어 선생님과 함께 하는 맞춤형 한국어 학습</p>
+            <Link to="/signup"><button style={styles.ctaButton}>지금 시작하기</button></Link>
           </div>
         </div>
       </section>
-
       <section style={styles.section}>
         <h2 style={styles.sectionTitle}>추천 튜터</h2>
         <div style={styles.tutorList}>
@@ -119,7 +112,6 @@ function MainPage() {
           )}
         </div>
       </section>
-
       <footer style={styles.footer}>
         <p>© 20250901 KOREAN TUTORING. 장준영 All rights reserved.</p>
         <p>문의: jjy@mail.kcu.ac</p>
@@ -139,6 +131,7 @@ function TutorDetailPage() {
   const [availableSlots, setAvailableSlots] = useState([]);
   const [selectedSlot, setSelectedSlot] = useState("");
   const [message, setMessage] = useState("");
+
   const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || "http://localhost:8000";
 
   useEffect(() => {
@@ -181,8 +174,7 @@ function TutorDetailPage() {
     setSelectedSlot("");
   }, [selectedDate, tutor]);
 
-  const formatDate = (date) =>
-    `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,"0")}-${String(date.getDate()).padStart(2,"0")}`;
+  const formatDate = (date) => `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,"0")}-${String(date.getDate()).padStart(2,"0")}`;
 
   const handleBooking = async () => {
     if (!selectedSlot) {
@@ -200,10 +192,19 @@ function TutorDetailPage() {
   let videoElement = <p style={{color:"#888"}}>등록된 영상이 없습니다.</p>;
   if (tutor?.sampleVideoUrl) {
     let embedUrl = tutor.sampleVideoUrl;
-    if (tutor.sampleVideoUrl.includes("youtube.com")) embedUrl = tutor.sampleVideoUrl.replace("watch?v=", "embed/");
-    else if (tutor.sampleVideoUrl.includes("youtu.be")) embedUrl = tutor.sampleVideoUrl.replace("youtu.be/", "www.youtube.com/embed/");
+    if (tutor.sampleVideoUrl.includes("youtube.com"))
+      embedUrl = tutor.sampleVideoUrl.replace("watch?v=", "embed/");
+    else if (tutor.sampleVideoUrl.includes("youtu.be"))
+      embedUrl = tutor.sampleVideoUrl.replace("youtu.be/", "www.youtube.com/embed/");
     videoElement = (
-      <iframe className="w-full h-80 rounded" src={embedUrl} title="튜터 소개 영상" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen ></iframe>
+      <iframe
+        className="w-full h-80 rounded"
+        src={embedUrl}
+        title="튜터 소개 영상"
+        frameBorder="0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowFullScreen
+      ></iframe>
     );
   }
 
@@ -243,7 +244,7 @@ function TutorDetailPage() {
         ) : (
           <div className="flex gap-2 flex-wrap">
             {availableSlots.map((slot) => (
-              <button key={slot} onClick={() => setSelectedSlot(slot)} className={`px-3 py-1 rounded border ${ selectedSlot === slot ? "bg-blue-500 text-white" : "bg-gray-100" }`}>
+              <button key={slot} onClick={() => setSelectedSlot(slot)} className={`px-3 py-1 rounded border ${selectedSlot === slot ? "bg-blue-500 text-white" : "bg-gray-100"}`}>
                 {slot}
               </button>
             ))}
@@ -251,10 +252,7 @@ function TutorDetailPage() {
         )}
       </div>
 
-      <button onClick={handleBooking} className="mt-4 px-4 py-2 bg-green-600 text-white rounded">
-        예약하기
-      </button>
-
+      <button onClick={handleBooking} className="mt-4 px-4 py-2 bg-green-600 text-white rounded">예약하기</button>
       {message && <p className="mt-2">{message}</p>}
 
       <div className="mt-8">
@@ -341,7 +339,6 @@ function AppRoutes() {
     </Routes>
   );
 }
-
 
 // ----------------------
 // Styles

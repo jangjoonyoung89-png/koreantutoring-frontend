@@ -1,16 +1,15 @@
-import React, { useState, useContext } from "react";
-import { AuthContext } from "../context/AuthContext";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 function LoginPage() {
   const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  const { login } = useContext(AuthContext);
+  const { login } = useAuth();
   const navigate = useNavigate();
 
-  // 환경변수에서 API URL 가져오기 (배포용과 로컬 모두 대응)
   const API_URL = (process.env.REACT_APP_API_URL || "http://localhost:8000").trim();
 
   const handleChange = (e) => {
@@ -23,7 +22,6 @@ function LoginPage() {
   const handleLogin = async (e) => {
     e.preventDefault();
 
-    // 이메일과 비밀번호 공백 제거
     const email = form.email.trim();
     const password = form.password.trim();
 
@@ -46,19 +44,17 @@ function LoginPage() {
         return;
       }
 
-      // role 안정적으로 처리 (소문자 + 공백 제거)
       const role = data.user.role?.trim().toLowerCase();
 
-      // ✅ 관리자 로그인은 이 페이지에서 차단
+      // 관리자 계정 차단
       if (role === "admin") {
         setError("관리자 계정은 관리자 로그인 페이지(/admin/login)를 이용해주세요.");
         return;
       }
 
-      // 로그인 성공 처리
       setSuccess("로그인 성공");
       localStorage.setItem("token", data.token);
-      login({ token: data.token, user: data.user });
+      login({ user: data.user, token: data.token });
 
       if (role === "tutor") {
         navigate("/tutor/dashboard");
