@@ -47,10 +47,11 @@ function LoginPage() {
       const role = data.user.role?.trim().toLowerCase();
 
       // 관리자 계정 차단
-      if (role === "admin") {
-        setError("관리자 계정은 관리자 로그인 페이지(/admin/login)를 이용해주세요.");
-        return;
-      }
+    if (role === "admin") {
+     alert("⚠️ 관리자 계정은 관리자 전용 로그인 페이지에서 로그인해주세요.");
+     navigate("/admin/login");
+     return;
+    }
 
       setSuccess("로그인 성공");
       localStorage.setItem("token", data.token);

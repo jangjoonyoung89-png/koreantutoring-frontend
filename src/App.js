@@ -4,7 +4,7 @@ import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import api from "./api";
 import { AuthProvider, AuthContext } from "./context/AuthContext";
-import { AdminAuthProvider } from "./context/AdminAuthContext";
+import { AdminAuthProvider, useAdminAuth } from "./context/AdminAuthContext";
 
 // ----------------------
 // 페이지 임포트
@@ -73,6 +73,7 @@ function MainPage() {
       { _id: "sample2", name: "장서은", experience: 3, photoUrl: "https://via.placeholder.com/100" },
       { _id: "sample3", name: "김수영", experience: 7, photoUrl: "https://via.placeholder.com/100" },
     ];
+
     api.get("/api/tutors/with-rating")
       .then((res) => {
         if (Array.isArray(res.data) && res.data.length > 0) setTutors(res.data);
@@ -95,6 +96,7 @@ function MainPage() {
           </div>
         </div>
       </section>
+
       <section style={styles.section}>
         <h2 style={styles.sectionTitle}>추천 튜터</h2>
         <div style={styles.tutorList}>
@@ -112,6 +114,7 @@ function MainPage() {
           )}
         </div>
       </section>
+
       <footer style={styles.footer}>
         <p>© 20250901 KOREAN TUTORING. 장준영 All rights reserved.</p>
         <p>문의: jjy@mail.kcu.ac</p>
@@ -131,7 +134,6 @@ function TutorDetailPage() {
   const [availableSlots, setAvailableSlots] = useState([]);
   const [selectedSlot, setSelectedSlot] = useState("");
   const [message, setMessage] = useState("");
-
   const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || "http://localhost:8000";
 
   useEffect(() => {
@@ -192,19 +194,10 @@ function TutorDetailPage() {
   let videoElement = <p style={{color:"#888"}}>등록된 영상이 없습니다.</p>;
   if (tutor?.sampleVideoUrl) {
     let embedUrl = tutor.sampleVideoUrl;
-    if (tutor.sampleVideoUrl.includes("youtube.com"))
-      embedUrl = tutor.sampleVideoUrl.replace("watch?v=", "embed/");
-    else if (tutor.sampleVideoUrl.includes("youtu.be"))
-      embedUrl = tutor.sampleVideoUrl.replace("youtu.be/", "www.youtube.com/embed/");
+    if (tutor.sampleVideoUrl.includes("youtube.com")) embedUrl = tutor.sampleVideoUrl.replace("watch?v=", "embed/");
+    else if (tutor.sampleVideoUrl.includes("youtu.be")) embedUrl = tutor.sampleVideoUrl.replace("youtu.be/", "www.youtube.com/embed/");
     videoElement = (
-      <iframe
-        className="w-full h-80 rounded"
-        src={embedUrl}
-        title="튜터 소개 영상"
-        frameBorder="0"
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-        allowFullScreen
-      ></iframe>
+      <iframe className="w-full h-80 rounded" src={embedUrl} title="튜터 소개 영상" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen ></iframe>
     );
   }
 
@@ -280,10 +273,11 @@ export default function App() {
 }
 
 // ----------------------
-// Routes 분리
+// Routes
 // ----------------------
 function AppRoutes() {
   const { user } = useContext(AuthContext);
+  const { admin } = useAdminAuth();
 
   return (
     <Routes>
@@ -327,12 +321,12 @@ function AppRoutes() {
       <Route path="/admin/qa" element={<RequireAuth role="admin"><AdminQAManagement /></RequireAuth>} />
       <Route path="/admin/login" element={<AdminLoginPage />} />
 
-      {/* 잘못된 /dashboard 접근 리다이렉트 */}
+      {/* /dashboard 접근 리다이렉트 */}
       <Route path="/dashboard" element={
+        admin ? <Navigate to="/admin/dashboard" replace /> :
         user ? (
           user.role === "student" ? <Navigate to="/dashboard/student" replace /> :
           user.role === "tutor" ? <Navigate to="/tutor/dashboard" replace /> :
-          user.role === "admin" ? <Navigate to="/admin/dashboard" replace /> :
           <Navigate to="/" replace />
         ) : <Navigate to="/login" replace />
       } />

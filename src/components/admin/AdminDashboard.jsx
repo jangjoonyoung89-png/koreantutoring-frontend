@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { Link, Navigate, useNavigate } from "react-router-dom";
+import { Link, Navigate, useNavigate, Routes, Route } from "react-router-dom";
 import axios from "axios";
+
+// 학생용 미리보기 페이지
+import AdminStudentPreview from "../AdminStudentPreview"; // 위에서 만든 학생 대시보드 복사본
+import TutorDashboardPage from "../TutorDashboardPage"; // 튜터 대시보드
 
 export default function AdminDashboardPage() {
   const [stats, setStats] = useState(null);
@@ -63,69 +67,93 @@ export default function AdminDashboardPage() {
       {/* 상단 */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
         <h1 className="text-3xl font-bold text-gray-800">🛠️ 관리자 대시보드</h1>
-        <button
-          onClick={handleLogout}
-          className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded shadow transition"
-        >
-          로그아웃
-        </button>
+        <div className="flex gap-2">
+          <Link
+            to="/admin/student-preview"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded shadow transition"
+          >
+            학생 대시보드 미리보기
+          </Link>
+          <button
+            onClick={handleLogout}
+            className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded shadow transition"
+          >
+            로그아웃
+          </button>
+        </div>
       </div>
 
-      {/* 메뉴 링크 */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
-        <MenuCard to="/admin/users" label="회원 목록" />
-        <MenuCard to="/admin/tutors" label="튜터 목록" />
-        <MenuCard to="/admin/bookings" label="전체 예약" />
-        <MenuCard to="/admin/videos" label="실시간 영상" />
-      </div>
+      <Routes>
+        {/* 관리자 기본 대시보드 */}
+        <Route
+          path="/"
+          element={
+            <>
+              {/* 메뉴 링크 */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
+                <MenuCard to="/admin/users" label="회원 목록" />
+                <MenuCard to="/admin/tutors" label="튜터 목록" />
+                <MenuCard to="/admin/bookings" label="전체 예약" />
+                <MenuCard to="/admin/videos" label="실시간 영상" />
+              </div>
 
-      {/* 통계 카드 */}
-      {stats ? (
-        <>
-          <h2 className="text-2xl font-semibold text-gray-700 mb-4">
-            플랫폼 통계
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
-            <StatCard label="학생 수" count={stats.totalStudents} />
-            <StatCard label="튜터 수" count={stats.totalTutors} />
-            <StatCard label="총 예약 수" count={stats.totalBookings} />
-            <StatCard
-              label="총 결제 금액"
-              count={
-                typeof stats.totalPayments === "number"
-                  ? `₩${stats.totalPayments.toLocaleString()}`
-                  : "₩0"
-              }
-            />
-            <StatCard label="총 리뷰 수" count={stats.totalReviews} />
-          </div>
+              {/* 통계 카드 */}
+              {stats ? (
+                <>
+                  <h2 className="text-2xl font-semibold text-gray-700 mb-4">
+                    플랫폼 통계
+                  </h2>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
+                    <StatCard label="학생 수" count={stats.totalStudents} />
+                    <StatCard label="튜터 수" count={stats.totalTutors} />
+                    <StatCard label="총 예약 수" count={stats.totalBookings} />
+                    <StatCard
+                      label="총 결제 금액"
+                      count={
+                        typeof stats.totalPayments === "number"
+                          ? `₩${stats.totalPayments.toLocaleString()}`
+                          : "₩0"
+                      }
+                    />
+                    <StatCard label="총 리뷰 수" count={stats.totalReviews} />
+                  </div>
 
-          {/* 평점 높은 튜터 Top 5 */}
-          <Section title="⭐ 평점 높은 튜터 Top 5">
-            {stats.topTutors && stats.topTutors.length > 0 ? (
-              <ul className="bg-white rounded-xl shadow divide-y divide-gray-200">
-                {stats.topTutors.map((tutor, idx) => (
-                  <li
-                    key={tutor._id}
-                    className="flex justify-between items-center px-4 py-3 hover:bg-gray-50 transition"
-                  >
-                    <span>
-                      {idx + 1}. {tutor.full_name || tutor.name}
-                    </span>
-                    <span className="text-yellow-500 font-semibold">
-                      ⭐ {tutor.averageRating?.toFixed(1) || 0}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className="text-gray-500">등록된 튜터가 없습니다.</p>
-            )}
-          </Section>
-        </>
-      ) : (
-        <p className="text-gray-500">통계 불러오는 중...</p>
-      )}
+                  {/* 평점 높은 튜터 Top 5 */}
+                  <Section title="⭐ 평점 높은 튜터 Top 5">
+                    {stats.topTutors && stats.topTutors.length > 0 ? (
+                      <ul className="bg-white rounded-xl shadow divide-y divide-gray-200">
+                        {stats.topTutors.map((tutor, idx) => (
+                          <li
+                            key={tutor._id}
+                            className="flex justify-between items-center px-4 py-3 hover:bg-gray-50 transition"
+                          >
+                            <span>
+                              {idx + 1}. {tutor.full_name || tutor.name}
+                            </span>
+                            <span className="text-yellow-500 font-semibold">
+                              ⭐ {tutor.averageRating?.toFixed(1) || 0}
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p className="text-gray-500">등록된 튜터가 없습니다.</p>
+                    )}
+                  </Section>
+                </>
+              ) : (
+                <p className="text-gray-500">통계 불러오는 중...</p>
+              )}
+            </>
+          }
+        />
+
+        {/* 학생 대시보드 미리보기 */}
+        <Route path="/student-preview" element={<AdminStudentPreview />} />
+
+        {/* 튜터 대시보드 미리보기 */}
+        <Route path="/tutor-preview" element={<TutorDashboardPage />} />
+      </Routes>
     </div>
   );
 }

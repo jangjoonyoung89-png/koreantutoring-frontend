@@ -7,7 +7,7 @@ export default function Navbar() {
   const { user, logout } = useContext(AuthContext);
   const [adminMenuOpen, setAdminMenuOpen] = useState(false);
   const adminRef = useRef(null);
-
+  
   // 클릭 외부 영역 닫기
   useEffect(() => {
     function handleClickOutside(event) {
