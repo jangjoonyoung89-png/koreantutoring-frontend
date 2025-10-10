@@ -23,10 +23,8 @@ function SignupPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!validateEmail(form.email)) return setError("유효한 이메일을 입력하세요.");
-    if (form.password.length < 8)
-      return setError("비밀번호는 최소 8자 이상이어야 합니다.");
+    if (form.password.length < 8) return setError("비밀번호는 최소 8자 이상이어야 합니다.");
     if (!form.fullName) return setError("이름을 입력하세요.");
 
     try {
@@ -103,6 +101,7 @@ function SignupPage() {
       <h2 style={{ textAlign: "center", marginBottom: "20px" }}>회원가입</h2>
       {error && <p style={messageStyle("red")}>{error}</p>}
       {success && <p style={messageStyle("green")}>{success}</p>}
+
       <form onSubmit={handleSubmit}>
         <label style={labelStyle}>이메일</label>
         <input
