@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 // ======================
-// 별점 렌더링 유틸
+// ⭐ 별점 렌더링 유틸
 // ======================
 const renderStars = (rating) => {
   const fullStars = Math.floor(rating);
@@ -19,7 +19,7 @@ const renderStars = (rating) => {
 };
 
 // ======================
-// TutorListPage 컴포넌트
+// 🎓 TutorListPage 컴포넌트
 // ======================
 function TutorListPage() {
   const [tutors, setTutors] = useState([]);
@@ -58,38 +58,69 @@ function TutorListPage() {
   }, []);
 
   return (
-    <div className="p-6 max-w-5xl mx-auto">
-      <h2 className="text-2xl font-bold mb-6">튜터 목록</h2>
-      <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+    <div className="min-h-screen bg-gray-50">
+      {/* 상단 제목 섹션 */}
+      <div className="text-center py-10">
+        <h1 className="text-3xl font-bold text-gray-800">🎓 튜터 목록</h1>
+        <p className="text-gray-500 mt-2">
+          나에게 맞는 한국어 튜터를 찾아보세요.
+        </p>
+      </div>
+
+      {/* 카드 리스트 */}
+      <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 px-6 pb-16">
         {tutors.map((tutor) => (
-          <li
+          <div
             key={tutor.id}
-            className="bg-white border rounded-xl overflow-hidden shadow transition-transform transform hover:scale-105 hover:shadow-2xl cursor-pointer"
             onClick={() => navigate(`/tutors/${tutor.id}`)}
+            className="bg-white rounded-2xl shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-200 overflow-hidden cursor-pointer"
           >
-            {/* 튜터 사진 */}
-            <img
-              src={tutor.img}
-              alt={tutor.name}
-              className="w-full h-48 object-cover transition-transform duration-200"
-            />
-            <div className="p-4">
-              <h3 className="text-lg font-semibold mb-1">{tutor.name}</h3>
-              <p className="text-gray-600 mb-2 line-clamp-2">
+            {/* 프로필 이미지 */}
+            <div className="h-52 w-full bg-gray-100 overflow-hidden">
+              <img
+                src={tutor.img}
+                alt={tutor.name}
+                className="object-cover w-full h-full transform hover:scale-105 transition-transform duration-300"
+              />
+            </div>
+
+            {/* 내용 */}
+            <div className="p-5">
+              <h2 className="text-lg font-semibold text-gray-800 mb-1">
+                {tutor.name}
+              </h2>
+              <p className="text-gray-600 text-sm mb-3 line-clamp-2">
                 {tutor.bio || "소개 정보 없음"}
               </p>
-              <p className="mb-1">
-                💰 가격:{" "}
-                <span className="font-medium">{tutor.price?.toLocaleString() || 0}원</span>
-              </p>
-              <p>
-                ⭐ 평점: {renderStars(tutor.averageRating)}{" "}
-                <span className="text-sm text-gray-500">({tutor.averageRating.toFixed(1)})</span>
-              </p>
+
+              <div className="flex items-center justify-between text-sm text-gray-700">
+                <span>
+                  💰{" "}
+                  <span className="font-medium text-blue-700">
+                    {tutor.price.toLocaleString()}원
+                  </span>
+                </span>
+                <span className="text-yellow-500">
+                  ⭐ {renderStars(tutor.averageRating)}{" "}
+                  <span className="text-gray-500 text-xs ml-1">
+                    ({tutor.averageRating.toFixed(1)})
+                  </span>
+                </span>
+              </div>
+
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigate(`/tutors/${tutor.id}`);
+                }}
+                className="mt-5 w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-xl font-medium transition"
+              >
+                자세히 보기
+              </button>
             </div>
-          </li>
+          </div>
         ))}
-      </ul>
+      </div>
     </div>
   );
 }
