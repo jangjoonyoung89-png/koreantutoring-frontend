@@ -1,35 +1,34 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { fetchTutors } from "../api/tutorApi";
-import styles from "./MainPage.module.css"; // CSS 모듈 import
+import styles from "./MainPage.module.css"; 
 
 export default function MainPage() {
   const [tutors, setTutors] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // 무조건 나오는 샘플 얼굴 (randomuser.me)
+  // 기본 샘플 튜터 목록
   const sampleTutors = [
     {
       _id: "sample1",
       name: "장준영",
       experience: 5,
-      photoUrl: "https://randomuser.me/api/portraits/men/32.jpg",
+      photoUrl: "/images/korean_teacher1.jpg",
     },
     {
       _id: "sample2",
       name: "장서은",
       experience: 3,
-      photoUrl: "https://randomuser.me/api/portraits/women/44.jpg",
+      photoUrl: "/images/korean_teacher2.jpg",
     },
     {
       _id: "sample3",
       name: "김수영",
       experience: 7,
-      photoUrl: "https://randomuser.me/api/portraits/women/68.jpg",
+      photoUrl: "/images/korean_teacher3.jpg",
     },
   ];
 
-  // API 호출 + fallback
   useEffect(() => {
     const loadTutors = async () => {
       try {
@@ -37,8 +36,7 @@ export default function MainPage() {
         if (Array.isArray(data) && data.length > 0) {
           const tutorsWithPhotos = data.map((tutor, index) => ({
             ...tutor,
-            photoUrl:
-              sampleTutors[index % sampleTutors.length].photoUrl, // 무조건 샘플 이미지 사용
+            photoUrl: sampleTutors[index % sampleTutors.length].photoUrl,
           }));
           setTutors(tutorsWithPhotos);
         } else {
@@ -53,10 +51,8 @@ export default function MainPage() {
     loadTutors();
   }, []);
 
-  // 최대 3명 표시
   const displayTutors = tutors.slice(0, 3);
 
-  // inline 스타일
   const inlineStyles = {
     navbar: {
       display: "flex",
@@ -82,8 +78,11 @@ export default function MainPage() {
     },
     banner: {
       position: "relative",
-      height: "300px",
-      backgroundColor: "#555",
+      height: "350px",
+      backgroundImage:
+        "url('https://images.unsplash.com/photo-1584697964192-f67d3a6a0f77?auto=format&fit=crop&w=1600&q=80')",
+      backgroundSize: "cover",
+      backgroundPosition: "center",
       color: "#fff",
       display: "flex",
       justifyContent: "center",
@@ -91,11 +90,22 @@ export default function MainPage() {
       textAlign: "center",
       flexDirection: "column",
     },
+    bannerOverlay: {
+      position: "absolute",
+      top: 0,
+      left: 0,
+      width: "100%",
+      height: "100%",
+      backgroundColor: "rgba(0,0,0,0.4)",
+      zIndex: 1,
+    },
     bannerContent: {
+      position: "relative",
+      zIndex: 2,
       maxWidth: "600px",
     },
     bannerTitle: {
-      fontSize: "36px",
+      fontSize: "38px",
       fontWeight: "bold",
       textShadow: "2px 2px 6px rgba(0,0,0,0.5)",
       marginBottom: "15px",
@@ -107,23 +117,21 @@ export default function MainPage() {
       color: "#ffdd99",
       textShadow: "1px 1px 4px rgba(0,0,0,0.4)",
     },
-    ctaButton: {
-      marginTop: "20px",
-      padding: "10px 20px",
-      fontSize: "16px",
-      backgroundColor: "#ff6600",
-      color: "#fff",
-      border: "none",
-      cursor: "pointer",
-      borderRadius: "5px",
-    },
     section: {
-      padding: "40px 20px",
+      padding: "50px 20px",
       textAlign: "center",
     },
     sectionTitle: {
-      fontSize: "24px",
-      marginBottom: "20px",
+      fontSize: "26px",
+      marginBottom: "30px",
+      fontWeight: "bold",
+    },
+    tutorCardImg: {
+      width: "180px",
+      height: "180px",
+      objectFit: "cover",
+      borderRadius: "10px",
+      marginBottom: "10px",
     },
   };
 
@@ -153,6 +161,7 @@ export default function MainPage() {
 
       {/* 배너 */}
       <section style={inlineStyles.banner}>
+        <div style={inlineStyles.bannerOverlay}></div>
         <div style={inlineStyles.bannerContent}>
           <h1 style={inlineStyles.bannerTitle}>
             외국인을 위한 한국어 튜터링 플랫폼
@@ -177,7 +186,11 @@ export default function MainPage() {
           <div className={styles.tutorList}>
             {displayTutors.map((tutor) => (
               <div key={tutor._id} className={styles.tutorCard}>
-                <img src={tutor.photoUrl} alt={tutor.name} />
+                <img
+                  src={tutor.photoUrl}
+                  alt={tutor.name}
+                  style={inlineStyles.tutorCardImg}
+                />
                 <h3>{tutor.name}</h3>
                 <p>경력: {tutor.experience}년</p>
                 <span>자세히 보기 →</span>
@@ -189,7 +202,7 @@ export default function MainPage() {
 
       {/* 푸터 */}
       <footer className={styles.footer}>
-        <p>© 2025 KOREAN TUTORING 장준영. All rights reserved.</p>
+        <p>© 2025 KOREAN TUTORING. 장준영 All rights reserved.</p>
         <p>문의: jjy@mail.kcu.ac</p>
       </footer>
     </div>

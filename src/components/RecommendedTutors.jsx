@@ -1,46 +1,81 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import { FaStar, FaStarHalfAlt, FaRegStar } from "react-icons/fa";
+import styles from "./RecommendedTutors.module.css";
 
-const styles = {
-  section: { padding: "2rem" },
-  sectionTitle: { fontSize: "1.5rem", marginBottom: "1rem" },
-  tutorList: { display: "flex", gap: "1rem", flexWrap: "wrap" },
-  tutorCard: { border: "1px solid #ccc", borderRadius: "8px", padding: "1rem", width: "200px" },
-  tutorImage: { width: "100%", borderRadius: "50%" },
-  tutorName: { fontSize: "1.2rem", margin: "0.5rem 0" },
-  tutorExperience: { marginBottom: "0.5rem" },
-  detailLink: { color: "blue", textDecoration: "underline" },
+const tutors = [
+  {
+    id: 1,
+    name: "장준영",
+    experience: 5,
+    rating: 4.5,
+    nationality: "한국",
+    languages: ["한국어", "영어"],
+    image: "장준영.jpg",
+    isRecommended: true,
+    isOnline: true,
+  },
+  {
+    id: 2,
+    name: "장서은",
+    experience: 3,
+    rating: 4.8,
+    nationality: "한국",
+    languages: ["한국어", "영어", "일본어"],
+    image: "장서은.jpg",
+    isRecommended: false,
+    isOnline: false,
+  },
+  {
+    id: 3,
+    name: "김수영",
+    experience: 7,
+    rating: 5.0,
+    nationality: "한국",
+    languages: ["한국어", "영어"],
+    image: "김수영.jpg",
+    isRecommended: true,
+    isOnline: true,
+  },
+];
+
+// 별점 렌더링
+const renderStars = (rating) => {
+  const stars = [];
+  const fullStars = Math.floor(rating);
+  const halfStar = rating - fullStars >= 0.5;
+  const emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
+
+  for (let i = 0; i < fullStars; i++) stars.push(<FaStar key={`full-${i}`} />);
+  if (halfStar) stars.push(<FaStarHalfAlt key="half" />);
+  for (let i = 0; i < emptyStars; i++) stars.push(<FaRegStar key={`empty-${i}`} />);
+
+  return stars;
 };
 
-function RecommendedTutors({ tutors }) {
-  if (!tutors || tutors.length === 0) return <p>튜터 정보가 없습니다.</p>;
-
+export default function RecommendedTutors() {
   return (
-    <section style={styles.section}>
-      <h2 style={styles.sectionTitle}>추천 튜터</h2>
-      <div style={styles.tutorList}>
+    <div className={styles.container}>
+      <h2>추천 튜터</h2>
+      <div className={styles.cardWrapper}>
         {tutors.map((tutor) => (
-          <div key={tutor._id} style={styles.tutorCard}>
-            <img
-              src={tutor.img || "https://via.placeholder.com/150"}
-              alt={tutor.name}
-              style={styles.tutorImage}
-            />
-            <h3 style={styles.tutorName}>{tutor.name}</h3>
-            <p style={styles.tutorExperience}>경력: {tutor.experience}년</p>
-            <Link to={`/tutors/${tutor._id}`} style={styles.detailLink}>
-              자세히 보기 →
-            </Link>
+          <div key={tutor.id} className={styles.card}>
+            <div className={styles.avatarWrapper}>
+              <img src={`/images/${tutor.image}`} alt={tutor.name} className={styles.avatar} />
+              {tutor.isOnline && <span className={styles.onlineBadge}></span>}
+              {tutor.isRecommended && <span className={styles.recommendBadge}>추천</span>}
+            </div>
+            <div className={styles.info}>
+              <h3>{tutor.name}</h3>
+              <p>경력: {tutor.experience}년</p>
+              <p>국적: {tutor.nationality}</p>
+              <p>언어: {tutor.languages.join(", ")}</p>
+              <div className={styles.rating}>{renderStars(tutor.rating)}</div>
+              <a href={`/tutors/${tutor.id}`} className={styles.link}>
+                자세히 보기 →
+              </a>
+            </div>
           </div>
         ))}
       </div>
-      <div style={{ marginTop: "1rem" }}>
-        <Link to="/tutors" style={{ textDecoration: "underline", color: "green" }}>
-          모든 튜터 보기 →
-        </Link>
-      </div>
-    </section>
+    </div>
   );
 }
-
-export default RecommendedTutors;

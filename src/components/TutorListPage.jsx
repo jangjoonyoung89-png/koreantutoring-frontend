@@ -33,7 +33,7 @@ function TutorListPage() {
         name: "장선미",
         bio: "10년 경력의 한국어 전문 튜터입니다.",
         averageRating: 4.5,
-        img: "/images/korean_teacher1.jpg", // public/images 폴더에 이미지
+        img: "/images/korean_teacher1.jpg", // 절대경로로 변경
         price: 20000,
       },
       {
