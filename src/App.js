@@ -39,6 +39,8 @@ import AdminTutorApprovalPage from "./components/AdminTutorApprovalPage";
 import AdminBookingList from "./components/admin/AdminBookingList";
 import AdminReviewManagement from "./components/admin/AdminReviewManagement";
 import AdminLoginPage from "./components/AdminLoginPage";
+import AdminForgotPasswordPage from "./components/AdminForgotPasswordPage";
+import AdminResetPasswordPage from "./components/AdminResetPasswordPage";
 import AdminQAManagement from "./components/admin/AdminQAManagement";
 import RequireAuth from "./components/RequireAuth";
 
@@ -116,7 +118,7 @@ function MainPage() {
       </section>
 
       <footer style={styles.footer}>
-        <p>© 20250901 KOREAN TUTORING. 장준영 All rights reserved.</p>
+        <p>© 2025 KOREAN TUTORING. 장준영 All rights reserved.</p>
         <p>문의: jjy@mail.kcu.ac</p>
       </footer>
     </div>
@@ -197,7 +199,7 @@ function TutorDetailPage() {
     if (tutor.sampleVideoUrl.includes("youtube.com")) embedUrl = tutor.sampleVideoUrl.replace("watch?v=", "embed/");
     else if (tutor.sampleVideoUrl.includes("youtu.be")) embedUrl = tutor.sampleVideoUrl.replace("youtu.be/", "www.youtube.com/embed/");
     videoElement = (
-      <iframe className="w-full h-80 rounded" src={embedUrl} title="튜터 소개 영상" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen ></iframe>
+      <iframe className="w-full h-80 rounded" src={embedUrl} title="튜터 소개 영상" frameBorder="0" allowFullScreen ></iframe>
     );
   }
 
@@ -320,6 +322,8 @@ function AppRoutes() {
       <Route path="/admin/reviews" element={<RequireAuth role="admin"><AdminReviewManagement /></RequireAuth>} />
       <Route path="/admin/qa" element={<RequireAuth role="admin"><AdminQAManagement /></RequireAuth>} />
       <Route path="/admin/login" element={<AdminLoginPage />} />
+      <Route path="/admin/forgot-password" element={<AdminForgotPasswordPage />} />
+      <Route path="/admin/reset-password" element={<AdminResetPasswordPage />} />
 
       {/* /dashboard 접근 리다이렉트 */}
       <Route path="/dashboard" element={
@@ -382,7 +386,7 @@ const styles = {
   },
   bannerTitle: {
     fontSize: "3rem",
-    fontWeight: "700",
+    fontWeight: 700,
     marginBottom: "1rem",
     lineHeight: 1.2,
   },

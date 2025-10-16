@@ -11,24 +11,29 @@ function Dashboard() {
     navigate("/login");
   };
 
-  const displayName = user?.full_name?.trim() !== "" ? user.full_name : user?.email || "사용자";
+  const displayName =
+    user?.full_name?.trim() !== "" ? user.full_name : user?.email || "사용자";
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100 px-4">
-      <div className="bg-white shadow-lg rounded-2xl p-8 max-w-md w-full text-center">
-        <h2 className="text-3xl font-bold text-gray-800 mb-4">📊 대시보드</h2>
-        <p className="text-lg text-gray-600 mb-6">
+      <div className="bg-white shadow-lg rounded-2xl p-8 max-w-md w-full">
+        <h2 className="text-3xl font-bold text-gray-800 mb-4 text-center">📊 대시보드</h2>
+        <p className="text-lg text-gray-600 mb-6 text-center">
           환영합니다,{" "}
           <span className="text-blue-600 font-semibold">{displayName}</span>!
         </p>
-        <button
-          aria-label="로그아웃"
-          onClick={handleLogout}
-          className="px-6 py-2 bg-red-500 hover:bg-red-600 text-white font-medium rounded-lg shadow transition duration-200"
-        >
-          로그아웃
-        </button>
-        {/* 게시판 컴포넌트 삽입 */}
+
+        <div className="flex justify-center mb-6">
+          <button
+            aria-label="로그아웃"
+            onClick={handleLogout}
+            className="px-6 py-2 bg-red-500 hover:bg-red-600 text-white font-medium rounded-lg shadow transition duration-200"
+          >
+            로그아웃
+          </button>
+        </div>
+
+        {/* 게시판 컴포넌트 */}
         <Board />
       </div>
     </div>

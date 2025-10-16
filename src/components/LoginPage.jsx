@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 function LoginPage() {
@@ -46,12 +46,11 @@ function LoginPage() {
 
       const role = data.user.role?.trim().toLowerCase();
 
-      // 관리자 계정 차단
-    if (role === "admin") {
-     alert("⚠️ 관리자 계정은 관리자 전용 로그인 페이지에서 로그인해주세요.");
-     navigate("/admin/login");
-     return;
-    }
+      if (role === "admin") {
+        alert("⚠️ 관리자 계정은 관리자 전용 로그인 페이지에서 로그인해주세요.");
+        navigate("/admin/login");
+        return;
+      }
 
       setSuccess("로그인 성공");
       localStorage.setItem("token", data.token);
@@ -70,82 +69,45 @@ function LoginPage() {
   };
 
   return (
-    <div style={styles.container}>
-      <h2 style={styles.title}>로그인</h2>
-      {error && <p style={styles.error}>{error}</p>}
-      {success && <p style={styles.success}>{success}</p>}
-      <form onSubmit={handleLogin} style={styles.form}>
-        <label style={styles.label}>이메일</label>
-        <input
-          name="email"
-          type="email"
-          value={form.email}
-          onChange={handleChange}
-          required
-          style={styles.input}
-        />
-        <label style={styles.label}>비밀번호</label>
-        <input
-          name="password"
-          type="password"
-          value={form.password}
-          onChange={handleChange}
-          required
-          style={styles.input}
-        />
-        <button type="submit" style={styles.button}>로그인</button>
-      </form>
+    <div className="flex items-center justify-center min-h-screen bg-gray-100 px-4">
+      <div className="w-full max-w-md p-6 sm:p-8 bg-white rounded-xl shadow-md">
+        <h2 className="text-2xl font-bold text-center mb-6">로그인</h2>
+        {error && <p className="text-red-500 text-center mb-2">{error}</p>}
+        {success && <p className="text-green-500 text-center mb-2">{success}</p>}
+        <form className="flex flex-col" onSubmit={handleLogin}>
+          <label className="mt-2 mb-1">이메일</label>
+          <input
+            name="email"
+            type="email"
+            value={form.email}
+            onChange={handleChange}
+            required
+            className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+          />
+          <label className="mt-2 mb-1">비밀번호</label>
+          <input
+            name="password"
+            type="password"
+            value={form.password}
+            onChange={handleChange}
+            required
+            className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+          />
+          <button
+            type="submit"
+            className="mt-4 py-3 bg-blue-500 text-white font-semibold rounded-md hover:bg-blue-600 transition"
+          >
+            로그인
+          </button>
+        </form>
+        <div className="text-center mt-4">
+          <Link to="/forgot-password" className="text-blue-500 hover:underline">
+            비밀번호 찾기
+          </Link>
+        </div>
+      </div>
     </div>
   );
 }
-
-const styles = {
-  container: {
-    maxWidth: 400,
-    margin: "auto",
-    marginTop: 100,
-    padding: 30,
-    border: "1px solid #ccc",
-    borderRadius: 12,
-    backgroundColor: "#f4f4f4",
-    boxShadow: "0 0 10px rgba(0,0,0,0.1)",
-  },
-  title: {
-    textAlign: "center",
-    marginBottom: 20,
-  },
-  form: {
-    display: "flex",
-    flexDirection: "column",
-  },
-  label: {
-    marginTop: 10,
-    marginBottom: 5,
-  },
-  input: {
-    padding: 10,
-    borderRadius: 6,
-    border: "1px solid #ccc",
-    fontSize: 16,
-  },
-  button: {
-    marginTop: 20,
-    padding: 12,
-    backgroundColor: "#2196F3",
-    color: "white",
-    border: "none",
-    borderRadius: 6,
-    cursor: "pointer",
-    fontSize: 16,
-  },
-  error: {
-    color: "red",
-    textAlign: "center",
-  },
-  success: {
-    color: "green",
-    textAlign: "center",
-  },
-};
 
 export default LoginPage;

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useAdminAuth } from "../context/AdminAuthContext";
 
 function AdminLoginPage() {
@@ -69,11 +69,11 @@ function AdminLoginPage() {
   // 💅 UI 렌더링
   // ------------------------------
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-gray-100 to-gray-200">
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 px-4">
       <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
         {/* 제목 */}
         <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">
-          관리자 로그인
+          🛡 관리자 로그인
         </h2>
 
         {/* 에러 메시지 */}
@@ -129,6 +129,16 @@ function AdminLoginPage() {
         <p className="text-center text-gray-500 text-sm mt-5">
           관리 전용 페이지입니다. 일반 사용자는 접근할 수 없습니다.
         </p>
+
+        {/* 비밀번호 찾기 링크 */}
+        <div className="text-center mt-3">
+          <Link
+            to="/admin/forgot-password"
+            className="text-blue-500 hover:underline text-sm"
+          >
+            비밀번호 찾기
+          </Link>
+        </div>
       </div>
     </div>
   );
