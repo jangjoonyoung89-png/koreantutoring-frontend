@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { fetchTutors } from "../api/tutorApi";
-import styles from "./MainPage.module.css"; 
+import styles from "./MainPage.module.css"; // 스타일 모듈
 
 export default function MainPage() {
   const [tutors, setTutors] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // 기본 샘플 튜터 목록
+  // 기본 샘플 튜터 목록 (API 실패 시 표시)
   const sampleTutors = [
     {
       _id: "sample1",
@@ -29,6 +29,7 @@ export default function MainPage() {
     },
   ];
 
+  // 튜터 데이터 로드
   useEffect(() => {
     const loadTutors = async () => {
       try {
@@ -53,32 +54,41 @@ export default function MainPage() {
 
   const displayTutors = tutors.slice(0, 3);
 
+  // 인라인 스타일 정의
   const inlineStyles = {
     navbar: {
       display: "flex",
       justifyContent: "space-between",
       alignItems: "center",
-      padding: "10px 20px",
-      backgroundColor: "#333",
+      padding: "12px 24px",
+      backgroundColor: "#0077cc",
       color: "#fff",
+      flexWrap: "wrap",
+      position: "sticky",
+      top: 0,
+      zIndex: 50,
     },
     logo: {
       fontWeight: "bold",
-      fontSize: "20px",
+      fontSize: "22px",
+      marginBottom: "8px",
     },
     navLinks: {
       display: "flex",
-      gap: "20px",
+      gap: "18px",
+      flexWrap: "wrap",
+      justifyContent: "center",
     },
     navLink: {
       color: "#fff",
       textDecoration: "none",
-      fontSize: "18px",
+      fontSize: "17px",
       fontWeight: "500",
+      transition: "color 0.3s",
     },
     banner: {
       position: "relative",
-      height: "350px",
+      height: "380px",
       backgroundImage:
         "url('https://images.unsplash.com/photo-1584697964192-f67d3a6a0f77?auto=format&fit=crop&w=1600&q=80')",
       backgroundSize: "cover",
@@ -96,35 +106,38 @@ export default function MainPage() {
       left: 0,
       width: "100%",
       height: "100%",
-      backgroundColor: "rgba(0,0,0,0.4)",
+      backgroundColor: "rgba(0,0,0,0.45)",
       zIndex: 1,
     },
     bannerContent: {
       position: "relative",
       zIndex: 2,
-      maxWidth: "600px",
+      maxWidth: "90%",
+      padding: "0 20px",
     },
     bannerTitle: {
-      fontSize: "38px",
+      fontSize: "34px",
       fontWeight: "bold",
       textShadow: "2px 2px 6px rgba(0,0,0,0.5)",
-      marginBottom: "15px",
+      marginBottom: "10px",
     },
     bannerSubtitle: {
-      fontSize: "20px",
+      fontSize: "18px",
       fontWeight: "500",
       lineHeight: "1.6",
       color: "#ffdd99",
       textShadow: "1px 1px 4px rgba(0,0,0,0.4)",
+      marginBottom: "18px",
     },
     section: {
-      padding: "50px 20px",
+      padding: "60px 20px",
       textAlign: "center",
     },
     sectionTitle: {
       fontSize: "26px",
-      marginBottom: "30px",
+      marginBottom: "35px",
       fontWeight: "bold",
+      color: "#333",
     },
     tutorCardImg: {
       width: "180px",
@@ -137,29 +150,29 @@ export default function MainPage() {
 
   return (
     <div>
-      {/* 네비게이션 */}
+      {/* ✅ 네비게이션 */}
       <nav style={inlineStyles.navbar}>
         <div style={inlineStyles.logo}>KOREAN TUTORING</div>
         <div style={inlineStyles.navLinks}>
           <Link to="/" style={inlineStyles.navLink}>
-            HOME
+            홈
           </Link>
           <Link to="/tutors" style={inlineStyles.navLink}>
-            TUTOR
+            튜터 찾기
           </Link>
           <Link to="/signup" style={inlineStyles.navLink}>
-            SIGNUP
+            회원가입
           </Link>
           <Link to="/login" style={inlineStyles.navLink}>
-            LOGIN
+            로그인
           </Link>
           <Link to="/admin/login" className={styles.adminButton}>
-            ADMIN
+            관리자
           </Link>
         </div>
       </nav>
 
-      {/* 배너 */}
+      {/* ✅ 메인 배너 */}
       <section style={inlineStyles.banner}>
         <div style={inlineStyles.bannerOverlay}></div>
         <div style={inlineStyles.bannerContent}>
@@ -169,15 +182,13 @@ export default function MainPage() {
           <p style={inlineStyles.bannerSubtitle}>
             언제 어디서나 원어민 한국어 선생님과 함께 하는 맞춤형 한국어 학습
           </p>
-          <div>
-            <Link to="/signup">
-              <button className={styles.ctaButton}>지금 시작하기</button>
-            </Link>
-          </div>
+          <Link to="/signup">
+            <button className={styles.ctaButton}>지금 시작하기</button>
+          </Link>
         </div>
       </section>
 
-      {/* 추천 튜터 */}
+      {/* ✅ 추천 튜터 섹션 */}
       <section style={inlineStyles.section}>
         <h2 style={inlineStyles.sectionTitle}>추천 튜터</h2>
         {loading ? (
@@ -200,9 +211,9 @@ export default function MainPage() {
         )}
       </section>
 
-      {/* 푸터 */}
+      {/* ✅ 푸터 */}
       <footer className={styles.footer}>
-        <p>© 2025 KOREAN TUTORING. 장준영 All rights reserved.</p>
+        <p>© 20250901 KOREAN TUTORING. 장준영 All rights reserved.</p>
         <p>문의: jjy@mail.kcu.ac</p>
       </footer>
     </div>

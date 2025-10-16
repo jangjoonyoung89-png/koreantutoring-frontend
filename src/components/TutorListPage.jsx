@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 // ======================
-// ⭐ 별점 렌더링 유틸
+// ⭐ 별점 렌더링 유틸 함수
 // ======================
 const renderStars = (rating) => {
   const fullStars = Math.floor(rating);
@@ -25,7 +25,7 @@ function TutorListPage() {
   const [tutors, setTutors] = useState([]);
   const navigate = useNavigate();
 
-  // 샘플 데이터 초기화
+  // ✅ 샘플 튜터 데이터 (API 연결 전)
   useEffect(() => {
     const sampleTutors = [
       {
@@ -33,7 +33,7 @@ function TutorListPage() {
         name: "장선미",
         bio: "10년 경력의 한국어 전문 튜터입니다.",
         averageRating: 4.5,
-        img: "/images/korean_teacher1.jpg", // 절대경로로 변경
+        img: "/images/korean_teacher1.jpg",
         price: 20000,
       },
       {
@@ -53,21 +53,24 @@ function TutorListPage() {
         price: 25000,
       },
     ];
-
     setTutors(sampleTutors);
   }, []);
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* 상단 제목 섹션 */}
-      <div className="text-center py-10">
+      {/* =====================
+          🏷️ 상단 타이틀
+      ===================== */}
+      <div className="text-center py-10 px-4">
         <h1 className="text-3xl font-bold text-gray-800">🎓 튜터 목록</h1>
-        <p className="text-gray-500 mt-2">
+        <p className="text-gray-500 mt-2 text-base">
           나에게 맞는 한국어 튜터를 찾아보세요.
         </p>
       </div>
 
-      {/* 카드 리스트 */}
+      {/* =====================
+          📋 튜터 카드 리스트
+      ===================== */}
       <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 px-6 pb-16">
         {tutors.map((tutor) => (
           <div
@@ -84,7 +87,7 @@ function TutorListPage() {
               />
             </div>
 
-            {/* 내용 */}
+            {/* 튜터 내용 */}
             <div className="p-5">
               <h2 className="text-lg font-semibold text-gray-800 mb-1">
                 {tutor.name}
@@ -101,13 +104,14 @@ function TutorListPage() {
                   </span>
                 </span>
                 <span className="text-yellow-500">
-                  ⭐ {renderStars(tutor.averageRating)}{" "}
+                  {renderStars(tutor.averageRating)}{" "}
                   <span className="text-gray-500 text-xs ml-1">
                     ({tutor.averageRating.toFixed(1)})
                   </span>
                 </span>
               </div>
 
+              {/* 버튼 */}
               <button
                 onClick={(e) => {
                   e.stopPropagation();

@@ -5,137 +5,159 @@ import { AuthContext } from "../context/AuthContext";
 function MyPage() {
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();
+
   const [userInfo, setUserInfo] = useState(null);
   const [bookings, setBookings] = useState([]);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(true);
 
+  const API_URL = (process.env.REACT_APP_API_URL || "http://localhost:8000").trim();
+
+  // ============================
+  // ✅ 사용자 및 예약 정보 불러오기
+  // ============================
   useEffect(() => {
-    if (!user?.id) return;
+    if (!user?.id) {
+      setLoading(false);
+      return;
+    }
 
     const token = localStorage.getItem("token");
 
-    const fetchUser = async () => {
+    const fetchData = async () => {
       try {
-        const res = await fetch(`http://localhost:8000/api/users/${user.id}`, {
+        // 사용자 정보 가져오기
+        const resUser = await fetch(`${API_URL}/api/users/${user.id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        if (!res.ok) throw new Error("사용자 정보를 불러오지 못했습니다.");
-        const data = await res.json();
-        setUserInfo(data);
+        if (!resUser.ok) throw new Error("사용자 정보를 불러오지 못했습니다.");
+        const userData = await resUser.json();
+        setUserInfo(userData);
+
+        // 예약 정보 가져오기
+        const resBookings = await fetch(`${API_URL}/api/bookings?studentId=${user.id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!resBookings.ok) throw new Error("예약 정보를 불러오지 못했습니다.");
+        const bookingsData = await resBookings.json();
+        setBookings(bookingsData);
       } catch (err) {
+        console.error(err);
         setError(err.message);
+      } finally {
+        setLoading(false);
       }
     };
 
-    const fetchBookings = async () => {
-      try {
-        const res = await fetch(`http://localhost:8000/api/bookings?studentId=${user.id}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        if (!res.ok) throw new Error("예약 정보를 불러오지 못했습니다.");
-        const data = await res.json();
-        setBookings(data);
-      } catch (err) {
-        setError(err.message);
-      }
-    };
-
-    fetchUser();
-    fetchBookings();
+    fetchData();
   }, [user]);
 
-  if (error) return <p style={{ color: "red", textAlign: "center" }}>{error}</p>;
-  if (!userInfo) return <p style={{ textAlign: "center" }}>로딩 중...</p>;
+  // ============================
+  // ⏳ 로딩 및 에러 처리
+  // ============================
+  if (loading) {
+    return <p className="text-center mt-10 text-gray-600">로딩 중...</p>;
+  }
 
+  if (error) {
+    return <p className="text-center text-red-500 mt-10">{error}</p>;
+  }
+
+  if (!userInfo) {
+    return (
+      <div className="text-center mt-10">
+        <p>로그인이 필요합니다.</p>
+        <button
+          onClick={() => navigate("/login")}
+          className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
+        >
+          로그인 페이지로 이동
+        </button>
+      </div>
+    );
+  }
+
+  // ============================
+  // 🎨 페이지 본문
+  // ============================
   return (
-    <div style={{
-      maxWidth: 700,
-      margin: "0 auto",
-      padding: "40px 20px",
-      fontFamily: "sans-serif",
-      minHeight: "100vh",
-      backgroundColor: "#fff",
-    }}>
-      <h2 style={{ textAlign: "center", marginBottom: "30px" }}>📄 마이페이지</h2>
+    <div className="min-h-screen bg-gray-50 px-5 py-10">
+      <div className="max-w-3xl mx-auto bg-white rounded-2xl shadow-lg p-6 md:p-10">
+        <h2 className="text-3xl font-bold text-center mb-8 text-gray-800">
+          📄 마이페이지
+        </h2>
 
-      {/* 사용자 정보 */}
-      <div style={{
-        background: "#f9f9f9",
-        borderRadius: "12px",
-        padding: "20px",
-        boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
-        marginBottom: "30px",
-      }}>
-        <h3>👤 내 정보</h3>
-        <p><strong>이름:</strong> {userInfo.full_name}</p>
-        <p><strong>이메일:</strong> {userInfo.email}</p>
-        <p><strong>역할:</strong> {userInfo.role === "student" ? "학생" : "튜터"}</p>
-      </div>
+        {/* 👤 사용자 정보 */}
+        <section className="bg-blue-50 p-5 rounded-xl mb-8 shadow-sm">
+          <h3 className="text-lg font-semibold mb-3 text-gray-700">👤 내 정보</h3>
+          <div className="space-y-2 text-gray-700">
+            <p>
+              <strong>이름:</strong> {userInfo.full_name}
+            </p>
+            <p>
+              <strong>이메일:</strong> {userInfo.email}
+            </p>
+            <p>
+              <strong>역할:</strong>{" "}
+              {userInfo.role === "student" ? "학생" : "튜터"}
+            </p>
+          </div>
+        </section>
 
-      {/* 예약 목록 */}
-      <div style={{
-        background: "#f1f5ff",
-        borderRadius: "12px",
-        padding: "20px",
-        boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
-      }}>
-        <h3>📅 내 예약</h3>
-        {bookings.length === 0 ? (
-          <p>예약 내역이 없습니다.</p>
-        ) : (
-          <ul style={{ listStyle: "none", padding: 0 }}>
-            {bookings.map((booking) => (
-              <li key={booking.id} style={{
-                borderBottom: "1px solid #ddd",
-                padding: "15px 0",
-              }}>
-                <p><strong>튜터:</strong> {booking.tutor_name}</p>
-                <p><strong>날짜:</strong> {booking.date}</p>
-                <p><strong>시간:</strong> {booking.time}</p>
-                <p><strong>요청사항:</strong> {booking.notes || "없음"}</p>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
+        {/* 📅 예약 목록 */}
+        <section className="bg-gray-50 p-5 rounded-xl border border-gray-200 shadow-sm">
+          <h3 className="text-lg font-semibold mb-3 text-gray-700">📅 내 예약</h3>
+          {bookings.length === 0 ? (
+            <p className="text-gray-500">예약 내역이 없습니다.</p>
+          ) : (
+            <ul className="divide-y divide-gray-200">
+              {bookings.map((booking) => (
+                <li key={booking.id} className="py-4">
+                  <p>
+                    <strong>튜터:</strong> {booking.tutor_name}
+                  </p>
+                  <p>
+                    <strong>날짜:</strong> {booking.date}
+                  </p>
+                  <p>
+                    <strong>시간:</strong> {booking.time}
+                  </p>
+                  <p>
+                    <strong>요청사항:</strong> {booking.notes || "없음"}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
 
-      {/* 버튼 영역 */}
-      <div style={{ marginTop: "30px", textAlign: "center" }}>
-        <button
-          onClick={() => navigate("/edit-profile")}
-          style={btnStyle("#007bff")}
-        >
-          프로필 수정
-        </button>
-        <button
-          onClick={() => {
-            localStorage.removeItem("token");
-            navigate("/login");
-          }}
-          style={btnStyle("#6c757d")}
-        >
-          로그아웃
-        </button>
-        <button
-          onClick={() => navigate("/change-password")}
-          style={{ ...btnStyle("#28a745"), marginTop: "10px" }}
-        >
-          비밀번호 변경
-        </button>
+        {/* 🔘 버튼 영역 */}
+        <div className="flex flex-col sm:flex-row justify-center gap-3 mt-10">
+          <button
+            onClick={() => navigate("/edit-profile")}
+            className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
+          >
+            프로필 수정
+          </button>
+          <button
+            onClick={() => {
+              localStorage.removeItem("token");
+              navigate("/login");
+            }}
+            className="px-6 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition"
+          >
+            로그아웃
+          </button>
+          <button
+            onClick={() => navigate("/change-password")}
+            className="px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition"
+          >
+            비밀번호 변경
+          </button>
+        </div>
       </div>
     </div>
   );
 }
-
-
-const btnStyle = (bgColor) => ({
-  backgroundColor: bgColor,
-  color: "#fff",
-  padding: "10px 20px",
-  borderRadius: "6px",
-  border: "none",
-  cursor: "pointer",
-  margin: "5px",
-});
 
 export default MyPage;

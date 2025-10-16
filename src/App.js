@@ -118,7 +118,7 @@ function MainPage() {
       </section>
 
       <footer style={styles.footer}>
-        <p>© 2025 KOREAN TUTORING. 장준영 All rights reserved.</p>
+        <p>© 20250901 KOREAN TUTORING. 장준영 All rights reserved.</p>
         <p>문의: jjy@mail.kcu.ac</p>
       </footer>
     </div>
