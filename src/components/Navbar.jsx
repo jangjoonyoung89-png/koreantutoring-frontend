@@ -14,6 +14,7 @@ export default function Navbar() {
   const { user, logout } = useContext(AuthContext);
   const [adminMenuOpen, setAdminMenuOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const adminRef = useRef(null);
 
   // 외부 클릭 시 관리자 메뉴 닫기
@@ -27,8 +28,24 @@ export default function Navbar() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // 링크 클릭 시 모바일 메뉴 자동 닫기
+  // 화면 크기 변화 감지 (반응형)
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  // 모바일 메뉴 닫기
   const closeMobileMenu = () => setMobileMenuOpen(false);
+
+  // 메뉴 링크 배열 (중복 제거)
+  const commonLinks = [{ to: "/tutors", label: "튜터 찾기" }];
+  const studentLinks = [{ to: "/student/mypage", label: "마이페이지" }];
+  const tutorLinks = [{ to: "/tutor/dashboard", label: "튜터 대시보드" }];
+  const authLinks = [
+    { to: "/login", label: "로그인" },
+    { to: "/signup", label: "회원가입" },
+  ];
 
   return (
     <nav style={styles.navbar}>
@@ -36,42 +53,49 @@ export default function Navbar() {
       <div style={styles.logo}>KOREAN TUTORING</div>
 
       {/* 모바일 메뉴 버튼 */}
-      <button
-        style={styles.mobileMenuButton}
-        onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-      >
-        {mobileMenuOpen ? (
-          <XMarkIcon style={styles.icon} />
-        ) : (
-          <Bars3Icon style={styles.icon} />
-        )}
-      </button>
+      {windowWidth <= 768 && (
+        <button
+          style={styles.mobileMenuButton}
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          aria-label={mobileMenuOpen ? "메뉴 닫기" : "메뉴 열기"}
+        >
+          {mobileMenuOpen ? <XMarkIcon style={styles.icon} /> : <Bars3Icon style={styles.icon} />}
+        </button>
+      )}
 
-      {/* PC & 모바일 메뉴 */}
+      {/* 메뉴 링크 */}
       <div
         style={{
           ...styles.navLinks,
-          ...(mobileMenuOpen ? styles.navLinksMobileOpen : styles.navLinksMobileClosed),
+          ...(windowWidth <= 768
+            ? mobileMenuOpen
+              ? styles.navLinksMobileOpen
+              : styles.navLinksMobileClosed
+            : {}),
         }}
       >
-        {/* 누구나 볼 수 있는 메뉴 */}
-        <Link to="/tutors" style={styles.navLink} onClick={closeMobileMenu}>
-          튜터 찾기
-        </Link>
+        {/* 공통 링크 */}
+        {commonLinks.map((link) => (
+          <Link key={link.to} to={link.to} style={styles.navLink} onClick={closeMobileMenu}>
+            {link.label}
+          </Link>
+        ))}
 
         {/* 학생 전용 */}
-        {user?.role === "student" && (
-          <Link to="/student/mypage" style={styles.navLink} onClick={closeMobileMenu}>
-            마이페이지
-          </Link>
-        )}
+        {user?.role === "student" &&
+          studentLinks.map((link) => (
+            <Link key={link.to} to={link.to} style={styles.navLink} onClick={closeMobileMenu}>
+              {link.label}
+            </Link>
+          ))}
 
         {/* 튜터 전용 */}
-        {user?.role === "tutor" && (
-          <Link to="/tutor/dashboard" style={styles.navLink} onClick={closeMobileMenu}>
-            튜터 대시보드
-          </Link>
-        )}
+        {user?.role === "tutor" &&
+          tutorLinks.map((link) => (
+            <Link key={link.to} to={link.to} style={styles.navLink} onClick={closeMobileMenu}>
+              {link.label}
+            </Link>
+          ))}
 
         {/* 관리자 전용 */}
         {user?.role === "admin" && (
@@ -126,14 +150,11 @@ export default function Navbar() {
             로그아웃
           </button>
         ) : (
-          <>
-            <Link to="/login" style={styles.navLink} onClick={closeMobileMenu}>
-              로그인
+          authLinks.map((link) => (
+            <Link key={link.to} to={link.to} style={styles.navLink} onClick={closeMobileMenu}>
+              {link.label}
             </Link>
-            <Link to="/signup" style={styles.navLink} onClick={closeMobileMenu}>
-              회원가입
-            </Link>
-          </>
+          ))
         )}
       </div>
     </nav>
@@ -169,7 +190,6 @@ const styles = {
     background: "none",
     border: "none",
     color: "#fff",
-    display: "none",
     cursor: "pointer",
   },
   navLinks: {
@@ -216,8 +236,7 @@ const styles = {
     cursor: "pointer",
     transition: "background 0.2s",
   },
-
-  // 🔹 모바일용 스타일
+  // 🔹 모바일 메뉴
   navLinksMobileClosed: {
     display: "none",
   },
@@ -232,13 +251,6 @@ const styles = {
     padding: "1rem 0",
     gap: "1rem",
     alignItems: "center",
+    zIndex: 40,
   },
 };
-
-// --------------------------
-// 🧩 반응형 스타일 (CSS-in-JS 방식)
-// --------------------------
-if (window.innerWidth <= 768) {
-  styles.mobileMenuButton.display = "block";
-  styles.navLinks.display = "none";
-}
