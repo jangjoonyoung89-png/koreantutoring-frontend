@@ -8,7 +8,7 @@ import { getTutorById, createBooking } from "../api/tutorApi";
 import axios from "axios";
 
 // ============================
-// 결제 모달
+// 💳 결제 모달
 // ============================
 function PaymentModal({ isOpen, onClose, onPaid, amount }) {
   const [loading, setLoading] = useState(false);
@@ -16,8 +16,7 @@ function PaymentModal({ isOpen, onClose, onPaid, amount }) {
   const handlePayment = async () => {
     setLoading(true);
     try {
-      // 실제 PG사 연동 모킹
-      await new Promise((res) => setTimeout(res, 1500));
+      await new Promise((res) => setTimeout(res, 1500)); // 가상 결제 처리
       onPaid();
       onClose();
       alert("✅ 결제 완료!");
@@ -30,10 +29,15 @@ function PaymentModal({ isOpen, onClose, onPaid, amount }) {
 
   if (!isOpen) return null;
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-      <div className="bg-white p-6 rounded-2xl shadow-lg max-w-sm w-full">
-        <h3 className="text-xl font-bold mb-4">결제하기</h3>
-        <p className="mb-4">결제 금액: {amount.toLocaleString()}원</p>
+    <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
+      <div className="bg-white p-6 rounded-2xl shadow-xl max-w-sm w-full">
+        <h3 className="text-xl font-bold mb-4 text-gray-800">결제하기</h3>
+        <p className="mb-6 text-gray-600">
+          결제 금액:{" "}
+          <span className="font-semibold text-green-600">
+            {amount.toLocaleString()}원
+          </span>
+        </p>
         <div className="flex justify-end gap-3">
           <button
             onClick={onClose}
@@ -43,10 +47,10 @@ function PaymentModal({ isOpen, onClose, onPaid, amount }) {
           </button>
           <button
             onClick={handlePayment}
-            className={`px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg ${
-              loading ? "opacity-50 cursor-not-allowed" : ""
-            }`}
             disabled={loading}
+            className={`px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg shadow ${
+              loading ? "opacity-60 cursor-not-allowed" : ""
+            }`}
           >
             {loading ? "결제 중..." : "결제하기"}
           </button>
@@ -57,7 +61,7 @@ function PaymentModal({ isOpen, onClose, onPaid, amount }) {
 }
 
 // ============================
-// TutorDetailPage
+// 📘 TutorDetailPage
 // ============================
 export default function TutorDetailPage() {
   const { id } = useParams();
@@ -69,25 +73,26 @@ export default function TutorDetailPage() {
   const [message, setMessage] = useState("");
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
   const [pendingBooking, setPendingBooking] = useState(null);
-  const [calendarEvents, setCalendarEvents] = useState([]); // 예약 자동 표시
+  const [calendarEvents, setCalendarEvents] = useState([]);
 
-  const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || "http://localhost:8000";
+  const BACKEND_URL =
+    process.env.REACT_APP_BACKEND_URL || "http://localhost:8000";
 
   // -----------------------------
-  // 튜터 정보 로드
+  // 🎓 튜터 정보 불러오기
   // -----------------------------
   useEffect(() => {
     const fetchTutor = async () => {
       setLoading(true);
       try {
         const data = await getTutorById(id);
-        if (!data.hourlyRate) data.hourlyRate = 50000; // 기본 요금
+        if (!data.hourlyRate) data.hourlyRate = 50000;
         if (data.sampleVideoUrl && !data.sampleVideoUrl.startsWith("http")) {
           data.sampleVideoUrl = `${BACKEND_URL}${data.sampleVideoUrl}`;
         }
         setTutor(data);
       } catch {
-        // 샘플 튜터
+        // 샘플 데이터
         setTutor({
           _id: "tutor1",
           name: "장준영",
@@ -110,13 +115,23 @@ export default function TutorDetailPage() {
   }, [id, BACKEND_URL]);
 
   // -----------------------------
-  // 날짜 선택 시 가능 시간 업데이트
+  // 📅 날짜 선택 시 가능 시간 업데이트
   // -----------------------------
   useEffect(() => {
     if (!tutor) return;
-    const dayNamesEN = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+    const dayNamesEN = [
+      "Sunday",
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+    ];
     const selectedDay = dayNamesEN[selectedDate.getDay()];
-    const dayAvailability = tutor.availableTimes?.find((d) => d.day === selectedDay);
+    const dayAvailability = tutor.availableTimes?.find(
+      (d) => d.day === selectedDay
+    );
     setAvailableSlots(dayAvailability ? dayAvailability.slots : []);
     setSelectedSlot("");
   }, [selectedDate, tutor]);
@@ -129,7 +144,7 @@ export default function TutorDetailPage() {
   };
 
   // -----------------------------
-  // 예약 + 결제
+  // 📘 예약 + 결제 처리
   // -----------------------------
   const handleBooking = async () => {
     if (!selectedSlot) {
@@ -144,9 +159,9 @@ export default function TutorDetailPage() {
       amount: tutor.hourlyRate,
     };
     try {
-      const res = await createBooking(bookingData); 
+      const res = await createBooking(bookingData);
       setPendingBooking(res);
-      setPaymentModalOpen(true); 
+      setPaymentModalOpen(true);
     } catch {
       setMessage("❌ 예약 실패");
     }
@@ -155,28 +170,42 @@ export default function TutorDetailPage() {
   const handlePaid = async () => {
     try {
       await axios.post(`${BACKEND_URL}/api/bookings/${pendingBooking._id}/pay`);
-      setCalendarEvents([...calendarEvents, { date: pendingBooking.date, time: pendingBooking.time }]);
-      setMessage(`✅ ${pendingBooking.date} ${pendingBooking.time} 예약 및 결제 완료!`);
+      setCalendarEvents([
+        ...calendarEvents,
+        { date: pendingBooking.date, time: pendingBooking.time },
+      ]);
+      setMessage(
+        `✅ ${pendingBooking.date} ${pendingBooking.time} 예약 및 결제 완료!`
+      );
       setPendingBooking(null);
     } catch {
       alert("결제 후 상태 업데이트 실패");
     }
   };
 
-  if (loading) return <p className="text-center mt-6">로딩 중...</p>;
-  if (!tutor) return <p className="text-center mt-6 text-red-500">{message || "튜터 정보를 불러올 수 없습니다."}</p>;
+  if (loading)
+    return <p className="text-center mt-10 text-gray-500">로딩 중...</p>;
+
+  if (!tutor)
+    return (
+      <p className="text-center mt-10 text-red-500">
+        {message || "튜터 정보를 불러올 수 없습니다."}
+      </p>
+    );
 
   // -----------------------------
-  // 샘플 영상 처리
+  // 🎥 유튜브 영상 변환 처리
   // -----------------------------
   let videoElement = <p className="text-gray-500">등록된 영상이 없습니다.</p>;
   if (tutor.sampleVideoUrl) {
     let embedUrl = tutor.sampleVideoUrl;
-    if (embedUrl.includes("watch?v=")) embedUrl = embedUrl.replace("watch?v=", "embed/");
-    if (embedUrl.includes("youtu.be")) embedUrl = embedUrl.replace("youtu.be/", "www.youtube.com/embed/");
+    if (embedUrl.includes("watch?v="))
+      embedUrl = embedUrl.replace("watch?v=", "embed/");
+    if (embedUrl.includes("youtu.be"))
+      embedUrl = embedUrl.replace("youtu.be/", "www.youtube.com/embed/");
     videoElement = (
       <iframe
-        className="w-full h-80 rounded-lg shadow-md"
+        className="w-full h-80 rounded-xl shadow-md"
         src={embedUrl}
         title="튜터 소개 영상"
         frameBorder="0"
@@ -190,94 +219,126 @@ export default function TutorDetailPage() {
   // 렌더링
   // -----------------------------
   return (
-    <div className="max-w-3xl mx-auto p-6 bg-white shadow-lg rounded-xl space-y-8">
-      {/* 튜터 정보 */}
-      <div>
-        <h2 className="text-2xl font-bold">{tutor.name} 튜터 소개</h2>
-        <p className="text-gray-700">이메일: {tutor.email || "정보 없음"}</p>
-        <p className="text-gray-700">소개: {tutor.bio || "소개 정보 없음"}</p>
-        <p className="text-gray-700">평점: {tutor.averageRating ?? "없음"}</p>
-        <p className="text-gray-700">시간당 요금: {tutor.hourlyRate.toLocaleString()}원</p>
-      </div>
-
-      {/* 샘플 영상 */}
-      <div>
-        <h3 className="font-semibold mb-2">🎥 샘플 영상</h3>
-        {videoElement}
-      </div>
-
-      {/* 실시간 수업 */}
-      <div>
-        <h3 className="font-semibold mb-2">📡 실시간 수업</h3>
-        {tutor.videoLink ? (
-          <a
-            href={tutor.videoLink}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-block px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded shadow"
-          >
-            🎥 실시간 수업 입장하기
-          </a>
-        ) : (
-          <p className="text-gray-500">실시간 수업 링크가 아직 없습니다.</p>
-        )}
-      </div>
-
-      {/* 캘린더 */}
-      <div>
-        <h3 className="font-semibold mb-2">📅 예약 날짜 선택</h3>
-        <Calendar
-          value={selectedDate}
-          onChange={setSelectedDate}
-          tileContent={({ date }) => {
-            const hasBooking = calendarEvents.find(e => e.date === formatDate(date));
-            return hasBooking ? <span className="text-red-500 ml-1">●</span> : null;
-          }}
-        />
-      </div>
-
-      {/* 가능 시간 */}
-      <div>
-        <h3 className="font-semibold mb-2">⏰ 가능 시간</h3>
-        {availableSlots.length === 0 ? (
-          <p className="text-gray-500">선택한 날짜에는 수업 가능 시간이 없습니다.</p>
-        ) : (
-          <div className="flex flex-wrap gap-2">
-            {availableSlots.map(slot => (
-              <button
-                key={slot}
-                onClick={() => setSelectedSlot(slot)}
-                className={`px-3 py-1 rounded border font-medium ${
-                  selectedSlot === slot
-                    ? "bg-blue-500 text-white border-blue-500"
-                    : "bg-gray-100 text-gray-800 border-gray-300 hover:bg-gray-200"
-                }`}
-              >
-                {slot} ({tutor.hourlyRate.toLocaleString()}원)
-              </button>
-            ))}
+    <div className="min-h-screen bg-gray-50 py-10 px-4">
+      <div className="max-w-3xl mx-auto bg-white shadow-lg rounded-2xl p-8 space-y-10">
+        {/* 튜터 기본 정보 */}
+        <section className="border-b pb-6">
+          <h2 className="text-3xl font-bold text-gray-800 mb-4">
+            {tutor.name} 튜터 소개
+          </h2>
+          <div className="space-y-1 text-gray-700">
+            <p>📧 이메일: {tutor.email || "정보 없음"}</p>
+            <p>📝 소개: {tutor.bio || "소개 정보 없음"}</p>
+            <p>⭐ 평점: {tutor.averageRating ?? "없음"}</p>
+            <p>
+              💰 시간당 요금:{" "}
+              <span className="font-semibold text-green-600">
+                {tutor.hourlyRate.toLocaleString()}원
+              </span>
+            </p>
           </div>
-        )}
-      </div>
+        </section>
 
-      <button
-        onClick={handleBooking}
-        className="mt-4 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded shadow"
-      >
-        예약하기
-      </button>
+        {/* 소개 영상 */}
+        <section>
+          <h3 className="text-2xl font-semibold text-gray-800 mb-3">
+            🎥 샘플 영상
+          </h3>
+          {videoElement}
+        </section>
 
-      {message && <p className="mt-2 text-lg font-medium">{message}</p>}
+        {/* 실시간 수업 */}
+        <section className="text-center border-t pt-6">
+          <h3 className="text-xl font-semibold text-gray-800 mb-3">
+            📡 실시간 수업
+          </h3>
+          {tutor.videoLink ? (
+            <a
+              href={tutor.videoLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow transition"
+            >
+              🎥 실시간 수업 입장하기
+            </a>
+          ) : (
+            <p className="text-gray-500">실시간 수업 링크가 없습니다.</p>
+          )}
+        </section>
 
-      {/* 리뷰 */}
-      <div>
-        <h3 className="text-xl font-bold mb-4">학생 리뷰</h3>
-        <ReviewList tutorId={tutor._id} />
-      </div>
+        {/* 예약 캘린더 */}
+        <section>
+          <h3 className="text-2xl font-semibold text-gray-800 mb-3">
+            📅 예약 날짜 선택
+          </h3>
+          <div className="bg-gray-100 p-4 rounded-xl shadow-inner">
+            <Calendar
+              value={selectedDate}
+              onChange={setSelectedDate}
+              tileContent={({ date }) => {
+                const hasBooking = calendarEvents.find(
+                  (e) => e.date === formatDate(date)
+                );
+                return hasBooking ? (
+                  <span className="text-red-500 ml-1">●</span>
+                ) : null;
+              }}
+            />
+          </div>
+        </section>
 
-      {/* Q&A */}
-      <div>
-        <QASection tutorId={tutor._id} />
+        {/* 가능 시간 */}
+        <section>
+          <h3 className="text-2xl font-semibold text-gray-800 mb-3">
+            ⏰ 가능 시간
+          </h3>
+          {availableSlots.length === 0 ? (
+            <p className="text-gray-500">
+              선택한 날짜에는 수업 가능 시간이 없습니다.
+            </p>
+          ) : (
+            <div className="flex flex-wrap gap-2">
+              {availableSlots.map((slot) => (
+                <button
+                  key={slot}
+                  onClick={() => setSelectedSlot(slot)}
+                  className={`px-3 py-1.5 rounded-lg border font-medium transition ${
+                    selectedSlot === slot
+                      ? "bg-blue-600 text-white border-blue-600"
+                      : "bg-gray-100 text-gray-800 border-gray-300 hover:bg-gray-200"
+                  }`}
+                >
+                  {slot} ({tutor.hourlyRate.toLocaleString()}원)
+                </button>
+              ))}
+            </div>
+          )}
+        </section>
+
+        {/* 예약 버튼 */}
+        <div className="text-center">
+          <button
+            onClick={handleBooking}
+            className="mt-2 px-6 py-2.5 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-xl shadow transition"
+          >
+            예약하기
+          </button>
+          {message && (
+            <p className="mt-3 text-gray-700 font-medium">{message}</p>
+          )}
+        </div>
+
+        {/* 리뷰 섹션 */}
+        <section className="border-t pt-8">
+          <h3 className="text-2xl font-bold mb-4 text-gray-800">💬 학생 리뷰</h3>
+          <ReviewList tutorId={tutor._id} />
+        </section>
+
+        {/* Q&A 섹션 */}
+        <section className="border-t pt-8">
+          <h3 className="text-2xl font-bold mb-4 text-gray-800">❓ Q&A</h3>
+          <QASection tutorId={tutor._id} />
+        </section>
       </div>
 
       {/* 결제 모달 */}
