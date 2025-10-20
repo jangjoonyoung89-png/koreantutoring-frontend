@@ -2,7 +2,9 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 
-// 로컬 fallback 데이터
+// =============================
+// ✅ 로컬 fallback 데이터
+// =============================
 const tutorsFallback = [
   {
     id: "66bca24e6f6e3b1f44a9a111",
@@ -45,8 +47,11 @@ const tutorsFallback = [
   },
 ];
 
-// 환경 변수 또는 기본 API 주소
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL?.trim() || "https://api.koreantutoring.co.kr";
+// =============================
+// ✅ API 기본 설정
+// =============================
+const API_BASE_URL =
+  process.env.REACT_APP_API_BASE_URL?.trim() || "https://api.koreantutoring.co.kr";
 
 function TutorDetail() {
   const { id } = useParams();
@@ -61,12 +66,12 @@ function TutorDetail() {
 
     const fetchTutor = async () => {
       try {
-        const res = await axios.get(`${API_BASE_URL}/api/tutors/${id}`, { withCredentials: true });
+        const res = await axios.get(`${API_BASE_URL}/api/tutors/${id}`, {
+          withCredentials: true,
+        });
         if (res.data) {
-          // MongoDB ObjectId 처리
           setTutor({ ...res.data, id: res.data._id || res.data.id });
         } else {
-          // API에 데이터 없으면 fallback
           const localTutor = tutorsFallback.find((t) => t.id === id);
           if (localTutor) setTutor(localTutor);
           else setError("해당 튜터를 찾을 수 없습니다.");
@@ -82,43 +87,170 @@ function TutorDetail() {
     fetchTutor();
   }, [id]);
 
-  if (error) return <p style={{ color: "red", textAlign: "center" }}>{error}</p>;
-  if (!tutor) return <p style={{ textAlign: "center" }}>로딩 중...</p>;
+  if (error)
+    return <p style={{ color: "red", textAlign: "center", marginTop: 50 }}>{error}</p>;
+  if (!tutor)
+    return <p style={{ textAlign: "center", marginTop: 50 }}>로딩 중...</p>;
 
+  // =============================
+  // ✅ UI 렌더링
+  // =============================
   return (
-    <div style={{ maxWidth: 600, margin: "40px auto", padding: 20 }}>
-      <h2 style={{ marginBottom: 20 }}>{tutor.name} 튜터 상세 정보</h2>
-
-      <img
-        src={tutor.img || ""}
-        alt={`${tutor.name || "튜터"} 프로필`}
+    <div
+      style={{
+        display: "flex",
+        flexWrap: "wrap",
+        maxWidth: "1100px",
+        margin: "40px auto",
+        gap: "30px",
+        padding: "20px",
+        fontFamily: "Pretendard, sans-serif",
+      }}
+    >
+      {/* -----------------------------
+          ✅ Left Panel: 프로필 카드
+      --------------------------------*/}
+      <div
         style={{
-          width: 150,
-          height: 150,
-          borderRadius: "50%",
-          objectFit: "cover",
-          marginBottom: 15,
+          flex: "1 1 350px",
+          background: "#fff",
+          borderRadius: "16px",
+          boxShadow: "0 4px 15px rgba(0,0,0,0.08)",
+          padding: "30px 25px",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          textAlign: "center",
         }}
-      />
+      >
+        <img
+          src={tutor.img}
+          alt={`${tutor.name} 프로필`}
+          style={{
+            width: 180,
+            height: 180,
+            borderRadius: "50%",
+            objectFit: "cover",
+            marginBottom: 20,
+            boxShadow: "0 3px 10px rgba(0,0,0,0.15)",
+          }}
+        />
+        <h2 style={{ fontSize: "1.5rem", fontWeight: 700, marginBottom: 5 }}>
+          {tutor.name}
+        </h2>
+        <p style={{ color: "#666", marginBottom: 15 }}>
+          {tutor.specialty || "전문 분야 없음"}
+        </p>
 
-      <p><strong>이메일:</strong> {tutor.email || "정보 없음"}</p>
-      <p><strong>소개:</strong> {tutor.bio || tutor.description || "소개 없음"}</p>
-      <p><strong>수업 가격:</strong> {tutor.price ? `${tutor.price}원` : "가격 정보 없음"}</p>
-      <p><strong>전문 분야:</strong> {tutor.specialty || "정보 없음"}</p>
-      <p><strong>사용 언어:</strong> {tutor.language || "정보 없음"}</p>
-
-      {tutor.videoUrl && (
-        <div style={{ marginTop: 20 }}>
-          <h4>소개 영상</h4>
-          <video
-            src={tutor.videoUrl.startsWith("http") ? tutor.videoUrl : `${API_BASE_URL}${tutor.videoUrl}`}
-            controls
-            width="100%"
-          >
-            지원하지 않는 브라우저입니다.
-          </video>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: "8px",
+            marginTop: 10,
+            fontSize: "0.95rem",
+          }}
+        >
+          <p>
+            <strong>언어:</strong> {tutor.language || "정보 없음"}
+          </p>
+          <p>
+            <strong>경력:</strong> {tutor.experience
+              ? `${tutor.experience}년`
+              : "정보 없음"}
+          </p>
+          <p>
+            <strong>이메일:</strong> {tutor.email || "비공개"}
+          </p>
         </div>
-      )}
+
+        <div
+          style={{
+            marginTop: 25,
+            background: "#f9f9f9",
+            padding: "15px 20px",
+            borderRadius: "12px",
+            width: "100%",
+          }}
+        >
+          <p style={{ marginBottom: 8, fontWeight: 600 }}>💰 수업 가격</p>
+          <h3 style={{ fontSize: "1.2rem", color: "#333" }}>
+            {tutor.price ? `${tutor.price.toLocaleString()}원 / 시간` : "가격 정보 없음"}
+          </h3>
+        </div>
+
+        <button
+          style={{
+            marginTop: 25,
+            background: "#4f46e5",
+            color: "white",
+            border: "none",
+            borderRadius: "12px",
+            padding: "12px 18px",
+            width: "100%",
+            fontSize: "1rem",
+            cursor: "pointer",
+            transition: "0.2s",
+          }}
+          onClick={() => alert("예약 페이지로 이동 예정입니다.")}
+          onMouseOver={(e) => (e.target.style.background = "#4338ca")}
+          onMouseOut={(e) => (e.target.style.background = "#4f46e5")}
+        >
+          수업 예약하기
+        </button>
+      </div>
+
+      {/* -----------------------------
+          ✅ Right Panel: 상세 정보 + 영상
+      --------------------------------*/}
+      <div
+        style={{
+          flex: "2 1 600px",
+          background: "#fff",
+          borderRadius: "16px",
+          boxShadow: "0 4px 15px rgba(0,0,0,0.08)",
+          padding: "30px 40px",
+          lineHeight: 1.7,
+        }}
+      >
+        <h2 style={{ marginBottom: 20, fontWeight: 700 }}>튜터 소개</h2>
+        <p style={{ whiteSpace: "pre-line", color: "#333" }}>
+          {tutor.bio || tutor.description || "튜터 소개가 없습니다."}
+        </p>
+
+        {tutor.videoUrl && (
+          <div style={{ marginTop: 30 }}>
+            <h3 style={{ fontWeight: 600, marginBottom: 10 }}>🎬 소개 영상</h3>
+            <video
+              src={
+                tutor.videoUrl.startsWith("http")
+                  ? tutor.videoUrl
+                  : `${API_BASE_URL}${tutor.videoUrl}`
+              }
+              controls
+              width="100%"
+              style={{
+                borderRadius: "12px",
+                boxShadow: "0 3px 10px rgba(0,0,0,0.15)",
+              }}
+            >
+              지원하지 않는 브라우저입니다.
+            </video>
+          </div>
+        )}
+
+        <div
+          style={{
+            marginTop: 40,
+            borderTop: "1px solid #eee",
+            paddingTop: 20,
+          }}
+        >
+          <h3 style={{ fontWeight: 600, marginBottom: 10 }}>🗓️ 수업 가능 시간</h3>
+          <p style={{ color: "#666" }}>튜터가 등록한 예약 가능한 시간대가 여기에 표시됩니다.</p>
+        </div>
+      </div>
     </div>
   );
 }

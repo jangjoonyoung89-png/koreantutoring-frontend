@@ -29,6 +29,21 @@
   color: #ffb347;
 }
 
+/* 📌 ADMIN 버튼 */
+.adminButton {
+  background-color: #00aaff;
+  color: white;
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background-color 0.3s ease;
+}
+
+.adminButton:hover {
+  background-color: #0091da;
+}
+
 /* =======================
    🌄 배너 영역
 ======================= */
@@ -94,21 +109,6 @@
 .ctaButton:hover {
   background-color: #ffb347;
   transform: translateY(-2px);
-}
-
-/* 📌 ADMIN 버튼 */
-.adminButton {
-  background-color: #00aaff;
-  color: white;
-  padding: 8px 14px;
-  border-radius: 6px;
-  font-weight: 600;
-  text-decoration: none;
-  transition: background-color 0.3s ease;
-}
-
-.adminButton:hover {
-  background-color: #0091da;
 }
 
 /* =======================
