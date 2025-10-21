@@ -10,21 +10,26 @@ function SignupPage() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  // 환경변수에서 API URL 불러오기 (없으면 localhost 기본값 사용)
+  // 환경변수에서 API URL 불러오기 (없으면 localhost 기본값)
   const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8000";
 
+  // 입력값 변경 핸들러
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
     setError("");
     setSuccess("");
   };
 
+  // 이메일 형식 검증
   const validateEmail = (email) => /\S+@\S+\.\S+/.test(email);
 
+  // 회원가입 제출 핸들러
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (!validateEmail(form.email)) return setError("유효한 이메일을 입력하세요.");
-    if (form.password.length < 8) return setError("비밀번호는 최소 8자 이상이어야 합니다.");
+    if (form.password.length < 8)
+      return setError("비밀번호는 최소 8자 이상이어야 합니다.");
     if (!form.fullName) return setError("이름을 입력하세요.");
 
     try {
@@ -39,11 +44,12 @@ function SignupPage() {
         }),
       });
 
+      const data = await res.json();
+
       if (res.ok) {
         setSuccess("✅ 회원가입 완료!");
         setForm({ email: "", password: "", fullName: "", role: "student" });
       } else {
-        const data = await res.json();
         setError(data.detail || "회원가입 실패");
       }
     } catch (err) {
@@ -52,6 +58,7 @@ function SignupPage() {
     }
   };
 
+  // 스타일
   const formStyle = {
     maxWidth: "400px",
     margin: "40px auto",
@@ -94,6 +101,7 @@ function SignupPage() {
     color,
     marginBottom: "15px",
     fontWeight: "bold",
+    textAlign: "center",
   });
 
   return (

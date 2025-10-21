@@ -10,11 +10,11 @@ function LoginPage() {
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  // ✅ 환경 변수 또는 기본 로컬 서버 URL
+  // 환경변수에서 API URL 불러오기 (없으면 localhost 기본값)
   const API_URL = (process.env.REACT_APP_API_URL || "http://localhost:8000").trim();
 
   // ======================
-  // ✏️ 입력값 변경 핸들러
+  // 입력값 변경 핸들러
   // ======================
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -24,7 +24,7 @@ function LoginPage() {
   };
 
   // ======================
-  // 🔐 로그인 처리
+  // 로그인 제출 핸들러
   // ======================
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -53,7 +53,7 @@ function LoginPage() {
 
       const role = data.user.role?.trim().toLowerCase();
 
-      // ✅ 관리자 계정 로그인 시 분리 안내
+      // 관리자 계정 로그인 시 안내
       if (role === "admin") {
         alert("⚠️ 관리자 계정은 관리자 전용 로그인 페이지에서 로그인해주세요.");
         navigate("/admin/login");
@@ -64,7 +64,7 @@ function LoginPage() {
       localStorage.setItem("token", data.token);
       login({ user: data.user, token: data.token });
 
-      // ✅ 역할에 따라 페이지 이동
+      // 역할에 따라 페이지 이동
       if (role === "tutor") {
         navigate("/tutor/dashboard");
       } else {
@@ -77,7 +77,7 @@ function LoginPage() {
   };
 
   // ======================
-  // 🎨 화면 구성
+  // 화면 구성
   // ======================
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-blue-50 to-white px-4">

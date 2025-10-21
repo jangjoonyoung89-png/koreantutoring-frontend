@@ -1,9 +1,16 @@
 import React, { useState, useEffect, useContext } from "react";
-import { BrowserRouter, Routes, Route, Link, Navigate, useParams } from "react-router-dom";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Link,
+  Navigate,
+  useParams
+} from "react-router-dom";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import api from "./api";
-import { AuthProvider, AuthContext } from "./context/AuthContext";
+import { AuthProvider, AuthContext, useAuth } from "./context/AuthContext";
 import { AdminAuthProvider, useAdminAuth } from "./context/AdminAuthContext";
 
 // ----------------------
@@ -52,11 +59,21 @@ function Navbar() {
     <nav style={styles.navbar}>
       <div style={styles.logo}>KOREAN TUTORING</div>
       <div style={styles.navLinks}>
-        <Link to="/" style={styles.navLink}>HOME</Link>
-        <Link to="/tutors" style={styles.navLink}>TUTOR</Link>
-        <Link to="/signup" style={styles.navLink}>SIGNUP</Link>
-        <Link to="/login" style={styles.navLink}>LOGIN</Link>
-        <Link to="/admin/login" style={{ ...styles.navLink, color: "#ffdd57" }}>ADMIN</Link>
+        <Link to="/" style={styles.navLink}>
+          HOME
+        </Link>
+        <Link to="/tutors" style={styles.navLink}>
+          TUTOR
+        </Link>
+        <Link to="/signup" style={styles.navLink}>
+          SIGNUP
+        </Link>
+        <Link to="/login" style={styles.navLink}>
+          LOGIN
+        </Link>
+        <Link to="/admin/login" style={{ ...styles.navLink, color: "#ffdd57" }}>
+          ADMIN
+        </Link>
       </div>
     </nav>
   );
@@ -93,8 +110,12 @@ function MainPage() {
         <div style={styles.bannerOverlay}>
           <div style={styles.bannerContent}>
             <h1 style={styles.bannerTitle}>외국인을 위한 한국어 튜터링 플랫폼</h1>
-            <p style={styles.bannerSubtitle}>언제 어디서나 원어민 한국어 선생님과 함께 하는 맞춤형 한국어 학습</p>
-            <Link to="/signup"><button style={styles.ctaButton}>지금 시작하기</button></Link>
+            <p style={styles.bannerSubtitle}>
+              언제 어디서나 원어민 한국어 선생님과 함께 하는 맞춤형 한국어 학습
+            </p>
+            <Link to="/signup">
+              <button style={styles.ctaButton}>지금 시작하기</button>
+            </Link>
           </div>
         </div>
       </section>
@@ -107,10 +128,16 @@ function MainPage() {
           ) : (
             displayTutors.map((tutor) => (
               <div key={tutor._id} style={styles.tutorCard}>
-                <img src={tutor.photoUrl || "https://via.placeholder.com/100"} alt={tutor.name} style={styles.tutorImage} />
+                <img
+                  src={tutor.photoUrl || "https://via.placeholder.com/100"}
+                  alt={tutor.name}
+                  style={styles.tutorImage}
+                />
                 <h3 style={styles.tutorName}>{tutor.name}</h3>
                 <p style={styles.tutorExperience}>경력: {tutor.experience}년</p>
-                <Link to={`/tutors/${tutor._id}`} style={styles.detailLink}>자세히 보기 →</Link>
+                <Link to={`/tutors/${tutor._id}`} style={styles.detailLink}>
+                  자세히 보기 →
+                </Link>
               </div>
             ))
           )}
@@ -178,7 +205,8 @@ function TutorDetailPage() {
     setSelectedSlot("");
   }, [selectedDate, tutor]);
 
-  const formatDate = (date) => `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,"0")}-${String(date.getDate()).padStart(2,"0")}`;
+  const formatDate = (date) =>
+    `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
 
   const handleBooking = async () => {
     if (!selectedSlot) {
@@ -193,14 +221,12 @@ function TutorDetailPage() {
     }
   };
 
-  let videoElement = <p style={{color:"#888"}}>등록된 영상이 없습니다.</p>;
+  let videoElement = <p style={{ color: "#888" }}>등록된 영상이 없습니다.</p>;
   if (tutor?.sampleVideoUrl) {
     let embedUrl = tutor.sampleVideoUrl;
     if (tutor.sampleVideoUrl.includes("youtube.com")) embedUrl = tutor.sampleVideoUrl.replace("watch?v=", "embed/");
     else if (tutor.sampleVideoUrl.includes("youtu.be")) embedUrl = tutor.sampleVideoUrl.replace("youtu.be/", "www.youtube.com/embed/");
-    videoElement = (
-      <iframe className="w-full h-80 rounded" src={embedUrl} title="튜터 소개 영상" frameBorder="0" allowFullScreen ></iframe>
-    );
+    videoElement = <iframe className="w-full h-80 rounded" src={embedUrl} title="튜터 소개 영상" frameBorder="0" allowFullScreen></iframe>;
   }
 
   if (loading) return <p className="text-center mt-6">로딩 중...</p>;
@@ -213,26 +239,26 @@ function TutorDetailPage() {
       <p className="text-gray-700">소개: {tutor.bio}</p>
       <p className="text-gray-700">평점: {tutor.averageRating}</p>
 
-      <div style={{marginTop:20}}>
+      <div style={{ marginTop: 20 }}>
         <h3>🎥 튜터 소개 영상</h3>
         {videoElement}
       </div>
 
-      <div style={{marginTop:20}}>
+      <div style={{ marginTop: 20 }}>
         <h3>📡 실시간 수업</h3>
         {tutor.videoLink ? (
-          <a href={tutor.videoLink} target="_blank" rel="noopener noreferrer" style={{padding:"10px 20px", background:"#2563eb", color:"#fff", borderRadius:8, display:"inline-block", marginTop:10}}>
+          <a href={tutor.videoLink} target="_blank" rel="noopener noreferrer" style={{ padding: "10px 20px", background: "#2563eb", color: "#fff", borderRadius: 8, display: "inline-block", marginTop: 10 }}>
             실시간 수업 입장하기
           </a>
-        ) : <p style={{color:"#888"}}>실시간 수업 링크가 아직 없습니다.</p>}
+        ) : <p style={{ color: "#888" }}>실시간 수업 링크가 아직 없습니다.</p>}
       </div>
 
-      <div style={{marginTop:20}}>
+      <div style={{ marginTop: 20 }}>
         <h3>📅 예약 날짜 선택</h3>
         <Calendar value={selectedDate} onChange={setSelectedDate} />
       </div>
 
-      <div style={{marginTop:10}}>
+      <div style={{ marginTop: 10 }}>
         <h3>⏰ 가능 시간</h3>
         {availableSlots.length === 0 ? (
           <p>선택한 날짜에는 수업 가능 시간이 없습니다.</p>

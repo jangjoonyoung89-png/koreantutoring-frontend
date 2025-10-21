@@ -6,11 +6,17 @@ function Dashboard() {
   const { user, logout } = useContext(AuthContext);
   const navigate = useNavigate();
 
+  // 로그아웃 처리
   const handleLogout = async () => {
-    await logout();
-    navigate("/login");
+    try {
+      await logout();
+      navigate("/login");
+    } catch (err) {
+      console.error("로그아웃 실패:", err);
+    }
   };
 
+  // 표시 이름: full_name이 없으면 이메일, 없으면 "사용자"
   const displayName =
     user?.full_name?.trim() !== "" ? user.full_name : user?.email || "사용자";
 
@@ -40,16 +46,18 @@ function Dashboard() {
   );
 }
 
+// 게시판 컴포넌트
 function Board() {
   const navigate = useNavigate();
 
-  // 임시 게시글 데이터 (나중에 API 연동 가능)
+  // 임시 게시글 데이터 (추후 API 연동 가능)
   const posts = [
     { id: 1, title: "첫번째 게시글", author: "홍길동" },
     { id: 2, title: "두번째 게시글", author: "김철수" },
     { id: 3, title: "React 대시보드 만들기", author: "장준영" },
   ];
 
+  // 게시글 클릭 시 상세 페이지 이동
   const handleClick = (id) => {
     navigate(`/posts/${id}`);
   };

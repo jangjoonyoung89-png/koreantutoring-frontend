@@ -2,250 +2,192 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 20px;
-  background-color: #333;
-  color: white;
+  padding: 1rem 2rem;
+  background-color: #0077cc;
+  color: #ffffff;
 }
 
 .logo {
+  font-size: 1.6rem;
   font-weight: bold;
-  font-size: 20px;
 }
 
 .navLinks {
   display: flex;
-  gap: 20px;
+  gap: 1.5rem;
 }
 
 .navLink {
-  color: white;
+  color: #ffffff;
   text-decoration: none;
-  font-size: 18px;
-  font-weight: 500;
-  transition: color 0.3s ease;
+  font-weight: 600;
+  transition: color 0.2s;
 }
 
 .navLink:hover {
-  color: #ffb347;
+  color: #ffdd57;
 }
 
-/* 📌 ADMIN 버튼 */
 .adminButton {
-  background-color: #00aaff;
-  color: white;
-  padding: 8px 14px;
-  border-radius: 6px;
-  font-weight: 600;
+  color: #ffdd57;
   text-decoration: none;
-  transition: background-color 0.3s ease;
+  font-weight: 600;
 }
 
-.adminButton:hover {
-  background-color: #0091da;
-}
-
-/* =======================
-   🌄 배너 영역
-======================= */
+/* ----------------------
+   배너
+---------------------- */
 .banner {
-  position: relative;
-  height: 350px;
-  background-image: url("https://images.unsplash.com/photo-1584697964192-f67d3a6a0f77?auto=format&fit=crop&w=1600&q=80");
+  height: 80vh;
+  background-image: url("/images/banner.jpg");
   background-size: cover;
   background-position: center;
-  color: white;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  flex-direction: column;
+  position: relative;
 }
 
 .bannerOverlay {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.4);
-  z-index: 1;
+  inset: 0;
+  background-color: rgba(0,0,0,0.25);
 }
 
 .bannerContent {
-  position: relative;
-  z-index: 2;
-  max-width: 600px;
-  padding: 20px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  color: #ffffff;
+  max-width: 800px;
+  padding: 0 1rem;
 }
 
 .bannerTitle {
-  font-size: 38px;
-  font-weight: bold;
-  text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.5);
-  margin-bottom: 15px;
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  line-height: 1.2;
 }
 
 .bannerSubtitle {
-  font-size: 20px;
-  font-weight: 500;
-  line-height: 1.6;
-  color: #ffdd99;
-  text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.4);
+  font-size: 1.2rem;
+  margin-bottom: 2rem;
+  line-height: 1.5;
 }
 
-/* 📌 CTA 버튼 */
 .ctaButton {
-  background-color: #ff8c00;
-  color: white;
+  padding: 0.75rem 2rem;
+  background-color: #2563eb;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 1rem;
+  border-radius: 9999px;
   border: none;
-  padding: 12px 24px;
-  font-size: 18px;
-  font-weight: bold;
-  border-radius: 8px;
   cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.2s ease;
+  transition: background-color 0.3s;
 }
 
 .ctaButton:hover {
-  background-color: #ffb347;
-  transform: translateY(-2px);
+  background-color: #1e40af;
 }
 
-/* =======================
-   👩‍🏫 추천 튜터 섹션
-======================= */
+/* ----------------------
+   섹션
+---------------------- */
 .section {
-  padding: 50px 20px;
-  text-align: center;
+  max-width: 1100px;
+  margin: 4rem auto;
+  padding: 0 2rem;
 }
 
 .sectionTitle {
-  font-size: 26px;
-  margin-bottom: 30px;
-  font-weight: bold;
+  font-size: 2rem;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 2rem;
+  color: #333333;
 }
 
-/* 📌 튜터 리스트 영역 */
+/* ----------------------
+   튜터 카드
+---------------------- */
 .tutorList {
   display: flex;
-  justify-content: center;
   flex-wrap: wrap;
-  gap: 1.5rem;
-  margin-top: 1rem;
+  gap: 2rem;
+  justify-content: center;
 }
 
-/* 📌 튜터 카드 */
 .tutorCard {
-  background-color: #ffffff;
-  border-radius: 16px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   width: 220px;
-  padding: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   text-align: center;
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
-  cursor: pointer;
+  background-color: #fff;
+  position: relative;
+  transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .tutorCard:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  transform: translateY(-4px);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
 }
 
-/* 📌 튜터 이미지 */
-.tutorCard img {
-  width: 100%;
-  height: 200px;
-  object-fit: cover;
+.tutorImage {
+  width: 100px;
+  height: 100px;
   border-radius: 50%;
-  margin-bottom: 0.75rem;
+  object-fit: cover;
+  margin-bottom: 8px;
 }
 
-/* 📌 튜터 이름 */
-.tutorCard h3 {
-  font-size: 1.2rem;
-  color: #333;
-  margin-bottom: 0.25rem;
+.tutorName {
+  font-size: 18px;
   font-weight: 600;
+  margin-bottom: 4px;
 }
 
-/* 📌 튜터 경력 */
-.tutorCard p {
-  font-size: 0.95rem;
+.tutorExperience {
+  font-size: 14px;
   color: #666;
-  margin-bottom: 0.5rem;
+  margin-bottom: 8px;
 }
 
-/* 📌 자세히 보기 링크 */
-.tutorCard span {
-  color: #007bff;
-  font-weight: 500;
+.detailLink {
+  font-size: 14px;
+  color: #2563eb;
+  text-decoration: none;
+}
+
+.detailLink:hover {
   text-decoration: underline;
 }
 
-/* =======================
-   ⚙️ 푸터
-======================= */
+/* ----------------------
+   예약 카드
+---------------------- */
+.tutorCard .react-calendar {
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+
+.tutorCard button {
+  cursor: pointer;
+}
+
+.tutorCard .bg-gray-50 {
+  background-color: #f9fafb;
+}
+
+/* ----------------------
+   푸터
+---------------------- */
 .footer {
-  background-color: #333;
-  color: white;
-  padding: 20px;
   text-align: center;
-  margin-top: 50px;
-  font-size: 14px;
-  line-height: 1.6;
-}
-
-/* =======================
-   📱 반응형 디자인
-======================= */
-@media (max-width: 768px) {
-  .navbar {
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .navLinks {
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-
-  .banner {
-    height: 280px;
-  }
-
-  .bannerTitle {
-    font-size: 26px;
-  }
-
-  .bannerSubtitle {
-    font-size: 16px;
-  }
-
-  .tutorCard {
-    width: 180px;
-  }
-
-  .ctaButton {
-    font-size: 16px;
-    padding: 10px 20px;
-  }
-}
-
-@media (max-width: 480px) {
-  .tutorList {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .tutorCard {
-    width: 80%;
-  }
-
-  .bannerTitle {
-    font-size: 22px;
-  }
-
-  .bannerSubtitle {
-    font-size: 14px;
-  }
+  padding: 2rem 0;
+  background-color: #0077cc;
+  margin-top: 4rem;
+  color: #ffffff;
 }
