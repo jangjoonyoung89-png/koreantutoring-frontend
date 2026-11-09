@@ -59,7 +59,7 @@ const DEFAULT_IMAGE = "/images/default-tutor.svg";
 function Navbar() {
   return (
     <nav style={styles.navbar}>
-      <div style={styles.logo}>KOREAN TUTORING</div>
+      <div style={styles.logo}>ROKMUN</div>
       <div style={styles.navLinks}>
         <Link to="/" style={styles.navLink}>
           HOME
@@ -179,8 +179,7 @@ function MainPage() {
 </section>
 
       <footer style={styles.footer}>
-        <p>© 20250901 ROKMUN. 장준영 All rights reserved.</p>
-        <p>문의: jjy@mail.kcu.ac</p>
+        <p>© 20250901 ROKMUN. 장준영(jjy@mail.kcu.ac) All rights reserved.</p>
       </footer>
     </div>
   );

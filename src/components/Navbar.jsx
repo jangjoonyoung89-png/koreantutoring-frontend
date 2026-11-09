@@ -50,7 +50,7 @@ export default function Navbar() {
   return (
     <nav style={styles.navbar}>
       {/* 로고 */}
-      <div style={styles.logo}>KOREAN TUTORING</div>
+      <div style={styles.logo}>ROKMUN</div>
 
       {/* 모바일 메뉴 버튼 */}
       {windowWidth <= 768 && (
