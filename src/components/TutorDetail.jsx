@@ -51,7 +51,7 @@ const tutorsFallback = [
 // ✅ API 기본 설정
 // =============================
 const API_BASE_URL =
-  process.env.REACT_APP_API_BASE_URL?.trim() || "https://api.koreantutoring.co.kr";
+  process.env.REACT_APP_API_BASE_URL?.trim() || "https://api.rokmun.com";
 
 function TutorDetail() {
   const { id } = useParams();

@@ -3,7 +3,7 @@ import axios from "axios";
 // ----------------------
 // API 기본 URL 설정
 // ----------------------
-const API_BASE_URL = process.env.REACT_APP_API_URL || "https://api.koreantutoring.co.kr";
+const API_BASE_URL = process.env.REACT_APP_API_URL || "https://api.rokmun.com";
 
 // Axios 인스턴스 생성
 const api = axios.create({

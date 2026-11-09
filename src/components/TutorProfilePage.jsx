@@ -51,7 +51,7 @@ function TutorProfilePage() {
   const [reviewCount, setReviewCount] = useState(0);
 
   const API_BASE_URL =
-    process.env.REACT_APP_API_URL || "https://api.koreantutoring.co.kr";
+    process.env.REACT_APP_API_URL || "https://api.rokmun.com";
 
   async function fetchData(url) {
     const res = await fetch(url, {
