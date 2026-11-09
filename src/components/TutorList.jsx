@@ -24,7 +24,7 @@ function TutorList() {
     console.log("🎯 튜터 목록 API 호출 시작...");
 
     api
-      .get("/api/tutors/with-rating", {
+       .get("/api/tutors", {
         headers: { "Cache-Control": "no-store" },
         params: { t: Date.now() }, // 캐시 방지용 쿼리
       })
