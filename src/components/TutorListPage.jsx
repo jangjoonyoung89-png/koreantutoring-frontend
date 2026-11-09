@@ -15,6 +15,7 @@ const DEFAULT_IMAGE = "/images/default-tutor.svg";
 const getTutorImage = (tutor) => {
   const image =
     tutor.img ||
+    tutor.photo ||
     tutor.photoUrl ||
     tutor.profileImage ||
     tutor.profileImageUrl ||
