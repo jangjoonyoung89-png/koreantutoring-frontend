@@ -35,7 +35,6 @@ import StudentDashboardPage from "./components/StudentDashboardPage";
 import TutorDashboardPage from "./components/TutorDashboardPage";
 import ReviewList from "./components/ReviewList";
 import VideoClassPageWrapper from "./components/VideoClassPageWrapper";
-import MainPage from "./components/MainPage";
 
 // ----------------------
 // 관리자 페이지
