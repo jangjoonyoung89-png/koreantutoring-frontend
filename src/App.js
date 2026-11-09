@@ -35,6 +35,7 @@ import StudentDashboardPage from "./components/StudentDashboardPage";
 import TutorDashboardPage from "./components/TutorDashboardPage";
 import ReviewList from "./components/ReviewList";
 import VideoClassPageWrapper from "./components/VideoClassPageWrapper";
+import MainPage from "./components/MainPage";
 
 // ----------------------
 // 관리자 페이지
@@ -50,6 +51,8 @@ import AdminForgotPasswordPage from "./components/AdminForgotPasswordPage";
 import AdminResetPasswordPage from "./components/AdminResetPasswordPage";
 import AdminQAManagement from "./components/admin/AdminQAManagement";
 import RequireAuth from "./components/RequireAuth";
+
+const DEFAULT_IMAGE = "/images/default-tutor.svg";
 
 // ----------------------
 // Navbar
@@ -80,18 +83,33 @@ function Navbar() {
 }
 
 // ----------------------
-// MainPage
+// 
 // ----------------------
 function MainPage() {
   const [tutors, setTutors] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const sampleTutors = [
-      { _id: "sample1", name: "장준영", experience: 5, photoUrl: "https://via.placeholder.com/100" },
-      { _id: "sample2", name: "장서은", experience: 3, photoUrl: "https://via.placeholder.com/100" },
-      { _id: "sample3", name: "김수영", experience: 7, photoUrl: "https://via.placeholder.com/100" },
-    ];
+  const sampleTutors = [
+    {
+      _id: "sample1",
+      name: "장준영",
+      experience: 20,
+      photoUrl: DEFAULT_IMAGE,
+    },
+    {
+      _id: "sample2",
+      name: "장서은",
+      experience: 1,
+      photoUrl: DEFAULT_IMAGE,
+    },
+    {
+      _id: "sample3",
+      name: "김수영",
+      experience: 3,
+      photoUrl: DEFAULT_IMAGE,
+    },
+  ];
 
     api.get("/api/tutors/with-rating")
       .then((res) => {
@@ -121,28 +139,45 @@ function MainPage() {
       </section>
 
       <section style={styles.section}>
-        <h2 style={styles.sectionTitle}>추천 튜터</h2>
-        <div style={styles.tutorList}>
-          {loading ? (
-            <p>추천 튜터 정보를 불러오는 중...</p>
-          ) : (
-            displayTutors.map((tutor) => (
-              <div key={tutor._id} style={styles.tutorCard}>
-                <img
-                  src={tutor.photoUrl || "https://via.placeholder.com/100"}
-                  alt={tutor.name}
-                  style={styles.tutorImage}
-                />
-                <h3 style={styles.tutorName}>{tutor.name}</h3>
-                <p style={styles.tutorExperience}>경력: {tutor.experience}년</p>
-                <Link to={`/tutors/${tutor._id}`} style={styles.detailLink}>
-                  자세히 보기 →
-                </Link>
-              </div>
-            ))
-          )}
+  <h2 style={styles.sectionTitle}>추천 튜터</h2>
+
+  <div style={styles.tutorList}>
+    {loading ? (
+      <p>추천 튜터 정보를 불러오는 중...</p>
+    ) : (
+      displayTutors.map((tutor) => (
+        <div key={tutor._id} style={styles.tutorCard}>
+
+          <img
+            src={tutor.photoUrl || DEFAULT_IMAGE}
+            alt={`${tutor.name} 프로필`}
+            onError={(e) => {
+              e.currentTarget.onerror = null;
+              e.currentTarget.src = DEFAULT_IMAGE;
+            }}
+            style={styles.tutorImage}
+          />
+
+          <h3 style={styles.tutorName}>
+            {tutor.name}
+          </h3>
+
+          <p style={styles.tutorExperience}>
+            경력: {tutor.experience}년
+          </p>
+
+          <Link
+            to={`/tutors/${tutor._id}`}
+            style={styles.detailLink}
+          >
+            자세히 보기 →
+          </Link>
+
         </div>
-      </section>
+      ))
+    )}
+  </div>
+</section>
 
       <footer style={styles.footer}>
         <p>© 20250901 ROKMUN. 장준영 All rights reserved.</p>
