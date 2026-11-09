@@ -198,7 +198,7 @@ function MainPage() {
 </section>
 
       <footer style={styles.footer}>
-        <p>© 20250901 ROKMUN. 장준영(jjy@mail.kcu.ac) All rights reserved.</p>
+        <p>© 2025 ROKMUN. All rights reserved.</p>
       </footer>
     </div>
   );
