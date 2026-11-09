@@ -88,12 +88,9 @@ function TutorListPage() {
         setLoading(true);
         setError("");
 
-        const response = await api.get(
-          "/api/tutors/with-rating"
-        );
+        const response = await api.get("/api/tutors");
 
         if (!active) return;
-
         if (!Array.isArray(response.data)) {
           throw new Error("튜터 데이터 형식 오류");
         }
