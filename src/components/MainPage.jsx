@@ -4,6 +4,7 @@ import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import { fetchTutors } from "../api/tutorApi";
 import styles from "./MainPage.module.css";
+const DEFAULT_IMAGE = "/images/default-tutor.svg";
 
 export default function MainPage() {
   const [tutors, setTutors] = useState([]);
@@ -11,9 +12,9 @@ export default function MainPage() {
 
   // 샘플 튜터 사진 및 정보
   const sampleTutors = [
-    { _id: "sample1", name: "장준영", experience: 5, photoUrl: "/images/korean_teacher1.jpg" },
-    { _id: "sample2", name: "장서은", experience: 3, photoUrl: "/images/korean_teacher2.jpg" },
-    { _id: "sample3", name: "김수영", experience: 7, photoUrl: "/images/korean_teacher3.jpg" },
+  { _id: "sample1", name: "장준영", experience: 5, photoUrl: DEFAULT_IMAGE },
+  { _id: "sample2", name: "장서은", experience: 3, photoUrl: DEFAULT_IMAGE },
+  { _id: "sample3", name: "김수영", experience: 7, photoUrl: DEFAULT_IMAGE },
   ];
 
   useEffect(() => {
@@ -21,10 +22,16 @@ export default function MainPage() {
       try {
         const data = await fetchTutors();
         if (Array.isArray(data) && data.length > 0) {
-          const tutorsWithPhotos = data.map((tutor, index) => ({
-            ...tutor,
-            photoUrl: sampleTutors[index % sampleTutors.length].photoUrl,
-          }));
+          const tutorsWithPhotos = data.map((tutor) => ({
+  ...tutor,
+  photoUrl:
+    tutor.photoUrl ||
+    tutor.img ||
+    tutor.profileImage ||
+    tutor.profileImageUrl ||
+    tutor.image ||
+    DEFAULT_IMAGE,
+}));
           setTutors(tutorsWithPhotos);
         } else {
           setTutors(sampleTutors);
@@ -44,7 +51,7 @@ export default function MainPage() {
     <div className="bg-gray-50 min-h-screen">
       {/* 네비게이션 */}
       <nav className={styles.navbar}>
-        <div className={styles.logo}>KOREAN TUTORING</div>
+        <div className={styles.logo}>ROKMUN</div>
         <div className={styles.navLinks}>
           <Link to="/" className={styles.navLink}>홈</Link>
           <Link to="/tutors" className={styles.navLink}>튜터 찾기</Link>
@@ -108,7 +115,15 @@ function TutorCard({ tutor }) {
   return (
     <div className="bg-white shadow-lg rounded-lg overflow-hidden transition hover:shadow-xl">
       {/* 프로필 이미지 */}
-      <img src={tutor.photoUrl} alt={tutor.name} className="w-full h-48 object-cover" />
+      <img
+  src={tutor.photoUrl || DEFAULT_IMAGE}
+  alt={tutor.name}
+  onError={(e) => {
+    e.currentTarget.onerror = null;
+    e.currentTarget.src = DEFAULT_IMAGE;
+  }}
+  className="w-full h-48 object-cover"
+/>
 
       {/* 내용 */}
       <div className="p-4">
