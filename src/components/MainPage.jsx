@@ -84,8 +84,7 @@ export default function MainPage() {
 
       {/* 푸터 */}
       <footer className={styles.footer}>
-        <p>© 20250901 KOREAN TUTORING. 장준영 All rights reserved.</p>
-        <p>문의: jjy@mail.kcu.ac</p>
+        <p>© 20250901 ROKMUN. 장준영(jjy@mail.kcu.ac) All rights reserved.</p>
       </footer>
     </div>
   );
