@@ -122,20 +122,37 @@ function MainPage() {
   const displayTutors = tutors.slice(0, 3);
 
   return (
-    <div>
-      <section style={styles.banner}>
-        <div style={styles.bannerOverlay}>
-          <div style={styles.bannerContent}>
-            <h1 style={styles.bannerTitle}>외국인을 위한 한국어 튜터링 플랫폼</h1>
-            <p style={styles.bannerSubtitle}>
-              언제 어디서나 원어민 한국어 선생님과 함께 하는 맞춤형 한국어 학습
-            </p>
-            <Link to="/signup">
-              <button style={styles.ctaButton}>지금 시작하기</button>
-            </Link>
-          </div>
+  <div>
+    <section style={styles.banner}>
+      <div style={styles.bannerOverlay}>
+        <div style={styles.bannerContent}>
+
+          <h1 style={styles.bannerTitle}>
+            한국으로 향하는 모든 길이 시작되는 곳
+          </h1>
+
+          <p style={{
+            fontSize: "1.5rem",
+            fontWeight: "600",
+            marginBottom: "1.5rem",
+            color: "#ffffff"
+          }}>
+            Your Gateway to Korea
+          </p>
+
+          <p style={styles.bannerSubtitle}>
+            언제 어디서나 원어민 한국어 선생님과 함께 하는 맞춤형 한국어 학습
+          </p>
+
+          <Link to="/signup">
+            <button style={styles.ctaButton}>
+              지금 시작하기
+            </button>
+          </Link>
+
         </div>
-      </section>
+      </div>
+    </section>
 
       <section style={styles.section}>
   <h2 style={styles.sectionTitle}>추천 튜터</h2>

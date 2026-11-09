@@ -175,8 +175,7 @@ export default function MainPage() {
       ====================== */}
       <footer className={styles.footer}>
         <p>
-          © 20250901 ROKMUN. 장준영(jjy@mail.kcu.ac)
-          All rights reserved.
+          © 20250901 ROKMUN. 장준영(jjy@mail.kcu.ac) All rights reserved.
         </p>
       </footer>
     </div>
