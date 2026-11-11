@@ -484,7 +484,7 @@ const styles = {
     height: "90vh",
     backgroundImage: "url('/images/rokmun-main-banner.png')",
     backgroundSize: "cover",
-    backgroundPosition: "center",
+    backgroundPosition: "center top",
     position: "relative",
   },
   bannerOverlay: {
