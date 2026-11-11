@@ -59,9 +59,9 @@ const DEFAULT_IMAGE = "/images/default-tutor.svg";
 function Navbar() {
   return (
   <nav style={styles.navbar}>
-    <Link to="/" style={{ display: "inline-flex", alignItems: "center" }}>
+    <Link to="/" style={{ display: "inline-flex", alignItems: "center", textDecoration: "none", }}>
       <img
-        src="/images/rokmun-logo.png"
+        src="/images/rokmun-logo-header.png"
         alt="ROKMUN 로고"
         style={{
           height: "48px",
