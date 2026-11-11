@@ -147,10 +147,20 @@ function MainPage() {
           </p>
 
           <Link to="/signup">
-            <button style={styles.ctaButton}>
-              지금 시작하기
-            </button>
-          </Link>
+  <button
+    style={styles.ctaButton}
+    onMouseEnter={(e) => {
+      e.currentTarget.style.transform = "scale(1.05)";
+      e.currentTarget.style.boxShadow = "0 8px 20px rgba(0,0,0,0.25)";
+    }}
+    onMouseLeave={(e) => {
+      e.currentTarget.style.transform = "scale(1)";
+      e.currentTarget.style.boxShadow = "none";
+    }}
+  >
+    지금 시작하기
+  </button>
+</Link>
 
         </div>
       </div>
@@ -164,7 +174,18 @@ function MainPage() {
       <p>추천 튜터 정보를 불러오는 중...</p>
     ) : (
       displayTutors.map((tutor) => (
-        <div key={tutor._id} style={styles.tutorCard}>
+        <div
+  key={tutor._id}
+  style={styles.tutorCard}
+  onMouseEnter={(e) => {
+    e.currentTarget.style.transform = "scale(1.03)";
+    e.currentTarget.style.boxShadow = "0 10px 25px rgba(0,0,0,0.18)";
+  }}
+  onMouseLeave={(e) => {
+    e.currentTarget.style.transform = "scale(1)";
+    e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.1)";
+  }}
+>
 
           <img
             src={tutor.photoUrl || DEFAULT_IMAGE}
@@ -482,7 +503,7 @@ const styles = {
     borderRadius: "9999px",
     border: "none",
     cursor: "pointer",
-    transition: "background-color 0.3s",
+    transition: "background-color 0.3s, transform 0.25s ease, box-shadow 0.25s ease",
   },
   section: {
     maxWidth: "1100px",
@@ -510,6 +531,7 @@ const styles = {
     boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
     textAlign: "center",
     backgroundColor: "#fff",
+    transition: "transform 0.25s ease, box-shadow 0.25s ease",
   },
   tutorImage: {
     width: "100px",
