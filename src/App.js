@@ -483,7 +483,7 @@ const styles = {
   banner: {
   aspectRatio: "16 / 9",
   backgroundImage: "url('/images/rokmun-main-banner.png')",
-  backgroundSize: "contain",
+  backgroundSize: "100% 100%",
   backgroundPosition: "center",
   backgroundRepeat: "no-repeat",
   backgroundColor: "#eaf2f8",
