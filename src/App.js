@@ -481,7 +481,7 @@ const styles = {
     transition: "color 0.2s",
   },
   banner: {
-    height: "80vh",
+    height: "90vh",
     backgroundImage: "url('/images/rokmun-main-banner.png')",
     backgroundSize: "cover",
     backgroundPosition: "center",
