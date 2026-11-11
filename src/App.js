@@ -490,7 +490,7 @@ const styles = {
   position: "relative",
 },
   bannerOverlay: {
-    backgroundColor: "rgba(0,0,0,0.25)",
+    backgroundColor: "rgba(0,0,0,0.10)",
     height: "100%",
     display: "flex",
     justifyContent: "center",
