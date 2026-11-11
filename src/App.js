@@ -160,7 +160,7 @@ function MainPage() {
           </p>
 
           <p style={styles.bannerSubtitle}>
-            언제 어디서나 원어민 한국어 선생님과 함께 하는 맞춤형 한국어 학습
+            한국어 학습부터 입국·체류·정착까지
           </p>
 
           <Link to="/signup">
