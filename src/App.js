@@ -482,7 +482,7 @@ const styles = {
   },
   banner: {
     height: "80vh",
-    backgroundImage: 'url("https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1350&q=80")',
+    backgroundImage: "url('/images/rokmun-main-banner.png')",
     backgroundSize: "cover",
     backgroundPosition: "center",
     position: "relative",
