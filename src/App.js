@@ -130,7 +130,7 @@ function MainPage() {
           <h1 style={styles.bannerTitle}>
             한국으로 향하는 모든 길이 
             <br />
-            시작되는 곳
+            시작되는 문
           </h1>
 
           <p style={{
