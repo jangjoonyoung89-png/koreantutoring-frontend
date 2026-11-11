@@ -64,7 +64,7 @@ function Navbar() {
         src="/images/rokmun-logo-header.png"
         alt="ROKMUN 로고"
         style={{
-          height: "60px",
+          height: "48px",
           width: "auto",
           cursor: "pointer",
           transition: "transform 0.25s ease",
