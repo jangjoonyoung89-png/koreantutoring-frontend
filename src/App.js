@@ -58,9 +58,26 @@ const DEFAULT_IMAGE = "/images/default-tutor.svg";
 // ----------------------
 function Navbar() {
   return (
-    <nav style={styles.navbar}>
-      <div style={styles.logo}>ROKMUN</div>
-      <div style={styles.navLinks}>
+  <nav style={styles.navbar}>
+    <Link to="/" style={{ display: "inline-flex", alignItems: "center" }}>
+      <img
+        src="/images/rokmun-logo.png"
+        alt="ROKMUN 로고"
+        style={{
+          height: "48px",
+          width: "auto",
+          cursor: "pointer",
+          transition: "transform 0.25s ease",
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.transform = "scale(1.05)";
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.transform = "scale(1)";
+        }}
+      />
+    </Link>
+    <div style={styles.navLinks}>
         <Link to="/" style={styles.navLink}>
           HOME
         </Link>
