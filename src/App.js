@@ -64,7 +64,7 @@ function Navbar() {
         src="/images/rokmun-logo-header.png"
         alt="ROKMUN 로고"
         style={{
-          height: "48px",
+          height: "54px",
           width: "auto",
           cursor: "pointer",
           transition: "transform 0.25s ease",
@@ -459,13 +459,13 @@ function AppRoutes() {
 // ----------------------
 const styles = {
   navbar: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: "1rem 2rem",
-    backgroundColor: "#0077cc",
-    color: "#ffffff",
-  },
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+  padding: "7px 2rem",
+  backgroundColor: "#0077cc",
+  color: "#ffffff",
+},
   logo: {
     fontSize: "1.6rem",
     fontWeight: "bold",
