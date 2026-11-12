@@ -501,7 +501,7 @@ bannerMessage: {
   backgroundColor: "#0c3970",
   textAlign: "center",
   color: "#ffffff",
-  padding: "3rem 1.5rem",
+  padding: "2rem 1.5rem",
 },
 
 bannerTitle: {
@@ -538,7 +538,7 @@ bannerSubtitle: {
   },
   section: {
     maxWidth: "1100px",
-    margin: "4rem auto",
+    margin: "2.5rem auto",
     padding: "0 2rem",
   },
   sectionTitle: {
