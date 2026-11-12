@@ -141,47 +141,44 @@ function MainPage() {
   return (
   <div>
     <section style={styles.banner}>
-      <div style={styles.bannerOverlay}>
-        <div style={styles.bannerContent}>
+  <img
+    src="/images/rokmun-main-banner.png"
+    alt="대한민국으로 향하는 열린 관문 ROKMUN"
+    style={styles.bannerImage}
+  />
+</section>
 
-          <h1 style={styles.bannerTitle}>
-            한국으로 향하는 모든 길이 
-            <br />
-            시작되는 문
-          </h1>
+<section style={styles.bannerMessage}>
 
-          <p style={{
-            fontSize: "1.5rem",
-            fontWeight: "600",
-            marginBottom: "1.5rem",
-            color: "#ffffff"
-          }}>
-            Your Gateway to Korea
-          </p>
+  <h1 style={styles.bannerTitle}>
+    한국으로 향하는 모든 길이 시작되는 문
+  </h1>
 
-          <p style={styles.bannerSubtitle}>
-            한국어 학습부터 입국·체류·정착까지
-          </p>
+  <p style={styles.bannerEnglish}>
+    Your Gateway to Korea
+  </p>
 
-          <Link to="/signup">
-  <button
-    style={styles.ctaButton}
-    onMouseEnter={(e) => {
-      e.currentTarget.style.transform = "scale(1.05)";
-      e.currentTarget.style.boxShadow = "0 8px 20px rgba(0,0,0,0.25)";
-    }}
-    onMouseLeave={(e) => {
-      e.currentTarget.style.transform = "scale(1)";
-      e.currentTarget.style.boxShadow = "none";
-    }}
-  >
-    지금 시작하기
-  </button>
-</Link>
+  <p style={styles.bannerSubtitle}>
+    한국어 학습부터 입국·체류·정착까지
+  </p>
 
-        </div>
-      </div>
-    </section>
+  <Link to="/signup">
+    <button
+      style={styles.ctaButton}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.transform = "scale(1.05)";
+        e.currentTarget.style.boxShadow = "0 8px 20px rgba(0,0,0,0.25)";
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.transform = "scale(1)";
+        e.currentTarget.style.boxShadow = "none";
+      }}
+    >
+      지금 시작하기
+    </button>
+  </Link>
+
+</section>
 
       <section style={styles.section}>
   <h2 style={styles.sectionTitle}>추천 튜터</h2>
@@ -481,38 +478,46 @@ const styles = {
     transition: "color 0.2s",
   },
   banner: {
-  aspectRatio: "16 / 9",
-  backgroundImage: "url('/images/rokmun-main-banner.png')",
-  backgroundSize: "100% 100%",
-  backgroundPosition: "center",
-  backgroundRepeat: "no-repeat",
+  width: "100%",
+  margin: 0,
+  padding: 0,
   backgroundColor: "#eaf2f8",
-  position: "relative",
 },
-  bannerOverlay: {
-    backgroundColor: "rgba(0,0,0,0.10)",
-    height: "100%",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  bannerContent: {
-    textAlign: "center",
-    color: "#ffffff",
-    maxWidth: "800px",
-    padding: "0 1rem",
-  },
-  bannerTitle: {
-    fontSize: "3rem",
-    fontWeight: 700,
-    marginBottom: "1rem",
-    lineHeight: 1.2,
-  },
-  bannerSubtitle: {
-    fontSize: "1.2rem",
-    marginBottom: "2rem",
-    lineHeight: 1.5,
-  },
+
+bannerImage: {
+  width: "100%",
+  height: "auto",
+  display: "block",
+},
+
+bannerMessage: {
+  backgroundColor: "#0c3970",
+  textAlign: "center",
+  color: "#ffffff",
+  padding: "3rem 1.5rem",
+},
+
+bannerTitle: {
+  fontSize: "clamp(1.5rem, 3vw, 2.4rem)",
+  fontWeight: 700,
+  margin: "0 0 0.75rem",
+  lineHeight: 1.4,
+  wordBreak: "keep-all",
+},
+
+bannerEnglish: {
+  fontSize: "1.5rem",
+  fontWeight: 600,
+  margin: "0 0 1rem",
+  color: "#ffffff",
+},
+
+bannerSubtitle: {
+  fontSize: "1.2rem",
+  margin: "0 0 1.75rem",
+  lineHeight: 1.5,
+  wordBreak: "keep-all",
+},
   ctaButton: {
     padding: "0.75rem 2rem",
     backgroundColor: "#2563eb",
