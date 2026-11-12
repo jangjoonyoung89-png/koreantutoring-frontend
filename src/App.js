@@ -35,6 +35,7 @@ import StudentDashboardPage from "./components/StudentDashboardPage";
 import TutorDashboardPage from "./components/TutorDashboardPage";
 import ReviewList from "./components/ReviewList";
 import VideoClassPageWrapper from "./components/VideoClassPageWrapper";
+import "./App.css";
 
 // ----------------------
 // 관리자 페이지
@@ -78,23 +79,27 @@ function Navbar() {
       />
     </Link>
     <div style={styles.navLinks}>
-        <Link to="/" style={styles.navLink}>
-          HOME
-        </Link>
-        <Link to="/tutors" style={styles.navLink}>
-          TUTOR
-        </Link>
-        <Link to="/signup" style={styles.navLink}>
-          SIGNUP
-        </Link>
-        <Link to="/login" style={styles.navLink}>
-          LOGIN
-        </Link>
-        <Link to="/admin/login" style={{ ...styles.navLink, color: "#ffdd57" }}>
-          ADMIN
-        </Link>
-      </div>
-    </nav>
+  <Link to="/" style={styles.navLink} className="nav-menu-link">
+    HOME
+  </Link>
+
+  <Link to="/tutors" style={styles.navLink} className="nav-menu-link">
+    TUTOR
+  </Link>
+
+  <Link to="/signup" style={styles.navLink} className="nav-menu-link">
+    SIGNUP
+  </Link>
+
+  <Link to="/login" style={styles.navLink} className="nav-menu-link">
+    LOGIN
+  </Link>
+
+  <Link to="/admin/login" style={styles.navLink} className="nav-menu-link">
+    ADMIN
+  </Link>
+</div>
+  </nav>
   );
 }
 
@@ -472,11 +477,13 @@ const styles = {
     gap: "1.5rem",
   },
   navLink: {
-    color: "#ffffff",
-    textDecoration: "none",
-    fontWeight: 600,
-    transition: "color 0.2s",
-  },
+  color: "#ffffff",
+  textDecoration: "none",
+  fontSize: "18px",
+  fontWeight: 600,
+  display: "inline-block",
+  transition: "transform 0.2s ease",
+},
   banner: {
   width: "100%",
   margin: 0,
@@ -585,5 +592,5 @@ bannerSubtitle: {
     backgroundColor: "#0077cc",
     marginTop: "4rem",
     color: "#ffffff",
-  },
+  },  
 };
