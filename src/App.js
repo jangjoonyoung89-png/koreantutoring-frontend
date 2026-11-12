@@ -587,10 +587,10 @@ bannerSubtitle: {
     textDecoration: "none",
   },
   footer: {
-    textAlign: "center",
-    padding: "2rem 0",
-    backgroundColor: "#0077cc",
-    marginTop: "4rem",
-    color: "#ffffff",
-  },  
+  textAlign: "center",
+  padding: "1.2rem 0",
+  backgroundColor: "#0077cc",
+  marginTop: "4rem",
+  color: "#ffffff",
+},
 };
