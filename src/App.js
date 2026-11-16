@@ -193,137 +193,289 @@ function Navbar() {
 function MainPage() {
   const [tutors, setTutors] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
+  // ----------------------
+  // 실제 등록된 튜터 조회
+  // ----------------------
   useEffect(() => {
-  const sampleTutors = [
-    {
-      _id: "sample1",
-      name: "장준영",
-      experience: 20,
-      photoUrl: DEFAULT_IMAGE,
-    },
-    {
-      _id: "sample2",
-      name: "장서은",
-      experience: 1,
-      photoUrl: DEFAULT_IMAGE,
-    },
-    {
-      _id: "sample3",
-      name: "김수영",
-      experience: 3,
-      photoUrl: DEFAULT_IMAGE,
-    },
-  ];
+    let active = true;
 
-    api.get("/api/tutors/with-rating")
-      .then((res) => {
-        if (Array.isArray(res.data) && res.data.length > 0) setTutors(res.data);
-        else setTutors(sampleTutors);
-      })
-      .catch(() => setTutors(sampleTutors))
-      .finally(() => setLoading(false));
+    const fetchTutors = async () => {
+      setLoading(true);
+      setError("");
+
+      try {
+        const res = await api.get("/api/tutors");
+
+        if (!active) return;
+
+        const data = res.data;
+
+        const tutorList = Array.isArray(data)
+          ? data
+          : Array.isArray(data?.tutors)
+          ? data.tutors
+          : null;
+
+        if (!tutorList) {
+          throw new Error(
+            "튜터 목록 응답 형식이 올바르지 않습니다."
+          );
+        }
+
+        setTutors(
+          tutorList.filter(
+            (tutor) =>
+              tutor &&
+              tutor._id &&
+              tutor.approved === true &&
+              tutor.rejected !== true
+          )
+        );
+      } catch (err) {
+        if (!active) return;
+
+        console.error("추천 튜터 조회 실패:", err);
+
+        setTutors([]);
+        setError(
+          "추천 튜터 정보를 불러오지 못했습니다."
+        );
+      } finally {
+        if (active) {
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchTutors();
+
+    return () => {
+      active = false;
+    };
   }, []);
 
+  // ----------------------
+  // 튜터 이미지 주소 처리
+  // ----------------------
+  const getImageUrl = (tutor) => {
+    const photo = tutor.photo || tutor.photoUrl;
+
+    if (!photo || typeof photo !== "string") {
+      return DEFAULT_IMAGE;
+    }
+
+    if (
+      /^https?:\/\//i.test(photo) ||
+      photo.startsWith("data:image") ||
+      photo.startsWith("/images/")
+    ) {
+      return photo;
+    }
+
+    const baseUrl = (
+      api.defaults.baseURL ||
+      "https://api.rokmun.com"
+    ).replace(/\/+$/, "");
+
+    return `${baseUrl}/${photo.replace(
+      /^\/+/,
+      ""
+    )}`;
+  };
+
+  // ----------------------
+  // 추천 튜터 최대 3명 표시
+  // ----------------------
   const displayTutors = tutors.slice(0, 3);
 
   return (
-  <div>
-    <section style={styles.banner}>
-  <img
-    src="/images/rokmun-main-banner.png"
-    alt="대한민국으로 향하는 열린 관문 ROKMUN"
-    style={styles.bannerImage}
-  />
-</section>
+    <div>
 
-<section style={styles.bannerMessage}>
+      {/* 메인 배너 */}
+      <section style={styles.banner}>
+        <img
+          src="/images/rokmun-main-banner.png"
+          alt="대한민국으로 향하는 열린 관문 ROKMUN"
+          style={styles.bannerImage}
+        />
+      </section>
 
-  <h1 style={styles.bannerTitle}>
-    한국으로 향하는 모든 길이 시작되는 문
-  </h1>
+      {/* 브랜드 메시지 */}
+      <section style={styles.bannerMessage}>
 
-  <p style={styles.bannerEnglish}>
-    Your Gateway to Korea
-  </p>
+        <h1 style={styles.bannerTitle}>
+          한국으로 향하는 모든 길이 시작되는 문
+        </h1>
 
-  <p style={styles.bannerSubtitle}>
-    한국어 학습부터 입국·체류·정착까지
-  </p>
+        <p style={styles.bannerEnglish}>
+          Your Gateway to Korea
+        </p>
 
-  <Link to="/signup">
-    <button
-      style={styles.ctaButton}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.transform = "scale(1.05)";
-        e.currentTarget.style.boxShadow = "0 8px 20px rgba(0,0,0,0.25)";
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.transform = "scale(1)";
-        e.currentTarget.style.boxShadow = "none";
-      }}
-    >
-      지금 시작하기
-    </button>
-  </Link>
+        <p style={styles.bannerSubtitle}>
+          한국어 학습부터 입국·체류·정착까지
+        </p>
 
-</section>
-
-      <section style={styles.section}>
-  <h2 style={styles.sectionTitle}>추천 튜터</h2>
-
-  <div style={styles.tutorList}>
-    {loading ? (
-      <p>추천 튜터 정보를 불러오는 중...</p>
-    ) : (
-      displayTutors.map((tutor) => (
-        <div
-  key={tutor._id}
-  style={styles.tutorCard}
-  onMouseEnter={(e) => {
-    e.currentTarget.style.transform = "scale(1.03)";
-    e.currentTarget.style.boxShadow = "0 10px 25px rgba(0,0,0,0.18)";
-  }}
-  onMouseLeave={(e) => {
-    e.currentTarget.style.transform = "scale(1)";
-    e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.1)";
-  }}
->
-
-          <img
-            src={tutor.photoUrl || DEFAULT_IMAGE}
-            alt={`${tutor.name} 프로필`}
-            onError={(e) => {
-              e.currentTarget.onerror = null;
-              e.currentTarget.src = DEFAULT_IMAGE;
+        <Link to="/signup">
+          <button
+            style={styles.ctaButton}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform =
+                "scale(1.05)";
+              e.currentTarget.style.boxShadow =
+                "0 8px 20px rgba(0,0,0,0.25)";
             }}
-            style={styles.tutorImage}
-          />
-
-          <h3 style={styles.tutorName}>
-            {tutor.name}
-          </h3>
-
-          <p style={styles.tutorExperience}>
-            경력: {tutor.experience}년
-          </p>
-
-          <Link
-            to={`/tutors/${tutor._id}`}
-            style={styles.detailLink}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform =
+                "scale(1)";
+              e.currentTarget.style.boxShadow =
+                "none";
+            }}
           >
-            자세히 보기 →
-          </Link>
+            지금 시작하기
+          </button>
+        </Link>
+
+      </section>
+
+      {/* 추천 튜터 */}
+      <section style={styles.section}>
+
+        <h2 style={styles.sectionTitle}>
+          추천 튜터
+        </h2>
+
+        <div style={styles.tutorList}>
+
+          {loading ? (
+            <p>
+              추천 튜터 정보를 불러오는 중...
+            </p>
+
+          ) : error ? (
+            <div
+              style={{
+                textAlign: "center",
+                color: "#dc2626",
+                padding: "20px",
+              }}
+            >
+              <p>{error}</p>
+
+              <Link
+                to="/tutors"
+                style={styles.detailLink}
+              >
+                전체 튜터 목록 보기 →
+              </Link>
+            </div>
+
+          ) : displayTutors.length === 0 ? (
+            <p
+              style={{
+                color: "#666",
+                textAlign: "center",
+              }}
+            >
+              현재 등록된 추천 튜터가 없습니다.
+            </p>
+
+          ) : (
+            displayTutors.map((tutor) => {
+
+              const hasExperience =
+                tutor.experience !== undefined &&
+                tutor.experience !== null &&
+                tutor.experience !== "" &&
+                Number.isFinite(
+                  Number(tutor.experience)
+                ) &&
+                Number(tutor.experience) >= 0;
+
+              return (
+                <div
+                  key={tutor._id}
+                  style={styles.tutorCard}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform =
+                      "scale(1.03)";
+                    e.currentTarget.style.boxShadow =
+                      "0 10px 25px rgba(0,0,0,0.18)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform =
+                      "scale(1)";
+                    e.currentTarget.style.boxShadow =
+                      "0 2px 8px rgba(0,0,0,0.1)";
+                  }}
+                >
+
+                  {/* 튜터 프로필 이미지 */}
+                  <img
+                    src={getImageUrl(tutor)}
+                    alt={`${tutor.name} 프로필`}
+                    onError={(e) => {
+                      if (
+                        !e.currentTarget.src.endsWith(
+                          DEFAULT_IMAGE
+                        )
+                      ) {
+                        e.currentTarget.src =
+                          DEFAULT_IMAGE;
+                      }
+                    }}
+                    style={styles.tutorImage}
+                  />
+
+                  {/* 튜터 이름 */}
+                  <h3 style={styles.tutorName}>
+                    {tutor.name}
+                  </h3>
+
+                  {/* 튜터 경력 */}
+                  <p style={styles.tutorExperience}>
+                    {hasExperience
+                      ? `경력: ${tutor.experience}년`
+                      : "한국어 튜터"}
+                  </p>
+
+                  {/* 승인 튜터 표시 */}
+                  <p
+                    style={{
+                      fontSize: "12px",
+                      color: "#2563eb",
+                      fontWeight: 600,
+                      marginBottom: "12px",
+                    }}
+                  >
+                    ✓ ROKMUN 승인 튜터
+                  </p>
+
+                  {/* 상세 페이지 이동 */}
+                  <Link
+                    to={`/tutors/${tutor._id}`}
+                    style={styles.detailLink}
+                  >
+                    자세히 보기 →
+                  </Link>
+
+                </div>
+              );
+            })
+          )}
 
         </div>
-      ))
-    )}
-  </div>
-</section>
 
+      </section>
+
+      {/* 하단 푸터 */}
       <footer style={styles.footer}>
-        <p>© 2025 ROKMUN. All rights reserved.</p>
+        <p>
+          © 2025 ROKMUN. All rights reserved.
+        </p>
       </footer>
+
     </div>
   );
 }
