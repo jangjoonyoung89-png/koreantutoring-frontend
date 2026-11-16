@@ -356,10 +356,18 @@ function StudentBookingList({ studentId }) {
           bookingStatus === "pending" ||
           bookingStatus === "confirmed";
 
+         // ======================
+        // 리뷰 작성 여부 확인
+        // ======================
+        const hasReviewed =
+          booking.reviewed === true ||
+          Boolean(booking.review?._id);
+
+        // 완료된 수업 중 아직 리뷰를
+        // 작성하지 않은 수업만 작성 가능
         const canReview =
-          bookingStatus === "pending" ||
-          bookingStatus === "confirmed" ||
-          bookingStatus === "completed";
+          bookingStatus === "completed" &&
+          !hasReviewed;
 
         return (
           <article
@@ -477,6 +485,85 @@ function StudentBookingList({ studentId }) {
 
             </div>
 
+  {/* ======================
+                수업 완료 및 예약 이력 안내
+                ====================== */}
+            {bookingStatus === "completed" && (
+              <div
+                style={{
+                  marginTop: "12px",
+                  padding: "14px",
+                  backgroundColor: "#F0F7FF",
+                  border: "1px solid #DBEAFE",
+                  borderRadius: "9px",
+                }}
+              >
+
+                <p
+                  style={{
+                    fontSize: "13px",
+                    fontWeight: 700,
+                    color: "#0077CC",
+                    margin: "0 0 7px",
+                  }}
+                >
+                  수업 완료 기록
+                </p>
+
+                {booking.completedAt &&
+                  !Number.isNaN(
+                    new Date(
+                      booking.completedAt
+                    ).getTime()
+                  ) && (
+                    <p
+                      style={{
+                        fontSize: "12px",
+                        color: "#475569",
+                        margin: "0 0 7px",
+                        lineHeight: 1.6,
+                      }}
+                    >
+                      완료 처리 일시:{" "}
+                      {new Date(
+                        booking.completedAt
+                      ).toLocaleString("ko-KR", {
+                        timeZone: "Asia/Seoul",
+                      })}
+                    </p>
+                  )}
+
+                <p
+                  style={{
+                    fontSize: "12px",
+                    color: "#64748B",
+                    margin: 0,
+                    lineHeight: 1.6,
+                  }}
+                >
+                  완료된 수업은 학습 이력으로 보존됩니다.
+                  {" "}
+                  {hasReviewed
+                    ? "이 수업의 리뷰가 작성되었습니다."
+                    : "아래에서 수업 리뷰를 작성할 수 있습니다."}
+                </p>
+
+              </div>
+            )}
+
+            {bookingStatus === "canceled" && (
+              <p
+                style={{
+                  fontSize: "12px",
+                  color: "#64748B",
+                  margin: "10px 0 0",
+                  lineHeight: 1.6,
+                }}
+              >
+                취소된 예약도 예약 이력에 보존됩니다.
+              </p>
+            )}
+
             {/* ======================
                 수업 요청사항
                 ====================== */}
@@ -505,24 +592,182 @@ function StudentBookingList({ studentId }) {
               </div>
             )}
 
+             {/* ======================
+                작성 완료된 리뷰 표시
+                ====================== */}
+            {bookingStatus === "completed" &&
+              hasReviewed && (
+                <div
+                  style={{
+                    ...styles.reviewSection,
+                    backgroundColor: "#F8FBFF",
+                    padding: "16px",
+                  }}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "8px",
+                      marginBottom: "12px",
+                    }}
+                  >
+                    <CheckCircleIcon
+                      style={{
+                        width: 21,
+                        height: 21,
+                        color: "#16A34A",
+                        flexShrink: 0,
+                      }}
+                    />
+
+                    <strong
+                      style={{
+                        fontSize: "14px",
+                        color: "#15803D",
+                      }}
+                    >
+                      리뷰 작성 완료
+                    </strong>
+                  </div>
+
+                  {booking.review && (
+                    <>
+                      {/* 작성한 평점 */}
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "10px",
+                          marginBottom: "10px",
+                        }}
+                      >
+                        <span
+                          aria-label={`평점 ${booking.review.rating}점`}
+                          style={{
+                            color: "#EAB308",
+                            fontSize: "22px",
+                            letterSpacing: "2px",
+                          }}
+                        >
+                          {Array.from(
+                            { length: 5 },
+                            (_, index) =>
+                              index <
+                              Number(
+                                booking.review.rating
+                              )
+                                ? "★"
+                                : "☆"
+                          ).join("")}
+                        </span>
+
+                        <strong
+                          style={{
+                            color: "#15365C",
+                            fontSize: "14px",
+                          }}
+                        >
+                          {Number(
+                            booking.review.rating
+                          ).toFixed(1)}
+                        </strong>
+                      </div>
+
+                      {/* 작성한 리뷰 내용 */}
+                      <p
+                        style={{
+                          fontSize: "13px",
+                          color: "#475569",
+                          lineHeight: 1.8,
+                          margin: "0 0 10px",
+                          whiteSpace: "pre-wrap",
+                          overflowWrap: "anywhere",
+                        }}
+                      >
+                        {booking.review.comment}
+                      </p>
+
+                      {/* 리뷰 작성 날짜 */}
+                      {booking.review.createdAt &&
+                        !Number.isNaN(
+                          new Date(
+                            booking.review.createdAt
+                          ).getTime()
+                        ) && (
+                          <p
+                            style={{
+                              fontSize: "11px",
+                              color: "#94A3B8",
+                              margin: 0,
+                            }}
+                          >
+                            작성일:{" "}
+                            {new Date(
+                              booking.review.createdAt
+                            ).toLocaleDateString(
+                              "ko-KR",
+                              {
+                                timeZone: "Asia/Seoul",
+                              }
+                            )}
+                          </p>
+                        )}
+                    </>
+                  )}
+
+                  <p
+                    style={{
+                      fontSize: "12px",
+                      color: "#64748B",
+                      lineHeight: 1.6,
+                      margin: "12px 0 0",
+                    }}
+                  >
+                    이 수업에 대한 리뷰가 등록되었습니다.
+                    소중한 학습 경험을 공유해 주셔서
+                    감사합니다.
+                  </p>
+                </div>
+              )}
+
             {/* ======================
-                기존 리뷰 작성 기능
-                취소된 예약에서는 숨김
+                수업 완료 후 리뷰 작성
+                아직 리뷰가 없는 수업만 표시
                 ====================== */}
             {canReview &&
+              bookingId &&
               tutorId &&
               currentStudentId && (
                 <details style={styles.reviewSection}>
 
                   <summary style={styles.reviewSummary}>
-                    수업 리뷰 작성
+                    ⭐ 수업 리뷰 작성하기
                   </summary>
 
                   <div style={styles.reviewBody}>
 
+                    <p
+                      style={{
+                        fontSize: "13px",
+                        color: "#64748B",
+                        lineHeight: 1.7,
+                        margin: "0 0 16px",
+                      }}
+                    >
+                      완료된 수업에 대한 경험을 남겨 주세요.
+                      작성하신 리뷰는 다른 학습자들이
+                      튜터를 선택하는 데 도움이 됩니다.
+                    </p>
+
                     <ReviewForm
+                      key={bookingId}
+                      bookingId={bookingId}
                       tutorId={tutorId}
                       studentId={currentStudentId}
+                      onReviewSubmitted={() =>
+                        fetchBookings()
+                      }
                     />
 
                   </div>

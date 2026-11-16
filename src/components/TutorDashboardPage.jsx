@@ -122,31 +122,136 @@ export default function TutorDashboardPage() {
 
   const rejected = tutor?.rejected === true;
 
+   // =============================
+  // 수업 완료 가능 시간 확인
   // =============================
-  // 예약 확정 및 거절
+
+  const LESSON_DURATION_MINUTES = 60;
+
+  const [currentTime, setCurrentTime] = useState(
+    Date.now()
+  );
+
+  // 30초마다 현재 시간 갱신
+  // 수업 종료 시 새로고침 없이 버튼 표시
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(Date.now());
+    }, 30000);
+
+    return () => clearInterval(timer);
+  }, []);
+
+  const canCompleteBooking = (
+    booking,
+    now = currentTime
+  ) => {
+    if (
+      !booking ||
+      booking.status !== "confirmed" ||
+      !booking.date ||
+      !booking.time
+    ) {
+      return false;
+    }
+
+    // 날짜 및 시간 형식 확인
+    if (
+      !/^\d{4}-\d{2}-\d{2}$/.test(booking.date) ||
+      !/^([01]\d|2[0-3]):[0-5]\d$/.test(
+        booking.time
+      )
+    ) {
+      return false;
+    }
+
+    // 한국 시간 기준 수업 시작 시각
+    const lessonStart = new Date(
+      `${booking.date}T${booking.time}:00+09:00`
+    ).getTime();
+
+    if (Number.isNaN(lessonStart)) {
+      return false;
+    }
+
+    // 수업 종료 시각
+    const lessonEnd =
+      lessonStart +
+      LESSON_DURATION_MINUTES * 60 * 1000;
+
+    return now >= lessonEnd;
+  };
+
   // =============================
-  const handleBookingAction = async (booking, action) => {
+  // 예약 확정 / 거절 / 수업 완료
+  // =============================
+
+  const handleBookingAction = async (
+    booking,
+    action
+  ) => {
     if (
       processingBooking ||
       !token ||
       !approved ||
       rejected ||
-      booking.status !== "pending" ||
-      !booking._id
+      !booking?._id
     ) {
       return;
     }
 
-    if (action !== "confirm" && action !== "reject") {
+    // 허용된 예약 처리 기능 확인
+    if (
+      !["confirm", "reject", "complete"].includes(
+        action
+      )
+    ) {
       return;
     }
 
-    const label = action === "confirm" ? "확정" : "거절";
+    // 예약 확정 및 거절은 대기 상태에서만 가능
+    if (
+      (action === "confirm" ||
+        action === "reject") &&
+      booking.status !== "pending"
+    ) {
+      return;
+    }
+
+    // 수업 완료는 확정 상태에서만 가능
+    if (action === "complete") {
+      if (
+        booking.status !== "confirmed" ||
+        !canCompleteBooking(booking, Date.now())
+      ) {
+        setBookingError(
+          "수업 종료 후에 완료 처리할 수 있습니다."
+        );
+        return;
+      }
+    }
+
+    // 처리 기능별 안내 문구
+    const actionLabels = {
+      confirm: "확정",
+      reject: "거절",
+      complete: "완료 처리",
+    };
+
+    const label = actionLabels[action];
+
+    const confirmMessage =
+      action === "complete"
+        ? `이 수업을 완료 처리하시겠습니까?\n\n` +
+          `수업 날짜: ${booking.date}\n` +
+          `수업 시간: ${booking.time}\n\n` +
+          `실제로 수업을 마친 경우에만 완료해 주세요.`
+        : `이 수업 예약을 ${label}하시겠습니까?\n\n` +
+          `수업 날짜: ${booking.date}\n` +
+          `수업 시간: ${booking.time}`;
 
     const confirmed = window.confirm(
-      `이 수업 예약을 ${label}하시겠습니까?\n\n` +
-      `수업 날짜: ${booking.date}\n` +
-      `수업 시간: ${booking.time}`
+      confirmMessage
     );
 
     if (!confirmed) return;
@@ -156,6 +261,7 @@ export default function TutorDashboardPage() {
     setBookingError("");
 
     try {
+      // 예약 확정 / 거절 / 수업 완료 API
       const res = await axios.patch(
         `${API_URL}/bookings/${booking._id}/${action}`,
         {},
@@ -168,8 +274,30 @@ export default function TutorDashboardPage() {
 
       const updated = res.data.booking;
 
-      if (!updated || updated._id !== booking._id) {
-        throw new Error("예약 응답을 확인할 수 없습니다.");
+      // 서버 응답 확인
+      if (
+        !updated ||
+        updated._id !== booking._id
+      ) {
+        throw new Error(
+          "예약 응답을 확인할 수 없습니다."
+        );
+      }
+
+      // 처리된 예약 상태 검증
+      const expectedStatuses = {
+        confirm: "confirmed",
+        reject: "canceled",
+        complete: "completed",
+      };
+
+      if (
+        updated.status !==
+        expectedStatuses[action]
+      ) {
+        throw new Error(
+          "변경된 예약 상태를 확인할 수 없습니다."
+        );
       }
 
       // 변경된 예약 상태를 화면에 즉시 반영
@@ -181,18 +309,26 @@ export default function TutorDashboardPage() {
         )
       );
 
+      // 처리 성공 안내
       setBookingMessage(
         res.data.message ||
-        `수업 예약이 ${label}되었습니다.`
+          (action === "complete"
+            ? "수업이 완료 처리되었습니다."
+            : `수업 예약이 ${label}되었습니다.`)
       );
+
     } catch (err) {
-      console.error("예약 처리 실패:", err);
+      console.error(
+        "예약 처리 실패:",
+        err
+      );
 
       setBookingError(
         err.response?.data?.message ||
-        err.response?.data?.detail ||
-        "예약 처리에 실패했습니다. 새로고침 후 상태를 확인해 주세요."
+          err.response?.data?.detail ||
+          "예약 처리에 실패했습니다. 새로고침 후 상태를 확인해 주세요."
       );
+
     } finally {
       setProcessingBooking(null);
     }
@@ -665,13 +801,83 @@ export default function TutorDashboardPage() {
                         </div>
                       )}
 
-                    {/* 예약 확정 완료 안내 */}
+                    {/* =========================
+                        예약 확정 및 수업 완료 처리
+                        ========================= */}
                     {b.status === "confirmed" && (
-                      <div className="mt-4 pt-4 border-t border-gray-100">
+                      <div className="mt-4 pt-4 border-t border-gray-100 space-y-3">
+
                         <p className="text-sm text-green-700 flex items-center gap-2">
                           <FaCheckCircle />
                           수업 예약이 확정되었습니다.
                         </p>
+
+                        {approved && !rejected && (
+                          <>
+                            {canCompleteBooking(b) ? (
+                              <>
+                                <p className="text-sm text-blue-700">
+                                  수업 종료 시간이 지났습니다.
+                                </p>
+
+                                <button
+                                  type="button"
+                                  disabled={
+                                    processingBooking !== null
+                                  }
+                                  onClick={() =>
+                                    handleBookingAction(
+                                      b,
+                                      "complete"
+                                    )
+                                  }
+                                  className="inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-4 py-2 rounded-lg text-sm font-semibold transition"
+                                >
+                                  <FaCheckCircle />
+
+                                  {processingBooking === b._id
+                                    ? "처리 중..."
+                                    : "수업 완료 처리"}
+                                </button>
+                              </>
+                            ) : (
+                              <p className="text-xs text-gray-500 flex items-center gap-2">
+                                <FaClock />
+                                수업 종료 후 완료 처리할 수 있습니다.
+                              </p>
+                            )}
+                          </>
+                        )}
+
+                      </div>
+                    )}
+
+                    {/* =========================
+                        수업 완료 안내
+                        ========================= */}
+                    {b.status === "completed" && (
+                      <div className="mt-4 pt-4 border-t border-gray-100 space-y-2">
+
+                        <p className="text-sm text-blue-700 flex items-center gap-2 font-semibold">
+                          <FaCheckCircle />
+                          수업이 정상적으로 완료되었습니다.
+                        </p>
+
+                        {b.completedAt && (
+                          <p className="text-xs text-gray-500">
+                            완료 처리 일시:{" "}
+                            {new Date(
+                              b.completedAt
+                            ).toLocaleString("ko-KR", {
+                              timeZone: "Asia/Seoul",
+                            })}
+                          </p>
+                        )}
+
+                        <p className="text-xs text-gray-500">
+                          완료된 수업은 예약 이력에 보존됩니다.
+                        </p>
+
                       </div>
                     )}
 
