@@ -4,14 +4,16 @@ import axios from "axios";
 // API 기본 설정
 // ======================
 const API_BASE_URL =
-  process.env.REACT_APP_API_URL?.trim() ||
-  "https://api.rokmun.com";
+  process.env.NODE_ENV === "production"
+    ? "https://api.rokmun.com"
+    : process.env.REACT_APP_API_URL?.trim() ||
+      "https://api.rokmun.com";
 
 console.log("📡 API Base URL:", API_BASE_URL);
 
 const api = axios.create({
   baseURL: API_BASE_URL,
-  withCredentials: true, // 인증 쿠키 포함
+  withCredentials: true,
 });
 
 // ======================
@@ -61,13 +63,14 @@ export const getTutorById = async (id) => {
   return data;
 };
 
+// 튜터 목록 및 평점 조회
+// 최신 백엔드의 /api/tutors에서 평점 정보도 반환
 export const getTutorsWithRating = async () => {
-  const { data } = await api.get("/api/tutors/with-rating");
+  const { data } = await api.get("/api/tutors");
 
-  // 응답 구조 안전 처리
   if (Array.isArray(data)) {
     return data;
-  } else if (data?.tutors) {
+  } else if (Array.isArray(data?.tutors)) {
     return data.tutors;
   } else {
     console.warn("⚠️ 예상치 못한 튜터 응답 구조:", data);
@@ -91,9 +94,14 @@ export const uploadTutorVideo = async (id, file) => {
   const formData = new FormData();
   formData.append("video", file);
 
-  const { data } = await api.post(`/api/tutors/${id}/upload-video`, formData, {
-    headers: { "Content-Type": "multipart/form-data" },
-  });
+  const { data } = await api.post(
+    `/api/tutors/${id}/upload-video`,
+    formData,
+    {
+      headers: { "Content-Type": "multipart/form-data" },
+    }
+  );
+
   return data;
 };
 
@@ -118,8 +126,13 @@ export const cancelBooking = async (id) => {
 // ======================
 // 리뷰 관련
 // ======================
+
+// 특정 튜터의 리뷰 목록 조회
+// 백엔드 reviews.js의 실제 경로와 일치
 export const getReviews = async (tutorId) => {
-  const { data } = await api.get(`/api/reviews?tutor=${tutorId}`);
+  const { data } = await api.get(
+    `/api/reviews/tutor/${tutorId}`
+  );
   return data;
 };
 
@@ -140,6 +153,7 @@ export const uploadMaterial = async (file, title, bookingId) => {
   const { data } = await api.post("/api/materials", formData, {
     headers: { "Content-Type": "multipart/form-data" },
   });
+
   return data;
 };
 
