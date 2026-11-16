@@ -18,7 +18,9 @@ function AdminLoginPage() {
   // ------------------------------
   // 🌐 API 기본 URL
   // ------------------------------
-  const API_URL = (process.env.REACT_APP_API_URL || "http://localhost:8000").trim();
+  const API_URL = (
+  process.env.REACT_APP_API_URL || "https://api.rokmun.com"
+).trim();
 
   // ------------------------------
   // 🔐 로그인 처리 함수
@@ -30,10 +32,10 @@ function AdminLoginPage() {
 
     try {
       // 서버에 로그인 요청
-      const res = await axios.post(`${API_URL}/api/admin/login`, {
-        email,
-        password,
-      });
+      const res = await axios.post(`${API_URL}/admin/login`, {
+  email: email.trim().toLowerCase(),
+  password,
+});
 
       const { token, user } = res.data;
 
@@ -53,9 +55,12 @@ function AdminLoginPage() {
       console.error("❌ 관리자 로그인 오류:", err);
 
       // 백엔드에서 반환한 에러 메시지 처리
-      if (err.response?.data?.detail) {
-        setError(err.response.data.detail);
-      } else if (err.code === "ERR_NETWORK") {
+      if (err.response?.data?.detail || err.response?.data?.message) {
+  setError(
+    err.response.data.detail || err.response.data.message
+  );
+}
+      else if (err.code === "ERR_NETWORK") {
         setError("서버 연결에 실패했습니다. 서버가 실행 중인지 확인하세요.");
       } else {
         setError("이메일 또는 비밀번호가 올바르지 않습니다.");
