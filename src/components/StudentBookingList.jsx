@@ -79,7 +79,7 @@ const UNKNOWN_STATUS = {
   icon: ExclamationCircleIcon,
 };
 
-function StudentBookingList({ studentId }) {
+function StudentBookingList({ studentId, onReviewSubmitted }) {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -765,9 +765,10 @@ function StudentBookingList({ studentId }) {
                       bookingId={bookingId}
                       tutorId={tutorId}
                       studentId={currentStudentId}
-                      onReviewSubmitted={() =>
-                        fetchBookings()
-                      }
+                      onReviewSubmitted={() => {
+                        fetchBookings();
+                        onReviewSubmitted?.();
+                      }}
                     />
 
                   </div>

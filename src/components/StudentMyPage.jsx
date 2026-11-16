@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { Link } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import StudentBookingList from "./StudentBookingList";
@@ -16,7 +16,7 @@ import {
 
 function StudentMyPage() {
   const { user } = useContext(AuthContext);
-
+  const [reviewRefreshKey, setReviewRefreshKey] = useState(0);
   if (!user || user.role !== "student") {
     return (
       <div style={styles.accessDenied}>
@@ -198,8 +198,11 @@ function StudentMyPage() {
           </div>
 
           <div style={styles.cardBody}>
-            <StudentBookingList
+             <StudentBookingList
               studentId={studentId}
+              onReviewSubmitted={() =>
+                setReviewRefreshKey((prev) => prev + 1)
+              }
             />
           </div>
         </section>
@@ -226,7 +229,10 @@ function StudentMyPage() {
           </div>
 
           <div style={styles.cardBody}>
-            <MyReviewList studentId={studentId} />
+            <MyReviewList
+              key={reviewRefreshKey}
+              studentId={studentId}
+            />
           </div>
         </section>
 
