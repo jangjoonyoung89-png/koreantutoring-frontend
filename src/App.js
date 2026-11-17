@@ -1761,7 +1761,7 @@ const styles = {
   navLink: {
     color: "#ffffff",
     textDecoration: "none",
-    fontSize: "16px",
+    fontSize: "22px",
     fontWeight: 600,
     display: "inline-block",
     whiteSpace: "nowrap",
