@@ -40,3 +40,22 @@
 .nav-menu-link:hover {
   transform: scale(1.1);
 }
+
+/* ========================================
+   ROKMUN 예약 달력 - 주말 색상
+======================================== */
+
+/* 토요일: 파란색 */
+.react-calendar__month-view__days__day.rokmun-saturday:not(.react-calendar__tile--active):not(:disabled) {
+  color: #2563eb;
+}
+
+/* 일요일: 빨간색 */
+.react-calendar__month-view__days__day.rokmun-sunday:not(.react-calendar__tile--active):not(:disabled) {
+  color: #dc2626;
+}
+
+/* 선택한 날짜: 기존 선택 색상 유지 */
+.react-calendar__tile--active {
+  color: #ffffff;
+}

@@ -118,7 +118,7 @@ function TutorListPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+     <div className="bg-gray-50 h-full">
 
       {/* 상단 타이틀 */}
       <div className="text-center py-10 px-4">

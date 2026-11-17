@@ -1,7 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
-import VideoClassPage from "./VideoClassPage";
 
 // 샘플 테스트용 데이터
 const sampleBooking = {

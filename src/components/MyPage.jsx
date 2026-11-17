@@ -2,6 +2,8 @@ import React, { useEffect, useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 
+const API_URL = (process.env.REACT_APP_API_URL || "http://localhost:8000").trim();
+
 function MyPage() {
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();
@@ -11,8 +13,7 @@ function MyPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
 
-  const API_URL = (process.env.REACT_APP_API_URL || "http://localhost:8000").trim();
-
+  
   // ============================
   // ✅ 사용자 및 예약 정보 불러오기
   // ============================

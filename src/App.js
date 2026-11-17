@@ -10,7 +10,7 @@ import {
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import api from "./api";
-import { AuthProvider, AuthContext, useAuth } from "./context/AuthContext";
+import { AuthProvider, AuthContext, } from "./context/AuthContext";
 import { AdminAuthProvider, useAdminAuth } from "./context/AdminAuthContext";
 
 // ----------------------
@@ -21,6 +21,8 @@ import LoginPage from "./components/LoginPage";
 import ForgotPasswordPage from "./components/ForgotPasswordPage";
 import ResetPasswordPage from "./components/ResetPasswordPage";
 import TutorListPage from "./components/TutorListPage";
+import ResidencyKoreanPage from "./components/ResidencyKoreanPage";
+import Footer from "./components/Footer";
 import BookingForm from "./components/BookingForm";
 import StudentMyPage from "./components/StudentMyPage";
 import MyPage from "./components/MyPage";
@@ -106,7 +108,15 @@ function Navbar() {
           style={styles.navLink}
           className="nav-menu-link"
         >
-          TUTOR
+          TUTORING
+        </Link>
+
+        <Link
+          to="/residency-korean"
+          style={styles.navLink}
+          className="nav-menu-link"
+        >
+          RESIDENCY KOREAN
         </Link>
 
         {/* 로그인하지 않은 사용자 */}
@@ -338,6 +348,131 @@ function MainPage() {
         </Link>
 
       </section>
+{/* ROKMUN 교육 서비스 */}
+      <section className="max-w-6xl mx-auto px-4 sm:px-6 py-10">
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+          {/* 한국어 튜터링 */}
+          <article className="bg-white border border-blue-100 rounded-2xl p-6 md:p-8 shadow-sm hover:shadow-lg transition-shadow flex flex-col">
+
+            <div
+              className="w-12 h-12 rounded-xl flex items-center justify-center mb-5"
+              style={{ backgroundColor: "#e8f2ff" }}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="28"
+                height="28"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#0077cc"
+                strokeWidth="1.7"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M2 10l10-5 10 5-10 5-10-5z" />
+                <path d="M6 12v5c3 3 9 3 12 0v-5" />
+                <path d="M22 10v6" />
+              </svg>
+            </div>
+
+            <h2
+              className="text-2xl font-bold mb-2"
+              style={{ color: "#0c3970" }}
+            >
+              한국어 튜터링
+            </h2>
+
+            <p
+              className="text-sm font-medium mb-4"
+              style={{ color: "#0077cc" }}
+            >
+              Korean Tutoring
+            </p>
+
+            <p className="text-gray-600 leading-relaxed mb-6 flex-1">
+              나에게 맞는 튜터와 함께하는 1:1 한국어 수업.
+              학습 목표와 수준에 맞춰 한국어를 배워 보세요.
+            </p>
+
+            <Link
+              to="/tutors"
+              className="block text-center text-white font-semibold rounded-xl px-5 py-3 hover:opacity-90 transition"
+              style={{
+                backgroundColor: "#0077cc",
+                textDecoration: "none",
+              }}
+            >
+              튜터 찾아보기 →
+            </Link>
+
+          </article>
+
+          {/* 체류 단계 기반 한국어교육 */}
+          <article className="border border-blue-100 rounded-2xl p-6 md:p-8 shadow-sm hover:shadow-lg transition-shadow flex flex-col"
+            style={{ backgroundColor: "#f5f9ff" }}
+          >
+
+            <div
+              className="w-12 h-12 rounded-xl flex items-center justify-center mb-5"
+              style={{ backgroundColor: "#e8f2ff" }}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="28"
+                height="28"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#0077cc"
+                strokeWidth="1.7"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M12 7c-3-3-7-3-10-2v15c3-1 7-1 10 2 3-3 7-3 10-2V5c-3-1-7-1-10 2z" />
+                <path d="M12 7v15" />
+              </svg>
+            </div>
+
+            <h2
+              className="text-2xl font-bold mb-2"
+              style={{ color: "#0c3970" }}
+            >
+              체류 단계 기반 한국어교육
+            </h2>
+
+            <p
+              className="text-sm font-medium mb-4"
+              style={{ color: "#0077cc" }}
+            >
+              Residency-Based Korean Education
+            </p>
+
+            <p className="text-gray-600 leading-relaxed mb-6 flex-1">
+              입국 전부터 정착까지, 나의 한국 생활에 맞는
+              한국어교육. 체류 목적과 생활 환경에 필요한
+              한국어 능력을 준비합니다.
+            </p>
+
+            <Link
+              to="/residency-korean"
+              className="block text-center font-semibold rounded-xl px-5 py-3 bg-white hover:bg-blue-50 transition"
+              style={{
+                color: "#0077cc",
+                border: "1px solid #0077cc",
+                textDecoration: "none",
+              }}
+            >
+              교육 소개 →
+            </Link>
+
+          </article>
+
+        </div>
+
+      </section>
 
       {/* 추천 튜터 */}
       <section style={styles.section}>
@@ -469,12 +604,7 @@ function MainPage() {
 
       </section>
 
-      {/* 하단 푸터 */}
-      <footer style={styles.footer}>
-        <p>
-          © 2025 ROKMUN. All rights reserved.
-        </p>
-      </footer>
+      
 
     </div>
   );
@@ -1202,13 +1332,23 @@ function TutorDetailPage() {
                 <div className="flex justify-center overflow-hidden">
 
                   <Calendar
-                    value={selectedDate}
-                    minDate={new Date()}
-                    locale="ko-KR"
-                    onChange={handleDateChange}
-                    tileDisabled={() => booking}
-                    className="w-full rounded-xl"
-                  />
+  value={selectedDate}
+  minDate={new Date()}
+  locale="ko-KR"
+  onChange={handleDateChange}
+  tileDisabled={() => booking}
+  tileClassName={({ date, view }) => {
+    if (view !== "month") return "";
+
+    const day = date.getDay();
+
+    if (day === 6) return "rokmun-saturday";
+    if (day === 0) return "rokmun-sunday";
+
+    return "";
+  }}
+  className="w-full rounded-xl"
+/>
 
                 </div>
 
@@ -1442,10 +1582,7 @@ function TutorDetailPage() {
 
         </div>
 
-        {/* 하단 브랜드 */}
-        <footer className="text-center text-xs text-gray-400 py-8">
-          ROKMUN · 대한민국으로 향하는 모든 길
-        </footer>
+        
 
       </main>
 
@@ -1460,8 +1597,34 @@ export default function App() {
     <AuthProvider>
       <AdminAuthProvider>
         <BrowserRouter basename={process.env.PUBLIC_URL}>
-          <Navbar />
-          <AppRoutes />
+
+          <div
+            style={{
+              minHeight: "100vh",
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
+
+            {/* ROKMUN 공통 메뉴바 */}
+            <Navbar />
+
+            {/* 각 페이지의 콘텐츠 */}
+            <div
+              style={{
+                flex: "1 0 auto",
+                minWidth: 0,
+                backgroundColor: "#f9fafb",
+              }}
+            >
+              <AppRoutes />
+            </div>
+
+            {/* ROKMUN 공통 푸터 */}
+            <Footer />
+
+          </div>
+
         </BrowserRouter>
       </AdminAuthProvider>
     </AuthProvider>
@@ -1481,7 +1644,10 @@ function AppRoutes() {
       <Route path="/" element={<MainPage />} />
       <Route path="/tutors" element={<TutorListPage />} />
       <Route path="/tutors/:id" element={<TutorDetailPage />} />
-
+      <Route
+        path="/residency-korean"
+        element={<ResidencyKoreanPage />}
+      />
       {/* 회원가입/로그인 */}
       <Route path="/signup" element={<SignupPage />} />
       <Route path="/login" element={<LoginPage />} />
@@ -1571,30 +1737,36 @@ function AppRoutes() {
 // Styles
 // ----------------------
 const styles = {
-  navbar: {
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "center",
-  padding: "7px 2rem",
-  backgroundColor: "#0077cc",
-  color: "#ffffff",
-},
+   navbar: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    flexWrap: "wrap",
+    gap: "12px",
+    padding: "7px 2rem",
+    backgroundColor: "#0077cc",
+    color: "#ffffff",
+  },
   logo: {
     fontSize: "1.6rem",
     fontWeight: "bold",
   },
   navLinks: {
     display: "flex",
-    gap: "1.5rem",
+    flexWrap: "wrap",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: "1rem",
   },
   navLink: {
-  color: "#ffffff",
-  textDecoration: "none",
-  fontSize: "18px",
-  fontWeight: 600,
-  display: "inline-block",
-  transition: "transform 0.2s ease",
-},
+    color: "#ffffff",
+    textDecoration: "none",
+    fontSize: "16px",
+    fontWeight: 600,
+    display: "inline-block",
+    whiteSpace: "nowrap",
+    transition: "transform 0.2s ease",
+  },
   banner: {
   width: "100%",
   margin: 0,
@@ -1697,11 +1869,5 @@ bannerSubtitle: {
     color: "#2563eb",
     textDecoration: "none",
   },
-  footer: {
-  textAlign: "center",
-  padding: "1.2rem 0",
-  backgroundColor: "#0077cc",
-  marginTop: "4rem",
-  color: "#ffffff",
-},
+  
 };
