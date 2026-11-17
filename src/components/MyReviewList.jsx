@@ -25,6 +25,16 @@ function MyReviewList({ studentId }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+   // 리뷰 수정 상태
+  const [editingReviewId, setEditingReviewId] = useState(null);
+  const [editRating, setEditRating] = useState(5);
+  const [editComment, setEditComment] = useState("");
+  const [savingReview, setSavingReview] = useState(false);
+  const [editError, setEditError] = useState("");
+
+  // 리뷰 삭제 상태
+  const [deletingReviewId, setDeletingReviewId] = useState(null);
+
   // ======================
   // 내가 작성한 리뷰 조회
   // ======================
@@ -88,6 +98,169 @@ function MyReviewList({ studentId }) {
   useEffect(() => {
     fetchReviews();
   }, [fetchReviews]);
+
+  // ======================
+  // 리뷰 수정 시작
+  // ======================
+  const handleStartEdit = (review) => {
+    setEditingReviewId(review._id || review.id);
+    setEditRating(Number(review.rating));
+    setEditComment(review.comment || "");
+    setEditError("");
+  };
+
+  // ======================
+  // 리뷰 수정 취소
+  // ======================
+  const handleCancelEdit = () => {
+    setEditingReviewId(null);
+    setEditError("");
+  };
+
+  // ======================
+  // 리뷰 수정 저장
+  // ======================
+  const handleSaveReview = async (reviewId) => {
+    const trimmedComment = editComment.trim();
+
+    if (
+      !Number.isInteger(editRating) ||
+      editRating < 1 ||
+      editRating > 5
+    ) {
+      setEditError("평점은 1점부터 5점까지 선택해 주세요.");
+      return;
+    }
+
+    if (
+      trimmedComment.length < 1 ||
+      trimmedComment.length > 1000
+    ) {
+      setEditError(
+        "리뷰 내용은 1자 이상 1,000자 이하로 작성해 주세요."
+      );
+      return;
+    }
+
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      setEditError("로그인이 필요합니다.");
+      return;
+    }
+
+    setSavingReview(true);
+    setEditError("");
+
+    try {
+      const res = await fetch(
+        `${API_URL}/api/reviews/${reviewId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            rating: editRating,
+            comment: trimmedComment,
+          }),
+        }
+      );
+
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        setEditError(
+          data.message ||
+          data.detail ||
+          data.error ||
+          "리뷰 수정에 실패했습니다."
+        );
+        return;
+      }
+
+      // 서버에서 수정한 리뷰를 다시 조회하여
+      // 기존 튜터 정보와 화면 구성을 유지합니다.
+      await fetchReviews();
+
+      setEditingReviewId(null);
+      setEditError("");
+    } catch (err) {
+      console.error("리뷰 수정 오류:", err);
+      setEditError("서버와 연결할 수 없습니다.");
+    } finally {
+      setSavingReview(false);
+    }
+  };
+
+  // ======================
+  // 리뷰 삭제
+  // ======================
+  const handleDeleteReview = async (reviewId) => {
+    if (deletingReviewId !== null || savingReview) {
+      return;
+    }
+
+    const confirmed = window.confirm(
+      "정말 이 리뷰를 삭제하시겠습니까?\n삭제한 리뷰는 복구할 수 없습니다."
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      window.alert("로그인이 필요합니다.");
+      return;
+    }
+
+    setDeletingReviewId(reviewId);
+
+    try {
+      const res = await fetch(
+        `${API_URL}/api/reviews/${reviewId}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        window.alert(
+          data.message ||
+          data.detail ||
+          data.error ||
+          "리뷰 삭제에 실패했습니다."
+        );
+        return;
+      }
+
+      // 삭제된 리뷰를 목록에서 제거
+      setReviews((prev) =>
+        prev.filter(
+          (review) =>
+            String(review._id || review.id) !== String(reviewId)
+        )
+      );
+
+      setEditingReviewId(null);
+      setEditError("");
+
+      window.alert("리뷰가 삭제되었습니다.");
+    } catch (err) {
+      console.error("리뷰 삭제 오류:", err);
+      window.alert("서버와 연결할 수 없습니다.");
+    } finally {
+      setDeletingReviewId(null);
+    }
+  };
 
   // ======================
   // 리뷰 작성 날짜 표시
@@ -301,6 +474,258 @@ function MyReviewList({ studentId }) {
                 </p>
               </div>
             </div>
+
+            {/* 리뷰 수정 영역 */}
+            {editingReviewId === (review._id || review.id) ? (
+              <div
+                style={{
+                  marginTop: "16px",
+                  padding: "18px",
+                  backgroundColor: "#F6F9FD",
+                  border: "1px solid #E4EBF3",
+                  borderRadius: "10px",
+                }}
+              >
+                <h4
+                  style={{
+                    margin: "0 0 14px",
+                    color: "#15365C",
+                    fontSize: "15px",
+                    fontWeight: 800,
+                  }}
+                >
+                  수업 리뷰 수정
+                </h4>
+
+                <label
+                  style={{
+                    display: "block",
+                    marginBottom: "8px",
+                    fontWeight: 700,
+                    color: "#334155",
+                  }}
+                >
+                  수업 평점
+                </label>
+
+                <div
+                  style={{
+                    display: "flex",
+                    gap: "8px",
+                    marginBottom: "18px",
+                  }}
+                >
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      key={star}
+                      type="button"
+                      onClick={() => setEditRating(star)}
+                      disabled={savingReview}
+                      aria-label={`${star}점 선택`}
+                      aria-pressed={editRating === star}
+                      style={{
+                        border: "none",
+                        background: "transparent",
+                        padding: "2px",
+                        cursor: "pointer",
+                      }}
+                    >
+                      {star <= editRating ? (
+                        <SolidStarIcon
+                          style={{
+                            width: 28,
+                            height: 28,
+                            color: "#F5B301",
+                          }}
+                        />
+                      ) : (
+                        <StarIcon
+                          style={{
+                            width: 28,
+                            height: 28,
+                            color: "#CBD5E1",
+                          }}
+                        />
+                      )}
+                    </button>
+                  ))}
+
+                  <span
+                    style={{
+                      alignSelf: "center",
+                      marginLeft: "8px",
+                      fontWeight: 700,
+                      color: "#15365C",
+                    }}
+                  >
+                    {editRating}.0 / 5.0
+                  </span>
+                </div>
+
+                <label
+                  htmlFor={`edit-review-${review._id || review.id}`}
+                  style={{
+                    display: "block",
+                    marginBottom: "8px",
+                    fontWeight: 700,
+                    color: "#334155",
+                  }}
+                >
+                  수업 후기
+                </label>
+
+                <textarea
+                  id={`edit-review-${review._id || review.id}`}
+                  value={editComment}
+                  onChange={(e) => setEditComment(e.target.value)}
+                  disabled={savingReview}
+                  maxLength={1000}
+                  rows={4}
+                  style={{
+                    width: "100%",
+                    padding: "12px",
+                    border: "1px solid #CBD5E1",
+                    borderRadius: "8px",
+                    fontSize: "14px",
+                    lineHeight: 1.7,
+                    boxSizing: "border-box",
+                    resize: "vertical",
+                  }}
+                />
+
+                <p
+                  style={{
+                    margin: "5px 0 12px",
+                    textAlign: "right",
+                    fontSize: "12px",
+                    color: "#64748B",
+                  }}
+                >
+                  {editComment.length} / 1,000자
+                </p>
+
+                {editError && (
+                  <p
+                    role="alert"
+                    style={{
+                      color: "#DC2626",
+                      fontSize: "13px",
+                      marginBottom: "12px",
+                    }}
+                  >
+                    {editError}
+                  </p>
+                )}
+
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "flex-end",
+                    gap: "8px",
+                  }}
+                >
+                  <button
+                    type="button"
+                    onClick={handleCancelEdit}
+                    disabled={savingReview}
+                    style={{
+                      padding: "9px 16px",
+                      border: "1px solid #CBD5E1",
+                      borderRadius: "8px",
+                      backgroundColor: "#FFFFFF",
+                      color: "#475569",
+                      fontWeight: 700,
+                      cursor: "pointer",
+                    }}
+                  >
+                    취소
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() =>
+                      handleSaveReview(review._id || review.id)
+                    }
+                    disabled={savingReview}
+                    style={{
+                      padding: "9px 16px",
+                      border: "none",
+                      borderRadius: "8px",
+                      backgroundColor: "#0077CC",
+                      color: "#FFFFFF",
+                      fontWeight: 700,
+                      cursor: savingReview
+                        ? "not-allowed"
+                        : "pointer",
+                    }}
+                  >
+                    {savingReview ? "저장 중..." : "수정 저장"}
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "flex-end",
+                  gap: "8px",
+                  marginTop: "14px",
+                }}
+              >
+                {/* 수정 버튼 */}
+                <button
+                  type="button"
+                  onClick={() => handleStartEdit(review)}
+                  disabled={
+                    savingReview || deletingReviewId !== null
+                  }
+                  style={{
+                    padding: "8px 16px",
+                    border: "1px solid #CBD5E1",
+                    borderRadius: "8px",
+                    backgroundColor: "#FFFFFF",
+                    color: "#15365C",
+                    fontSize: "13px",
+                    fontWeight: 700,
+                    cursor:
+                      savingReview || deletingReviewId !== null
+                        ? "not-allowed"
+                        : "pointer",
+                  }}
+                >
+                  수정
+                </button>
+
+                {/* 삭제 버튼 */}
+                <button
+                  type="button"
+                  onClick={() =>
+                    handleDeleteReview(review._id || review.id)
+                  }
+                  disabled={
+                    savingReview || deletingReviewId !== null
+                  }
+                  style={{
+                    padding: "8px 16px",
+                    border: "1px solid #FECACA",
+                    borderRadius: "8px",
+                    backgroundColor: "#FFFFFF",
+                    color: "#DC2626",
+                    fontSize: "13px",
+                    fontWeight: 700,
+                    cursor:
+                      savingReview || deletingReviewId !== null
+                        ? "not-allowed"
+                        : "pointer",
+                  }}
+                >
+                  {deletingReviewId === (review._id || review.id)
+                    ? "삭제 중..."
+                    : "삭제"}
+                </button>
+              </div>
+            )}
+                
           </article>
         );
       })}
